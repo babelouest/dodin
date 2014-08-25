@@ -1076,6 +1076,7 @@ function initActionDialog($dialog, $action) {
         $pParamsSetpin.slideDown();
         $pParamsValue.slideDown();
         break;
+      case "88":
       case "99":
         // SYSTEM
         $devicesList.prop('disabled', true);
@@ -1162,7 +1163,7 @@ function initActionDialog($dialog, $action) {
        var values = action.params.split(',');
       $paramsSetpin.find('option[value="'+values[0]+'"]').prop('selected', true);
       $paramsValue.val(values[1]);
-    } else if (action.type == 99) {
+    } else if (action.type == 99 || action.type == 88) {
       $paramsSetpin.find('option[value="0"]').prop('selected', true);
       $paramsValue.val(action.params);
     } else {
@@ -1219,6 +1220,12 @@ function okAction($dialog) {
       return false;
     }
     params.params = $paramsSetpin.val()+','+$paramsValue.val();
+  } else if (params.type == 88) {
+    if ($paramsValue.val() == '') {
+      alert('Veuillez entrer une durée en millisecondes');
+      return false;
+    }
+    params.params = $paramsValue.val();
   } else if (params.type == 99) {
     if ($paramsValue.val() == '') {
       alert('Veuillez entrer une commande à exécuter sur le serveur');

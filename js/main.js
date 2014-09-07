@@ -9,8 +9,30 @@ var adminGlobal = false;
 var userLang = navigator.language || navigator.userLanguage;
 var globalMpd = [];
 
-$(document).ready(function(){
+// Init translation module and run application inside
+$.i18n.init({fallbackLng:'en'}, function() {
 
+function htmlI18n() {
+  $('html head').find('title').text($.t('Angharad Web Client'));
+  $('#admin-edit-TEMPLATE').attr('value', $.t('Edit device'));
+  $('#admin-reset-TEMPLATE').attr('value', $.t('Reset device'));
+  $('#admin-script-add-TEMPLATE').attr('value', $.t('Add'));
+  $('#admin-schedule-add-TEMPLATE').attr('value', $.t('Add'));
+  $('#admin-script-global-add').attr('value', $.t('Add'));
+  $('#admin-schedule-global-add').attr('value', $.t('Add'));
+  $('#admin-action-global-add').attr('value', $.t('Add'));
+  $('#dialog-script-action-add').attr('value', $.t('Add'));
+  $('#refresh').attr('value', $.t('Refresh'));
+  $('#dialog-script-action-up').attr('value', $.t('Up'));
+  $('#dialog-script-action-down').attr('value', $.t('Down'));
+  $('#dialog-script-action-remove').attr('value', $.t('Remove'));
+  $('.template').i18n();
+}
+
+$(document).ready(function() {
+  
+  htmlI18n();
+  
   initDevices();
   
   $(function() {
@@ -37,8 +59,8 @@ $(document).ready(function(){
         }
       },
       items: {
-        'edit': {name: 'Editer', icon: 'edit'},
-        'delete': {name: 'Supprimer', icon: 'delete'},
+        'edit': {name: $.t('Edit'), icon: 'edit'},
+        'delete': {name: $.t('Delete'), icon: 'delete'},
       }
     });
   });
@@ -49,17 +71,17 @@ $(document).ready(function(){
       trigger: 'left',
       callback: function (key, options) {
         if ($(this).attr('name').indexOf('admin-sensor-') == 0) {
-          modifSensor($(this));
+          editSensor($(this));
         } else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
-          modifSwitch($(this));
+          editSwitch($(this));
         } else if ($(this).attr('name').indexOf('admin-light-') == 0) {
-          modifLight($(this));
+          editLight($(this));
         } else if ($(this).attr('name').indexOf('admin-heater-') == 0) {
-          modifHeater($(this));
+          editHeater($(this));
         }
       },
       items: {
-        'edit': {name: 'Editer', icon: 'edit'},
+        'edit': {name: $.t('Edit'), icon: 'edit'},
       }
     });
   });
@@ -67,8 +89,10 @@ $(document).ready(function(){
 });
 
 function initDevices() {
+  // Language selection
+  
   var url = prefix+'/DEVICES/';
-  $('#message').text('Chargement des devices');
+  $('#message').text($.t('Loading'));
   $('#tabs ul').empty();
   var jqxhr = $.get( url, function(data) {
     var json = $.parseJSON(data);
@@ -92,7 +116,7 @@ function initDevices() {
         });
         overviewDevice(device.name);
       }
-      $('#tabs ul').append('<li><a href="#tab-global" id="href-global">Global</a></li>');
+      $('#tabs ul').append('<li><a href="#tab-global" id="href-global">'+$.t('Global')+'</a></li>');
       var template = $('#template-global').html();
       $('#tabs').append(template);
       $('#href-global').click(function(){
@@ -114,6 +138,12 @@ function initDevices() {
       $('#refresh').click(function () {
         refresh(true);
       });
+      
+      $('#global-lang-select option[value="'+$.i18n.options.lng+'"]').prop('selected', true);
+      
+      $('#global-lang-select').change(function() {
+        window.location = window.location.pathname + '?setLng=' + $(this).val();
+      });
 
       $('#tabs .tab').hide();
       $('#tabs div:first').show();
@@ -128,17 +158,17 @@ function initDevices() {
       $('#message').text('');
       
       var date = new Date();
-      $('#footer-message').text('Dernière synchronisation: '+date.toLocaleString());
+      $('#footer-message').text($.t('Last sync')+': '+date.toLocaleString());
     
     } else {
-      $('#message').text('Erreur lors du chargement des devices');
+      $('#message').text($.t('Error loading devices'));
     }
     setInterval(function() {
       refresh(false);
     }, 1000*60*5);
   })
   .fail(function() {
-    $('#message').text('Erreur, serveur inaccessible');
+    $('#message').text($.t('Error loading devices')+', '+$.t('network error'));
   });
 }
 
@@ -226,7 +256,7 @@ function overviewDevice(deviceId) {
                   //var json = $.parseJSON(data);
                 })
                 .fail(function() {
-                  $('#message-'+deviceId).text('Error setting heater');
+                  $('#message-'+deviceId).text($.t('Error setting heater'));
                 });
               }
             }
@@ -239,17 +269,21 @@ function overviewDevice(deviceId) {
             //var json = $.parseJSON(data);
           })
           .fail(function() {
-            $('#message-'+deviceId).text('Error setting heater');
+            $('#message-'+deviceId).text($.t('Error setting heater')+', '+$.t('network error'));
           });
           $('#he-slide-'+deviceId+'-'+$(this).attr('data-an-heater')).slider('option', 'disabled', !$(this).prop('checked'));
         });
+        if (!heater.enabled) {
+          $('#label-he-slide-'+deviceId+'-'+heater.name).hide();
+          $('#he-slide-'+deviceId+'-'+heater.name).hide();
+        }
       }
     }
-    
+
     initMusic(deviceId);
   })
   .fail(function() {
-    $('#message-'+deviceId).text('Error getting values');
+    $('#message-'+deviceId).text($.t('Error getting device values'));
   });
   
   $('#a-admin-'+deviceId).click(function() {
@@ -262,7 +296,7 @@ function overviewDevice(deviceId) {
   $('#admin-edit-'+deviceId).click(function() {
     for (key in devicesTab) {
       if (devicesTab[key].name == $(this).attr('data-an-device')) {
-        modifDevice(devicesTab[key]);
+        editDevice(devicesTab[key]);
       }
     }
     return false;
@@ -280,18 +314,18 @@ function overviewDevice(deviceId) {
 
 function resetDevice(device) {
   var $message = $('#header-message-'+device.name);
-  $message.text('Reconnexion');
+  $message.text($.t('Reset device'));
   var url = prefix + '/RESET/' + device.name;
   var jqxhr = $.get( url, function(data) {
     var json = $.parseJSON(data);
     if (json.result.response == 1 || json.result.response == 0) {
       $message.text('');
     } else {
-      $message.text('Erreur lors de la reconnexion');
+      $message.text($.t('Error reset device'));
     }
   })
   .fail(function() {
-    $message.text('Erreur de connexion au serveur');
+    $message.text($.t('Error reset device')+', '+$.t('network error'));
   })
 }
 
@@ -304,11 +338,11 @@ function setSwitchValue(device, pin, value) {
     if (json.result.response == 1 || json.result.response == 0) {
       $message.text('');
     } else {
-      $message.text(' - Error setting status');
+      $message.text($.t('Error setting switch'));
     }
   })
   .fail(function() {
-    $message.text(' - Error setting status');
+    $message.text($.t('Error setting switch')+', '+$.t('network error'));
   })
 }
 
@@ -322,11 +356,11 @@ function setLightValue(device, light, value) {
       $message.text('');
       refresh(false);
     } else {
-      $message.text(' - Error setting status');
+      $message.text($.t('Error setting switch'));
     }
   })
   .fail(function() {
-    $message.text(' - Error setting status');
+    $message.text($.t('Error setting switch')+', '+$.t('network error'));
   })
 }
 
@@ -357,7 +391,7 @@ function initScripts() {
     });
   })
   .fail(function() {
-    $message.text('Error setting status');
+    $message.text($.t('Error getting tasks'));
   })
   
 }
@@ -368,19 +402,19 @@ function runScript(scriptButton) {
   if ($(scriptButton).attr('data-an-device') != "") {
     $message = $('#message-script-'+$(scriptButton).attr('data-an-device')+'-'+scriptId);
   }
-  $message.text('En cours...');
+  $message.text($.t('Running')+'...');
   var url = prefix+'/RUNSCRIPT/'+scriptId;
   var jqxhr = $.get( url, function(data) {
     var json = $.parseJSON(data);
     if (json.result == 'ok') {
       $message.text('');
     } else {
-      $message.text('Erreur');
+      $message.text($.t('Error running task'));
     }
     refresh(false);
   })
   .fail(function() {
-    $message.text('Erreur lors de l\'exécution du script');
+    $message.text($.t('Error running task')+', '+$.t('network error'));
   })
 }
 
@@ -430,7 +464,7 @@ function initSchedules() {
     });
   })
   .fail(function() {
-    $('#message-global').text('Error getting schedules');
+    $('#message-global').text($.t('Error getting schedules'));
   })
 }
 
@@ -453,18 +487,18 @@ function enableSchedule($schedule, value) {
         $schedule.prop('checked', true);
       }
     } else {
-      $message.text('Error setting status');
+      $message.text($.t('Error setting schedule'));
     }
   })
   .fail(function() {
-    $message.text('Error setting status');
+    $message.text($.t('Error setting schedule')+', '+$.t('network error'));
   })
 }
 
 function refresh(force) {
   // Refresh schedules
   var urlSchedules = prefix+'/SCHEDULES/';
-  $('#header-message-global').text('Rafraîchissement...');
+  $('#header-message-global').text($.t('Loading')+'...');
   var footerMessage="";
   var jqxhr = $.get( urlSchedules, function(dataSchedule) {
     var jsonSchedule = $.parseJSON(dataSchedule);
@@ -472,28 +506,28 @@ function refresh(force) {
       var schedule = jsonSchedule.result[i];
       var nextTime = new Date(schedule.next_time * 1000);
       if (!schedule.enabled) {
-        $('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+' (Désactivé)');
+        $('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+' '+$.t('(Disabled)'));
         $('#schedule-'+schedule.device+'-'+schedule.id).prop('checked', false);
-        $('#message-schedule-'+schedule.id).text(schedule.name+' (Désactivé)');
+        $('#message-schedule-'+schedule.id).text(schedule.name+' '+$.t('(Disabled)'));
         $('#schedule-'+schedule.id).prop('checked', false);
       } else {
-        $('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+', Prochain lancement: '+nextTime.toLocaleString())
+        $('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+', '+$.t('Next launch')+': '+nextTime.toLocaleString())
         $('#schedule-'+schedule.device+'-'+schedule.id).prop('checked', true);
-        $('#message-schedule-'+schedule.id).text(schedule.name+', Prochain lancement: '+nextTime.toLocaleString())
+        $('#message-schedule-'+schedule.id).text(schedule.name+', '+$.t('Next launch')+': '+nextTime.toLocaleString())
         $('#schedule-'+schedule.id).prop('checked', true);
       }
     }
   })
   .fail(function() {
-    footerMessage = 'Error getting schedules';
+    footerMessage = $.t('Error getting schedules');
     $('#header-message-global').text(footerMessage);
   });
 
-	if (force) {
-		url = prefix+'/REFRESH/';
-	} else {
-		url = prefix+'/OVERVIEW/';
-	}
+  if (force) {
+    url = prefix+'/REFRESH/';
+  } else {
+    url = prefix+'/OVERVIEW/';
+  }
   // Refresh switches & sensors
   for (var key in devicesTab) {
     if (devicesTab[key].enabled) {
@@ -548,7 +582,7 @@ function refresh(force) {
         $('#header-message-global').text('');
       })
       .fail(function() {
-        footerMessage = 'Erreur lors de la récupération des données pour '+device;
+        footerMessage = $.t('Error when refreshing device ')+devicesTab[key].display;
         $('#header-message-global').text(footerMessage);
       });
       
@@ -560,71 +594,73 @@ function refresh(force) {
   
   var date = new Date();
   if (footerMessage != "") {
-    $('#footer-message').text('Dernière synchronisation: '+date.toLocaleString()+'<br/>'+footerMessage);
+    $('#footer-message').text($.t('Last sync')+': '+date.toLocaleString()+'<br/>'+footerMessage);
   } else {
-    $('#footer-message').text('Dernière synchronisation: '+date.toLocaleString());
+    $('#footer-message').text($.t('Last sync')+': '+date.toLocaleString());
   }
 }
 
-function modifDevice(device) {
-	var $dialog = $('#dialog-device');
-	$dialog.find('#dialog-device-name').text(device.name);
-	$dialog.find('#dialog-device-display').val(device.display);
-	$dialog.find('#dialog-device-enabled').prop('checked', device.enabled);
-	
-	$dialog.on('keypress', function(e) {
-		var code = (e.keyCode ? e.keyCode : e.which);
-		if(code == 13) {
-			var curName=device.name;
-			var curDisplay=$(this).find('#dialog-device-display').val();
-			var curEnabled=$(this).find('#dialog-device-enabled').prop('checked')?'true':'false';
-			
-			okDialogDevice(curName, curDisplay, curEnabled);
-			
-			$( this ).dialog( 'close' );
-		}
-	});
-	
-	$dialog.dialog({
-		autoOpen: false,
-		width: 400,
-		modal: true,
-		buttons: {
-			'Ok':function() {
-				var curName=device.name;
-				var curDisplay=$(this).find('#dialog-device-display').val();
-				var curEnabled=$(this).find('#dialog-device-enabled').prop('checked')?'true':'false';
-				
-				okDialogDevice(curName, curDisplay, curEnabled);
-				
-				$( this ).dialog( 'close' );
-			}
-		}
-	});
-	
-	$dialog.dialog('open');
+function editDevice(device) {
+  var $dialog = $('#dialog-device');
+  $dialog.find('#dialog-device-name').text(device.name);
+  $dialog.find('#dialog-device-display').val(device.display);
+  $dialog.find('#dialog-device-enabled').prop('checked', device.enabled);
+  
+  $dialog.on('keypress', function(e) {
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if(code == 13) {
+      var curName=device.name;
+      var curDisplay=$(this).find('#dialog-device-display').val();
+      var curEnabled=$(this).find('#dialog-device-enabled').prop('checked')?'true':'false';
+      
+      okDialogDevice(curName, curDisplay, curEnabled);
+      
+      $( this ).dialog( 'close' );
+    }
+  });
+  
+  $dialog.dialog({
+    autoOpen: false,
+    width: 400,
+    modal: true,
+    title: $.t('Edit a device'),
+    buttons: [{
+      text:$.t('Ok'),
+      click:function() {
+        var curName=device.name;
+        var curDisplay=$(this).find('#dialog-device-display').val();
+        var curEnabled=$(this).find('#dialog-device-enabled').prop('checked')?'true':'false';
+        
+        okDialogDevice(curName, curDisplay, curEnabled);
+        
+        $( this ).dialog( 'close' );
+      }
+    }]
+  });
+  
+  $dialog.dialog('open');
 }
 
 function okDialogDevice(curName, curDisplay, curEnabled) {
-	var url = prefix+'/SETDEVICEDATA/';
-	
-	var $posting = $.post(url,
-		{name: curName, display: curDisplay, enabled: curEnabled}
-	);
-	
-	$posting.done(function(data) {
-		var json = $.parseJSON(data);
-		$('a#href-'+json.device.name).text(json.device.display);
+  var url = prefix+'/SETDEVICEDATA/';
+  
+  var $posting = $.post(url,
+    {name: curName, display: curDisplay, enabled: curEnabled}
+  );
+  
+  $posting.done(function(data) {
+    var json = $.parseJSON(data);
+    $('a#href-'+json.device.name).text(json.device.display);
     
     for (var key in devicesTab) {
       if (devicesTab[key].name == curName) {
         devicesTab[key] = {name: curName, display: curDisplay, enabled: curEnabled};
       }
     }
-	});
+  });
 }
 
-function modifSensor($sensorAdminButton) {
+function editSensor($sensorAdminButton) {
   for (var i=0; i<globalOverview[$sensorAdminButton.attr('data-an-device')].sensors.length; i++) {
     if ($sensorAdminButton.attr('data-an-sensor') == globalOverview[$sensorAdminButton.attr('data-an-device')].sensors[i].name) {
       var curSensor = globalOverview[$sensorAdminButton.attr('data-an-device')].sensors[i];
@@ -652,8 +688,9 @@ function modifSensor($sensorAdminButton) {
         autoOpen: false,
         width: 400,
         modal: true,
-        buttons: {
-          'Ok':function() {
+        buttons: [{
+          text:$.t('Ok'),
+          click:function() {
             var curName=curSensor.name;
             var curDisplay=$(this).find('#dialog-sensor-display').val();
             var curUnit=$(this).find('#dialog-sensor-unit').val();
@@ -663,7 +700,7 @@ function modifSensor($sensorAdminButton) {
             
             $( this ).dialog( 'close' );
           }
-        }
+        }]
       });
       
       $dialog.dialog('open');
@@ -700,7 +737,7 @@ function okDialogSensor(curDevice, curName, curDisplay, curUnit, curEnabled) {
   });
 }
 
-function modifHeater($heaterAdminButton) {
+function editHeater($heaterAdminButton) {
   for (var i=0; i<globalOverview[$heaterAdminButton.attr('data-an-device')].heaters.length; i++) {
     if ($heaterAdminButton.attr('data-an-heater') == globalOverview[$heaterAdminButton.attr('data-an-device')].heaters[i].name) {
       var curHeater = globalOverview[$heaterAdminButton.attr('data-an-device')].heaters[i];
@@ -728,8 +765,9 @@ function modifHeater($heaterAdminButton) {
         autoOpen: false,
         width: 400,
         modal: true,
-        buttons: {
-          'Ok':function() {
+        buttons: [{
+          text:$.t('Ok'),
+          click:function() {
             var curName=curHeater.name;
             var curDisplay=$(this).find('#dialog-heater-display').val();
             var curUnit=$(this).find('#dialog-heater-unit').val();
@@ -739,7 +777,7 @@ function modifHeater($heaterAdminButton) {
             
             $( this ).dialog( 'close' );
           }
-        }
+        }]
       });
       
       $dialog.dialog('open');
@@ -759,6 +797,8 @@ function okDialogHeater(curDevice, curName, curDisplay, curUnit, curEnabled) {
       $('#p-heater-'+curDevice+'-'+curName).removeClass('p-hidden');
     } else {
       $('#p-heater-'+curDevice+'-'+curName).addClass('p-hidden');
+      $('#label-he-slide-'+deviceId+'-'+heater.name).show();
+      $('#he-slide-'+deviceId+'-'+heater.name).show();
       $('#p-heater-'+curDevice+'-'+curName).show();
     }
     var $label = $('#label-heater-'+curDevice+'-'+curName);
@@ -777,7 +817,7 @@ function okDialogHeater(curDevice, curName, curDisplay, curUnit, curEnabled) {
   });
 }
 
-function modifLight($lightAdminButton) {
+function editLight($lightAdminButton) {
   for (var i=0; i<globalOverview[$lightAdminButton.attr('data-an-device')].lights.length; i++) {
     if ($lightAdminButton.attr('data-an-light') == globalOverview[$lightAdminButton.attr('data-an-device')].lights[i].name) {
       var curLight = globalOverview[$lightAdminButton.attr('data-an-device')].lights[i];
@@ -803,8 +843,10 @@ function modifLight($lightAdminButton) {
         autoOpen: false,
         width: 400,
         modal: true,
-        buttons: {
-          'Ok':function() {
+        title: $.t('Edit a light'),
+        buttons: [{
+          text:$.t('Ok'),
+          click:function() {
             var curName=curLight.name;
             var curDisplay=$(this).find('#dialog-light-display').val();
             var curEnabled=$(this).find('#dialog-light-enabled').prop('checked')?'true':'false';
@@ -813,7 +855,7 @@ function modifLight($lightAdminButton) {
             
             $( this ).dialog( 'close' );
           }
-        }
+        }]
       });
       
       $dialog.dialog('open');
@@ -849,7 +891,7 @@ function okDialogLight(curDevice, curName, curDisplay, curEnabled) {
   });
 }
 
-function modifSwitch($switchAdminButton) {
+function editSwitch($switchAdminButton) {
   for (var i=0; i<globalOverview[$switchAdminButton.attr('data-an-device')].pins.length; i++) {
     if ($switchAdminButton.attr('data-an-switch') == globalOverview[$switchAdminButton.attr('data-an-device')].pins[i].name) {
       var curSwitch = globalOverview[$switchAdminButton.attr('data-an-device')].pins[i];
@@ -877,8 +919,10 @@ function modifSwitch($switchAdminButton) {
         autoOpen: false,
         width: 400,
         modal: true,
-        buttons: {
-          'Ok':function() {
+        title: $.t('Edit a switch'),
+        buttons: [{
+          text:$.t('Ok'),
+          click:function() {
             var curName=curSwitch.name;
             var curDisplay=$(this).find('#dialog-switch-display').val();
             var curType=$(this).find('#dialog-switch-type').val();
@@ -888,7 +932,7 @@ function modifSwitch($switchAdminButton) {
             
             $( this ).dialog( 'close' );
           }
-        }
+        }]
       });
       
       $dialog.dialog('open');
@@ -955,9 +999,9 @@ function initActions() {
 
 function editAction($action) {
   var $dialog = $('#dialog-action');
-  var title = 'Modifier une action';
+  var title = $.t('Edit an action');
   if ($action == null) {
-    title = 'Ajouter une action';
+    title = $.t('Add an action');
   }
   
   initActionDialog($dialog, $action);
@@ -973,11 +1017,12 @@ function editAction($action) {
     width: 500,
     modal: true,
     title: title,
-    buttons: {
-      'Ok':function() {
+    buttons: [{
+      text:$.t('Ok'),
+      click:function() {
         okAction($dialog);
       }
-    }
+    }]
   });
   
   $dialog.dialog('open');
@@ -1077,6 +1122,7 @@ function initActionDialog($dialog, $action) {
         $pParamsValue.slideDown();
         break;
       case "88":
+        // SLEEP
       case "99":
         // SYSTEM
         $devicesList.prop('disabled', true);
@@ -1127,14 +1173,14 @@ function initActionDialog($dialog, $action) {
       }
     }
     if (pin.type == 0) {
-      $paramsSetpin.find('option[value="0"]').text('Éteint');
-      $paramsSetpin.find('option[value="1"]').text('Allumé');
+      $paramsSetpin.find('option[value="0"]').text($.t('Off'));
+      $paramsSetpin.find('option[value="1"]').text($.t('On'));
     } else if (pin.type == 1) {
-      $paramsSetpin.find('option[value="0"]').text('Allumé');
-      $paramsSetpin.find('option[value="1"]').text('Éteint');
+      $paramsSetpin.find('option[value="0"]').text($.t('On'));
+      $paramsSetpin.find('option[value="1"]').text($.t('Off'));
     } else if (pin.type == 2) {
-      $paramsSetpin.find('option[value="0"]').text('Gauche');
-      $paramsSetpin.find('option[value="1"]').text('Droite');
+      $paramsSetpin.find('option[value="0"]').text($.t('Left'));
+      $paramsSetpin.find('option[value="1"]').text($.t('Right'));
     }
   });
   
@@ -1190,10 +1236,10 @@ function okAction($dialog) {
   var $paramsValue = $dialog.find('#dialog-action-params-value');
   
   if ($dialog.find('#dialog-action-id').val() == '') {
-    // Ajouter action
+    // Add action
     url += '/ADDACTION';
   } else {
-    // Modifier action
+    // Edit action
     url += '/SETACTION';
     isAdd = false;
     params.id = $dialog.find('#dialog-action-id').val();
@@ -1207,7 +1253,7 @@ function okAction($dialog) {
   params.heater = $dialog.find('#dialog-action-heater').val();
   
   if (params.name == '') {
-    alert('Veuillez entrer un nom pour l\'action');
+    alert($.t('Enter action name'));
     return false;
   }
   if (params.type == 4) {
@@ -1216,19 +1262,19 @@ function okAction($dialog) {
     params.params = '1';
   } else if (params.type == 6) {
     if ($paramsValue.val() == '' || isNaN($paramsValue.val())) {
-      alert('Veuillez entrer une valeur numérique pour le chauffage');
+      alert($.t('Heat value must be numeric'));
       return false;
     }
     params.params = $paramsSetpin.val()+','+$paramsValue.val();
   } else if (params.type == 88) {
     if ($paramsValue.val() == '') {
-      alert('Veuillez entrer une durée en millisecondes');
+      alert($.t('Duration must be in milliseconds'));
       return false;
     }
     params.params = $paramsValue.val();
   } else if (params.type == 99) {
     if ($paramsValue.val() == '') {
-      alert('Veuillez entrer une commande à exécuter sur le serveur');
+      alert($.t('You must enter a server command'));
       return false;
     }
     params.params = $paramsValue.val();
@@ -1256,7 +1302,7 @@ function okAction($dialog) {
 function deleteAction($action) {
   var url = prefix + '/DELETEACTION/'+$action.attr('data-an-action-id');
   
-  if (confirm('Etes-vous sûr de vouloir supprimer cette action ?')) {
+  if (confirm($.t('Are you sure you want to delete this action ?'))) {
     var jqxhr = $.get( url, function(data) {
       var json = $.parseJSON(data);
       if (json.result == "ok") {
@@ -1265,16 +1311,16 @@ function deleteAction($action) {
       }
     })
     .fail(function() {
-      $('#footer-message-global').text('Error setting heater');
+      $('#footer-message-global').text($.t('Error deleting action'));
     });
   }
 }
 
 function editScript($script) {
   var $dialog = $('#dialog-script');
-  var title = 'Modifier un script';
+  var title = $.t('Edit a task');
   if ($script == null) {
-    title = 'Ajouter une tâche';
+    title = $.t('Add a task');
   }
     
   initScriptDialog($dialog, $script);
@@ -1290,11 +1336,12 @@ function editScript($script) {
     width: 500,
     modal: true,
     title: title,
-    buttons: {
-      'Ok':function() {
+    buttons: [{
+      text:$.t('Ok'),
+      click:function() {
         okScript($dialog);
       }
-    }
+    }]
   });
   
   $dialog.dialog('open');
@@ -1308,7 +1355,7 @@ function initScriptDialog($dialog, $script) {
   
   
   $devicesList.empty();
-  $devicesList.append('<option value="">Aucun</option>');
+  $devicesList.append('<option value="">'+$.t('None')+'</option>');
   for (var key in devicesTab) {
     if (devicesTab[key].enabled) {
       var htmlOption = '<option value="'+devicesTab[key].name+'">'+devicesTab[key].display+'</option>\n';
@@ -1447,7 +1494,7 @@ function deleteScript($script) {
   var scriptId = $script.attr('data-an-script-id');
   var url = prefix + '/DELETESCRIPT/'+scriptId;
   
-  if (confirm('Etes-vous sûr de vouloir supprimer cette tâche ?')) {
+  if (confirm($.t('Are you sure you want to delete this task ?'))) {
     var jqxhr = $.get( url, function(data) {
       var json = $.parseJSON(data);
       if (json.result == "ok") {
@@ -1462,16 +1509,16 @@ function deleteScript($script) {
       }
     })
     .fail(function() {
-      $('#footer-message-global').text('Erreur');
+      $('#footer-message-global').text($.t('Error deleting task'));
     });
   }
 }
 
 function editSchedule($schedule) {
   var $dialog = $('#dialog-schedule');
-  var title = 'Modifier une tâche planifiée';
+  var title = $.t('Edit a scheduled task');
   if ($schedule == null) {
-    title = 'Ajouter une tâche planifiée';
+    title = $.t('Add a scheduled task');
   }
   
   $dialog.on('keypress', function(e) {
@@ -1486,11 +1533,12 @@ function editSchedule($schedule) {
     width: 500,
     modal: true,
     title: title,
-    buttons: {
-      'Ok':function() {
+    buttons: [{
+      text:$.t('Ok'),
+      click:function() {
         okSchedule($dialog);
       }
-    }
+    }]
   });
   
   $dialog.dialog('open');
@@ -1517,7 +1565,7 @@ function initScriptSchedule($dialog, $schedule) {
   }
   
   $('#dialog-schedule-device').empty();
-  $('#dialog-schedule-device').append('<option value="">Aucun</option>\n');
+  $('#dialog-schedule-device').append('<option value="">'+$.t('None')+'</option>\n');
   for (var key in devicesTab) {
     if (devicesTab[key].enabled) {
       var htmlOption = '<option value="'+devicesTab[key].name+'">'+devicesTab[key].display+'</option>\n';
@@ -1599,7 +1647,7 @@ function okSchedule($dialog) {
   var isAdd = true;
   
   if ($dialog.find('#dialog-schedule-name').val() == '') {
-    alert('Le nom est obligatoire');
+    alert($.t('You must enter a name for the scheduled task'));
     return false;
   }
   
@@ -1620,7 +1668,7 @@ function okSchedule($dialog) {
   nextTime.setHours($dialog.find('#dialog-schedule-hh').val());
   nextTime.setMinutes($dialog.find('#dialog-schedule-mm').val());
   if (nextTime.getTime() < now.getTime() && !$dialog.find('#dialog-schedule-repeat').prop('checked')) {
-    alert('La tâche planifiée doit avoir lieu dans le futur');
+    alert($.t('The next run must be in the future'));
     return false;
   }
   postParams.next_time = nextTime.getTime() / 1000;
@@ -1707,7 +1755,7 @@ function deleteSchedule($schedule) {
   var scheduleId = $schedule.attr('data-an-schedule-id');
   var url = prefix + '/DELETESCHEDULE/'+scheduleId;
   
-  if (confirm('Etes-vous sûr de vouloir supprimer cette tâche planifiée ?')) {
+  if (confirm($.t('Are you sure you want to delete this scheduled task ?'))) {
     var jqxhr = $.get( url, function(data) {
       var json = $.parseJSON(data);
       if (json.result == "ok") {
@@ -1718,7 +1766,7 @@ function deleteSchedule($schedule) {
       }
     })
     .fail(function() {
-      $('#footer-message-global').text('Erreur');
+      $('#footer-message-global').text($.t('Error deleting scheduled task'));
     });
   }
 }
@@ -1731,85 +1779,90 @@ function initMusic(deviceId) {
     for (var key in json) {
       var mpdName = json[key].name;
       var mpdDisplay = json[key].display;
-      var urlStatus = 'mpc/control.php?device='+deviceId+'&server='+mpdName+'&status';
-      var jqxhr = $.get( urlStatus, function(data) {
-        var music = $.parseJSON(data);
-        var $mpc = $('#mpc-'+deviceId+' .inside');
-        var htmlMpc = '<p id="p-mpc-'+deviceId+'-'+mpdName+'" ><p>\n';
-        htmlMpc += mpdDisplay+'</p><p>';
-        htmlMpc += '<div id="div-mpc-'+deviceId+'-'+mpdName+'-stop"><a href="#" id="mpc-'+deviceId+'-'+mpdName+'-stop" ><img src="images/media-playback-stop-big.png" /></a></div><div id="div-mpc-'+deviceId+'-'+mpdName+'-play"><a href="#" id="mpc-'+deviceId+'-'+mpdName+'-play"><img src="images/media-playback-start-big.png" /></a></div>\n';
-        if (music.state == 'stopped') {
-          htmlMpc += '<label id="label-mpc-'+deviceId+'-'+mpdName+'-status" class="music-title"></label>\n';
-        } else {
-          htmlMpc += '<label id="label-mpc-'+deviceId+'-'+mpdName+'-status" class="music-title">'+music.title+'</label>\n';
-        }
-        htmlMpc += '</p><p><label id="label-mpc-'+deviceId+'-'+mpdName+'" for="mpc-'+deviceId+'-'+mpdName+'">Volume: '+music.volume+' %</label><div id="label-mpc-slide-'+deviceId+'-'+mpdName+'"></div><div class="music" data-an-device="'+deviceId+'" data-an-mpc="'+mpdName+'" id="mpc-slide-'+deviceId+'-'+mpdName+'" ></div>\n';
-        htmlMpc += '</p></p>\n';
-        $mpc.append(htmlMpc);
-        if (music.state == 'playing') {
-          $('#div-mpc-'+deviceId+'-'+mpdName+'-stop').show();
-          $('#div-mpc-'+deviceId+'-'+mpdName+'-play').hide();
-        } else {
-          $('#div-mpc-'+deviceId+'-'+mpdName+'-stop').hide();
-          $('#div-mpc-'+deviceId+'-'+mpdName+'-play').show();
-        }
-        $('#label-mpc-slide-'+deviceId+'-'+mpdName).html(music.volume+' %');
-        $(function() {
-          $('#label-mpc-slide-'+deviceId+'-'+mpdName).empty().slider({
-            min:0,
-            max:100,
-            step:1,
-            value:music.volume,
-            /*slide:function( event, ui ) {
-              $('#label-mpc-slide-'+$(this).attr('data-an-device')+'-'+$(this).attr('data-an-mpc')).html('Volume: '+ui.value+' %');
-            },*/
-            change:function( event, ui ) {
-              if (event.originalEvent) {
-                var url = 'mpc/control.php?device='+deviceId+'&server='+mpdName+'&volume='+$(this).slider( 'value' );
-                var jqxhr = $.get( url, function(data) {
-                  var json = $.parseJSON(data);
-                  updateMusic(deviceId, mpdName);
-                })
-                .fail(function() {
-                  $('#message-'+deviceId).text('Error setting music');
-                });
-              }
-            }
-          });
-        });
-        
-        $('#mpc-'+deviceId+'-'+mpdName+'-stop').click(function() {
-          var url = 'mpc/control.php?device='+deviceId+'&server='+mpdName+'&stop';
-          var jqxhr = $.get( url, function(data) {
-            var json = $.parseJSON(data);
-            updateMusic(deviceId, mpdName);
-          })
-          .fail(function() {
-            $('#message-'+deviceId).text('Error setting music');
-          });
-          return false;
-        });
-        
-        $('#mpc-'+deviceId+'-'+mpdName+'-play').click(function() {
-          var url = 'mpc/control.php?device='+deviceId+'&server='+mpdName+'&play';
-          var jqxhr = $.get( url, function(data) {
-            setTimeout(function() {
-              updateMusic(deviceId, mpdName);
-            }, 100);
-          })
-          .fail(function() {
-            $('#message-'+deviceId).text('Error setting music');
-          });
-          return false;
-        });
-      })
-      .fail(function() {
-        $('#footer-message-global').text('Erreur musique');
-      });
+      buildMusic(deviceId, mpdName, mpdDisplay);
     }
   })
   .fail(function() {
-    $('#footer-message-global').text('Erreur musique');
+    $('#footer-message-global').text($.t('Error getting music device status'));
+  });
+}
+
+function buildMusic(deviceId, mpdName, mpdDisplay) {
+  var urlStatus = 'mpc/control.php?device='+deviceId+'&server='+mpdName+'&status';
+  var jqxhr = $.get( urlStatus, function(data) {
+    var music = $.parseJSON(data);
+    var $mpc = $('#mpc-'+deviceId+' .inside');
+    var htmlMpc = '<p id="p-mpc-'+deviceId+'-'+mpdName+'" ><p>\n';
+    htmlMpc += mpdDisplay+'</p><p>';
+    htmlMpc += '<div id="div-mpc-'+deviceId+'-'+mpdName+'-stop"><a href="#" id="mpc-'+deviceId+'-'+mpdName+'-stop" ><img src="images/media-playback-stop-big.png" /></a></div><div id="div-mpc-'+deviceId+'-'+mpdName+'-play"><a href="#" id="mpc-'+deviceId+'-'+mpdName+'-play"><img src="images/media-playback-start-big.png" /></a></div>\n';
+    if (music.state == 'stopped') {
+      htmlMpc += '<label id="label-mpc-'+deviceId+'-'+mpdName+'-status" class="music-title"></label>\n';
+    } else {
+      htmlMpc += '<label id="label-mpc-'+deviceId+'-'+mpdName+'-status" class="music-title">'+music.title+'</label>\n';
+    }
+    htmlMpc += '</p><p><label id="label-mpc-'+deviceId+'-'+mpdName+'" for="mpc-'+deviceId+'-'+mpdName+'">Volume: '+music.volume+' %</label><div id="label-mpc-slide-'+deviceId+'-'+mpdName+'"></div><div class="music" data-an-device="'+deviceId+'" data-an-mpc="'+mpdName+'" id="mpc-slide-'+deviceId+'-'+mpdName+'" ></div>\n';
+    htmlMpc += '</p></p>\n';
+    $mpc.append(htmlMpc);
+    if (music.state == 'playing') {
+      $('#div-mpc-'+deviceId+'-'+mpdName+'-stop').show();
+      $('#div-mpc-'+deviceId+'-'+mpdName+'-play').hide();
+    } else {
+      $('#div-mpc-'+deviceId+'-'+mpdName+'-stop').hide();
+      $('#div-mpc-'+deviceId+'-'+mpdName+'-play').show();
+    }
+    $('#label-mpc-slide-'+deviceId+'-'+mpdName).html(music.volume+' %');
+    $(function() {
+      $('#label-mpc-slide-'+deviceId+'-'+mpdName).empty().slider({
+        min:0,
+        max:100,
+        step:1,
+        value:music.volume,
+        change:function( event, ui ) {
+          if (event.originalEvent) {
+            var url = 'mpc/control.php?device='+deviceId+'&server='+mpdName+'&volume='+$(this).slider( 'value' );
+            var jqxhr = $.get( url, function(data) {
+              var json = $.parseJSON(data);
+              updateMusic(deviceId, mpdName);
+            })
+            .fail(function() {
+              $('#message-'+deviceId).text($.t('Error setting music'));
+            });
+          }
+        }
+      });
+    });
+    
+    $('#mpc-'+deviceId+'-'+mpdName+'-stop').click(function() {
+      var url = 'mpc/control.php?device='+deviceId+'&server='+mpdName+'&stop';
+      var jqxhr = $.get( url, function(data) {
+        var json = $.parseJSON(data);
+        updateMusic(deviceId, mpdName);
+      })
+      .fail(function() {
+        $('#message-'+deviceId).text($.t('Error setting music'));
+      });
+      return false;
+    });
+    
+    $('#mpc-'+deviceId+'-'+mpdName+'-play').click(function() {
+      var url = 'mpc/control.php?device='+deviceId+'&server='+mpdName+'&play';
+      var jqxhr = $.get( url, function(data) {
+        setTimeout(function() {
+          updateMusic(deviceId, mpdName);
+        }, 100);
+      })
+      .fail(function() {
+        $('#message-'+deviceId).text($.t('Error setting music'));
+      });
+      return false;
+    });
+    
+    $('#label-mpc-'+deviceId+'-'+mpdName+'-status').click(function() {
+      updateMusic(deviceId, mpdName);
+    });
+  })
+  .fail(function() {
+    $('#footer-message-global').text($.t('Error setting music')+', '+$.t('network error'));
   });
 }
 
@@ -1817,7 +1870,7 @@ function updateMusic(deviceId, mpdName) {
   var urlStatus = 'mpc/control.php?device='+deviceId+'&server='+mpdName+'&status';
   var jqxhr = $.get( urlStatus, function(data) {
     var music = $.parseJSON(data);
-    $('#label-mpc-'+deviceId+'-'+mpdName).html('Volume: '+music.volume+' %');
+    $('#label-mpc-'+deviceId+'-'+mpdName).html($.t('Volume')+': '+music.volume+' %');
     $('#label-mpc-'+deviceId+'-'+mpdName+'-status').html(music.title);
     $('#label-mpc-slide-'+deviceId+'-'+mpdName).slider('value', music.volume);
     if (music.state == 'playing') {
@@ -1829,6 +1882,8 @@ function updateMusic(deviceId, mpdName) {
     }
   })
   .fail(function() {
-    $('#footer-message-global').text('Erreur musique');
+    $('#footer-message-global').text($.t('Error setting music')+', '+$.t('network error'));
   });
 }
+
+});

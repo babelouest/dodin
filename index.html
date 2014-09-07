@@ -1,46 +1,47 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Angharad web client</title>
-		<link rel="icon" type="image/png" href="images/favicon.png" />
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Angharad Web Client</title>
+    <link rel="icon" type="image/png" href="images/favicon.png" />
         
         <link rel="stylesheet" href="main.css" />
         <link rel="stylesheet" href="jquery-ui-1.10.4.min.css" />
         
-		<script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
         <script type="text/javascript" src="js/jquery-ui-1.10.4.min.js"></script>
+        <script type="text/javascript" src="js/i18next-1.7.4.min.js"></script>
         
-		<script type="text/javascript" src="js/main.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
     
         <!-- Context Menu -->
         <link rel="stylesheet" href="contextMenu/jquery.contextMenu.css" />
-		<script type="text/javascript" src="contextMenu/jquery.contextMenu.js"></script>
-		<script type="text/javascript" src="contextMenu/jquery.ui.position.js"></script>
+    <script type="text/javascript" src="contextMenu/jquery.contextMenu.js"></script>
+    <script type="text/javascript" src="contextMenu/jquery.ui.position.js"></script>
     
-	</head>
-	<body>
-		<div id="container">
-		  <div id="header">
+  </head>
+  <body>
+    <div id="container">
+      <div id="header">
         <label id="message"></label>
-		  </div>
-		  <div id="tabs">
-			<ul>
+      </div>
+      <div id="tabs">
+      <ul>
         <li>.</li>
-			</ul>
-		  </div>
+      </ul>
+      </div>
       <div id="footer" class="footer">
         <label id="footer-message"></label>
       </div>
-		</div>
-	</body>
+    </div>
+  </body>
 </html>
 
 <div id="template-device" class="template">
   <div id="tab-TEMPLATE" class="tab">
     <div id="elements-container" class="elements">
-      <input type="button" class="admin-button admin-edit" data-an-device="TEMPLATE" id="admin-edit-TEMPLATE" name="admin-TEMPLATE" value="Modifier le contrôleur">
-      <input type="button" class="admin-button admin-edit" data-an-device="TEMPLATE" id="admin-reset-TEMPLATE" name="admin-reset-TEMPLATE" value="Reconnecter">
+      <input type="button" class="admin-button admin-edit" data-an-device="TEMPLATE" id="admin-edit-TEMPLATE" name="admin-edit-TEMPLATE" value="Edit device">
+      <input type="button" class="admin-button admin-edit" data-an-device="TEMPLATE" id="admin-reset-TEMPLATE" name="admin-reset-TEMPLATE" value="Reset">
       <div id="header-TEMPLATE" class="header">
         <label id="header-message-TEMPLATE"></label>
       </div>
@@ -50,37 +51,37 @@
       </div>
       <!--<div id="light-TEMPLATE" class="lights">
         <div class="inside">
-          <h3>Lumières</h3>
+          <h3 data-i18n>Lights</h3>
         </div>
       </div>-->
       <div id="heater-TEMPLATE" class="heater">
         <div class="inside">
-          <h3>Chauffage</h3>
+          <h3 data-i18n>Heater</h3>
         </div>
       </div>
       <div id="switch-TEMPLATE" class="switches">
         <div class="inside">
-          <h3>Interrupteurs</h3>
+          <h3 data-i18n>Switches</h3>
         </div>
       </div>
       <div id="script-TEMPLATE" class="scripts">
         <div class="inside">
-          <h3>Tâches&nbsp;<input type="button" class="admin-button admin-script-add" id="admin-script-add-TEMPLATE" name="admin-script-add-TEMPLATE" value="Ajouter"></h3>
+          <h3 data-i18n>Tasks</h3><input type="button" class="admin-button admin-script-add" id="admin-script-add-TEMPLATE" name="admin-script-add-TEMPLATE" value="Add">
         </div>
       </div>
       <div id="schedule-TEMPLATE" class="schedules">
         <div class="inside">
-          <h3>Tâches planifiées&nbsp;<input type="button" class="admin-button admin-add" id="admin-schedule-add-TEMPLATE" name="admin-schedule-add-TEMPLATE" value="Ajouter"></h3>
+          <h3 data-i18n>Scheduled tasks</h3><input type="button" class="admin-button admin-add" id="admin-schedule-add-TEMPLATE" name="admin-schedule-add-TEMPLATE" value="Add">
         </div>
       </div>
       <div id="mpc-TEMPLATE" class="mpc">
         <div class="inside">
-          <h3>Musique</h3>
+          <h3 data-i18n>Music</h3>
         </div>
       </div>
       <div id="admin-TEMPLATE" >
         <div class="inside">
-          <p id="p-admin-TEMPLATE"><a id="a-admin-TEMPLATE" href="#">Administrer</a></p>
+          <p id="p-admin-TEMPLATE"><a id="a-admin-TEMPLATE" href="#" data-i18n>Admin</a></p>
         </div>
       </div>
     </div>
@@ -92,7 +93,14 @@
     <div id="elements-container-global" class="elements">
       <div id="header-global" class="header">
         <p>
-          <input type="button" name="refresh" id="refresh" value="Rafraîchir" />
+          <label for="global-lang-select" id="global-lang-label" data-i18n>Language</label>
+          <select id="global-lang-select" name="global-lang-select">
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+          </select>
+        </p>
+        <p>
+          <input type="button" name="refresh" id="refresh" value="Refresh" />
         </p>
         <p>
           <label id="header-message-global"></label>
@@ -100,22 +108,22 @@
       </div>
       <div id="script-global" class="scripts">
         <div class="inside">
-          <h3>Tâches&nbsp;<input type="button" class="admin-button admin-script-add" id="admin-script-global-add" name="admin-script-global-add" value="Ajouter"></h3>
+          <h3 data-i18n>Tasks</h3><input type="button" class="admin-button admin-script-add" id="admin-script-global-add" name="admin-script-global-add" value="Add">
         </div>
       </div>
       <div id="schedule-global" class="schedules">
         <div class="inside">
-          <h3>Tâches planifiées&nbsp;<input type="button" class="admin-button admin-add" id="admin-schedule-global-add" name="admin-schedule-global-add" value="Ajouter"></h3>
+          <h3 data-i18n>Scheduled tasks</h3><input type="button" class="admin-button admin-add" id="admin-schedule-global-add" name="admin-schedule-global-add" value="Add">
         </div>
       </div>
       <div id="action-global" class="actions p-hidden">
         <div class="inside">
-          <h3>Actions&nbsp;<input type="button" class="admin-button admin-add" id="admin-action-global-add" name="admin-action-global-add" value="Ajouter"></h3>
+          <h3 data-i18n>Actions</h3><input type="button" class="admin-button admin-add" id="admin-action-global-add" name="admin-action-global-add" value="Add">
         </div>
       </div>
       <div id="admin-global">
         <div class="inside">
-          <p id="p-admin-global"><a id="a-admin-global" href="#">Administrer</a></p>
+          <p id="p-admin-global"><a id="a-admin-global" href="#" data-i18n>Admin</a></p>
         </div>
       </div>
       <div id="footer-global" class="footer">
@@ -125,222 +133,222 @@
   </div>
 </div>
 
-<div id="dialog-device" title="Modifier un contrôleur" class="template dialog">
+<div id="dialog-device" title="Edit a device" class="template dialog">
   <p>
-    <label for="dialog-device-name">Nom interne</label>
+    <label for="dialog-device-name" data-i18n>Internal name</label>
     <label id="dialog-device-name"></label>
   </p>
   <p>
-    <label for="dialog-device-display">Nom affiché</label>
+    <label for="dialog-device-display" data-i18n>Displayed name</label>
     <input type="text" name="dialog-device-display" id="dialog-device-display" value="">
   </p>
   <p>
-    <label for="dialog-device-enabled">Actif</label>
+    <label for="dialog-device-enabled" data-i18n>Enabled</label>
     <input type="checkbox" name="dialog-device-enabled" id="dialog-device-enabled"><label for="dialog-device-enabled"></label>
   </p>
 </div>
 
-<div id="dialog-light" title="Modifier une lumière" class="template dialog">
+<div id="dialog-light" title="Edit a light" class="template dialog">
   <p>
-    <label for="dialog-light-name">Nom interne</label>
+    <label for="dialog-light-name" data-i18n>Internal name</label>
     <label id="dialog-light-name"></label>
   </p>
   <p>
-    <label for="dialog-light-display">Nom affiché</label>
+    <label for="dialog-light-display" data-i18n>Displayed name</label>
     <input type="text" name="dialog-light-display" id="dialog-light-display" value="">
   </p>
   <p>
-    <label for="dialog-light-enabled">Actif</label>
+    <label for="dialog-light-enabled" data-i18n>Enabled</label>
     <input type="checkbox" name="dialog-light-enabled" id="dialog-light-enabled"><label for="dialog-light-enabled"></label>
   </p>
 </div>
 
-<div id="dialog-heater" title="Modifier un chauffage" class="template dialog">
+<div id="dialog-heater" title="Edit a heater" class="template dialog">
   <p>
-    <label for="dialog-heater-name">Nom interne</label>
+    <label for="dialog-heater-name" data-i18n>Internal name</label>
     <label id="dialog-heater-name"></label>
   </p>
   <p>
-    <label for="dialog-heater-display">Nom affiché</label>
+    <label for="dialog-heater-display" data-i18n>Displayed name</label>
     <input type="text" name="dialog-heater-display" id="dialog-heater-display" value="">
   </p>
   <p>
-    <label for="dialog-heater-unit">Libellé de l'unité</label>
+    <label for="dialog-heater-unit" data-i18n>Unit</label>
     <input type="text" name="dialog-heater-unit" id="dialog-heater-unit" value="">
   </p>
   <p>
-    <label for="dialog-heater-enabled">Actif</label>
+    <label for="dialog-heater-enabled" data-i18n>Enabled</label>
     <input type="checkbox" name="dialog-heater-enabled" id="dialog-heater-enabled"><label for="dialog-heater-enabled"></label>
   </p>
 </div>
 
-<div id="dialog-sensor" title="Modifier un capteur" class="template dialog">
+<div id="dialog-sensor" title="Edit a sensor" class="template dialog">
   <p>
-    <label for="dialog-sensor-name">Nom interne</label>
+    <label for="dialog-sensor-name" data-i18n>Internal name</label>
     <label id="dialog-sensor-name"></label>
   </p>
   <p>
-    <label for="dialog-sensor-display">Nom affiché</label>
+    <label for="dialog-sensor-display" data-i18n>Displayed name</label>
     <input type="text" name="dialog-sensor-display" id="dialog-sensor-display" value="">
   </p>
   <p>
-    <label for="dialog-sensor-unit">Libellé de l'unité</label>
+    <label for="dialog-sensor-unit" data-i18n>Unit</label>
     <input type="text" name="dialog-sensor-unit" id="dialog-sensor-unit" value="">
   </p>
   <p>
-    <label for="dialog-sensor-enabled">Actif</label>
+    <label for="dialog-sensor-enabled" data-i18n>Enabled</label>
     <input type="checkbox" name="dialog-sensor-enabled" id="dialog-sensor-enabled"><label for="dialog-sensor-enabled"></label>
   </p>
 </div>
 
-<div id="dialog-switch" title="Modifier un interrupteur" class="template dialog">
+<div id="dialog-switch" title="Edit a switch" class="template dialog">
   <p>
-    <label for="dialog-switch-name">Nom interne</label>
+    <label for="dialog-switch-name" data-i18n>Internal name</label>
     <label id="dialog-switch-name"></label>
   </p>
   <p>
-    <label for="dialog-switch-display">Nom affiché</label>
+    <label for="dialog-switch-display" data-i18n>Displayed name</label>
     <input type="text" name="dialog-switch-display" id="dialog-switch-display" value="">
   </p>
   <p>
-    <label for="dialog-switch-display">Type</label>
+    <label for="dialog-switch-display" data-i18n>Type</label>
     <select id="dialog-switch-type" name="dialog-switch-type">
-      <option value="0">Normalement ouvert</option>
-      <option value="1">Normalement fermé</option>
-      <option value="2">Va-et-vient</option>
+      <option value="0" data-i18n>Normally open</option>
+      <option value="1" data-i18n>Normally close</option>
+      <option value="2" data-i18n>Threeway</option>
     </select>
   </p>
   <p>
-    <label for="dialog-switch-enabled">Actif</label>
+    <label for="dialog-switch-enabled" data-i18n>Enabled</label>
     <input type="checkbox" name="dialog-switch-enabled" id="dialog-switch-enabled"><label for="dialog-switch-enabled"></label>
   </p>
 </div>
 
-<div id="dialog-action" title="Modifier une action" class="template dialog">
+<div id="dialog-action" title="Edit an action" class="template dialog">
   <input type="hidden" name="dialog-action-id" id="dialog-action-id" value="">
   <p>
-    <label for="dialog-action-name">Nom</label>
+    <label for="dialog-action-name" data-i18n>Name</label>
     <input type="text" name="dialog-action-name" id="dialog-action-name" value="">
   </p>
   <p>
-    <label for="dialog-action-type">Type d'action</label>
+    <label for="dialog-action-type" data-i18n>Type</label>
     <select id="dialog-action-type" name="dialog-action-type">
-      <option value="0">Lister les contrôleurs</option>
-      <option value="1">Récupérer les données actuelles d'un contrôleur</option>
-      <option value="2">Rafraîchir les données d'un contrôleur</option>
-      <option value="3">Etat d'un interrupteur</option>
-      <option value="4">Modifier l'état d'un interrupteur</option>
-      <option value="5">Etat d'un capteur</option>
-      <option value="6">Modifier le chauffage</option>
-      <option value="88">Attendre (millisecondes)</option>
-      <option value="99">Commande interne au serveur</option>
+      <option value="0" data-i18n>Device list</option>
+      <option value="1" data-i18n>Overview device</option>
+      <option value="2" data-i18n>Refresh device</option>
+      <option value="3" data-i18n>Get switch status</option>
+      <option value="4" data-i18n>Set switch status</option>
+      <option value="5" data-i18n>Get sensor status</option>
+      <option value="6" data-i18n>Set heater status</option>
+      <option value="88" data-i18n>Sleep (milliseconds)</option>
+      <option value="99" data-i18n>Internal server command</option>
     </select>
   </p>
   <p>
-    <label for="dialog-action-device">Contrôleur</label>
+    <label for="dialog-action-device" data-i18n>Device</label>
     <select id="dialog-action-device" name="dialog-action-device"></select>
   </p>
   <p>
-    <label for="dialog-action-pin">Interrupteur</label>
+    <label for="dialog-action-pin" data-i18n>Switch</label>
     <select id="dialog-action-pin" name="dialog-action-pin"></select>
   </p>
   <p>
-    <label for="dialog-action-sensor">Capteur</label>
+    <label for="dialog-action-sensor" data-i18n>Sensor</label>
     <select id="dialog-action-sensor" name="dialog-action-sensor"></select>
   </p>
   <p>
-    <label for="dialog-action-heater">Chauffage</label>
+    <label for="dialog-action-heater" data-i18n>Heater</label>
     <select id="dialog-action-heater" name="dialog-action-heater"></select>
   </p>
   <p id="p-dialog-action-params" class="hidden">
-    <label id="dialog-action-params">Paramètres supplémentaires</label>
+    <label id="dialog-action-params" data-i18n>Additional parameters</label>
   </p>
   <p id="p-dialog-action-params-setpin" class="hidden">
-    <label for="dialog-action-params-setpin">Etat</label>
+    <label for="dialog-action-params-setpin" data-i18n>Status</label>
     <select id="dialog-action-params-setpin" name="dialog-action-params-setpin">
-      <option value="0">Eteint</option>
-      <option value="1">Allumé</option>
+      <option value="0" data-i18n>Off</option>
+      <option value="1" data-i18n>On</option>
     </select>
   </p>
   <p id="p-dialog-action-params-value" class="hidden">
-    <label for="dialog-action-params-value">Valeur</label>
+    <label for="dialog-action-params-value" data-i18n>Value</label>
     <input type="text" name="dialog-action-params-value" id="dialog-action-params-value" value="">
   </p>
 </div>
 
-<div id="dialog-script" title="Modifier un script" class="template dialog">
+<div id="dialog-script" title="Edit a task" class="template dialog">
   <input type="hidden" name="dialog-script-id" id="dialog-script-id" value="">
   <p>
-    <label for="dialog-script-name">Nom</label>
+    <label for="dialog-script-name" data-i18n>Name</label>
     <input type="text" name="dialog-script-name" id="dialog-script-name" value="">
   </p>
   <p>
-    <label for="dialog-script-enabled">Actif</label>
+    <label for="dialog-script-enabled" data-i18n>Enabled</label>
     <input type="checkbox" name="dialog-script-enabled" id="dialog-script-enabled"><label for="dialog-script-enabled"></label>
   </p>
   <p>
-    <label for="dialog-script-device">Contrôleur associé</label>
+    <label for="dialog-script-device" data-i18n>Associated device</label>
     <select id="dialog-script-device" name="dialog-script-device"></select>
   </p>
   <p>
-    <label for="dialog-script-actions">Actions</label>
+    <label for="dialog-script-actions" data-i18n>Actions</label>
     <select id="dialog-script-actions" name="dialog-script-actions" size="4"></select><br/>
-    <input type="button" value="Monter" name="dialog-script-action-up" id="dialog-script-action-up">
-    <input type="button" value="Descendre" name="dialog-script-action-down" id="dialog-script-action-down">
-    <input type="button" value="Supprimer" name="dialog-script-action-remove" id="dialog-script-action-remove">
+    <input type="button" value="Up" name="dialog-script-action-up" id="dialog-script-action-up">
+    <input type="button" value="Down" name="dialog-script-action-down" id="dialog-script-action-down">
+    <input type="button" value="Delete" name="dialog-script-action-remove" id="dialog-script-action-remove">
   </p>
   <p>
     <p>
-      <label for="dialog-script-action-list">Ajouter une action</label>
+      <label for="dialog-script-action-list" data-i18n>Add action</label>
       <select id="dialog-script-action-list" name="dialog-script-action-list"></select>
     </p>
     <p>
-      <label for="dialog-script-action-result">Validation du résultat</label>
+      <label for="dialog-script-action-result" data-i18n>Results validation</label>
       <select id="dialog-script-action-result" name="dialog-script-action-result">
-        <option value="0">Aucun</option>
-        <option value="1">Egal à</option>
-        <option value="2">Inférieur à</option>
-        <option value="3">Inférieur ou égal à</option>
-        <option value="4">Supérieur ou égal à</option>
-        <option value="5">Supérieur à</option>
-        <option value="6">Différent à</option>
-        <option value="7">Contient</option>
+        <option value="0" data-i18n>None</option>
+        <option value="1" data-i18n>Equal to</option>
+        <option value="2" data-i18n>Lower to</option>
+        <option value="3" data-i18n>Lower or equal to</option>
+        <option value="4" data-i18n>Higher or equal to</option>
+        <option value="5" data-i18n>Higher to</option>
+        <option value="6" data-i18n>Different from</option>
+        <option value="7" data-i18n>Contains</option>
       </select>
     </p>
     <p>
-      <label for="dialog-script-action-result-value">Valeur de comparaison</label>
+      <label for="dialog-script-action-result-value" data-i18n>Value compared</label>
       <input type="text" name="dialog-script-action-result-value" id="dialog-script-action-result-value" value="">
     </p>
     <p>
-      <input type="button" value="Ajouter" name="dialog-script-action-add" id="dialog-script-action-add">
+      <input type="button" value="Add" name="dialog-script-action-add" id="dialog-script-action-add">
     </p>
   </p>
 </div>
 
-<div id="dialog-schedule" title="Modifier une tâche planifiée" class="template dialog">
+<div id="dialog-schedule" title="Edit a scheduled task" class="template dialog">
   <input type="hidden" name="dialog-schedule-id" id="dialog-schedule-id" value="">
   <p>
-    <label for="dialog-schedule-name">Nom</label>
+    <label for="dialog-schedule-name" data-i18n>Name</label>
     <input type="text" name="dialog-schedule-name" id="dialog-schedule-name" value="">
   </p>
   <p>
-    <label for="dialog-schedule-enabled">Actif</label>
+    <label for="dialog-schedule-enabled" data-i18n>Enabled</label>
     <input type="checkbox" name="dialog-schedule-enabled" id="dialog-schedule-enabled"><label for="dialog-schedule-enabled"></label>
   </p>
   <p>
-    <label for="dialog-schedule-script">Tâche à exécuter</label>
+    <label for="dialog-schedule-script" data-i18n>Task to run</label>
     <select id="dialog-schedule-script" name="dialog-schedule-script"></select>
   </p>
   <p>
-    <label for="dialog-schedule-device">Contrôleur associé</label>
+    <label for="dialog-schedule-device" data-i18n>Associated device</label>
     <select id="dialog-schedule-device" name="dialog-schedule-device"></select>
   </p>
   <p>
-    <label for="dialog-schedule-date">Date</label>
+    <label for="dialog-schedule-date" data-i18n>Date</label>
     <input type="text" id="dialog-schedule-date" name="dialog-schedule-date">
   </p>
   <p>
-    <label for="dialog-schedule-hhmm">Heure</label>
+    <label for="dialog-schedule-hhmm" data-i18n>Time</label>
     <select id="dialog-schedule-hh" name="dialog-schedule-hh">
       <option value="0">00</option>
       <option value="1">01</option>
@@ -431,42 +439,42 @@
     </select>
   </p>
   <p>
-    <label for="dialog-schedule-repeat">Répéter</label>
+    <label for="dialog-schedule-repeat" data-i18n>Repeat</label>
     <input type="checkbox" name="dialog-schedule-repeat" id="dialog-schedule-repeat"><label for="dialog-schedule-repeat"></label>
   </p>
   <p class="p-dialog-schedule-repeat-every">
-    <label for="dialog-schedule-repeat-every">Fréquence</label>
+    <label for="dialog-schedule-repeat-every" data-i18n>Every</label>
     <input type="text" name="dialog-schedule-repeat-value" id="dialog-schedule-repeat-value" value="">
     <select id="dialog-schedule-repeat-every" name="dialog-schedule-repeat-every">
-      <option value="0">Minutes</option>
-      <option value="1">Heures</option>
-      <option value="2">Jours</option>
-      <option value="3">Jours de la semaine</option>
-      <option value="4">Mois</option>
-      <option value="5">Années</option>
+      <option value="0" data-i18n>Minutes</option>
+      <option value="1" data-i18n>Hours</option>
+      <option value="2" data-i18n>Days</option>
+      <option value="3" data-i18n>Weekdays</option>
+      <option value="4" data-i18n>Months</option>
+      <option value="5" data-i18n>Years</option>
     </select>
   </p>
   <p class="p-dialog-schedule-repeat-value-dow">
     <p class="p-dialog-schedule-repeat-value-dow">
-      <label for="dialog-schedule-repeat-value-dow-2">Lundi</label><input type="checkbox" name="dialog-schedule-repeat-value-dow-2" id="dialog-schedule-repeat-value-dow-2" day="2"><label for="dialog-schedule-repeat-value-dow-2"></label>
+      <label for="dialog-schedule-repeat-value-dow-2" data-i18n>Monday</label><input type="checkbox" name="dialog-schedule-repeat-value-dow-2" id="dialog-schedule-repeat-value-dow-2" day="2"><label for="dialog-schedule-repeat-value-dow-2"></label>
     </p>
     <p class="p-dialog-schedule-repeat-value-dow">
-      <label for="dialog-schedule-repeat-value-dow-4">Mardi</label><input type="checkbox" name="dialog-schedule-repeat-value-dow-4" id="dialog-schedule-repeat-value-dow-4" day="4"><label for="dialog-schedule-repeat-value-dow-4"></label>
+      <label for="dialog-schedule-repeat-value-dow-4" data-i18n>Tuesday</label><input type="checkbox" name="dialog-schedule-repeat-value-dow-4" id="dialog-schedule-repeat-value-dow-4" day="4"><label for="dialog-schedule-repeat-value-dow-4"></label>
     </p>
     <p class="p-dialog-schedule-repeat-value-dow">
-      <label for="dialog-schedule-repeat-value-dow-8">Mercredi</label><input type="checkbox" name="dialog-schedule-repeat-value-dow-8" id="dialog-schedule-repeat-value-dow-8" day="8"><label for="dialog-schedule-repeat-value-dow-8"></label>
+      <label for="dialog-schedule-repeat-value-dow-8" data-i18n>Wednesday</label><input type="checkbox" name="dialog-schedule-repeat-value-dow-8" id="dialog-schedule-repeat-value-dow-8" day="8"><label for="dialog-schedule-repeat-value-dow-8"></label>
     </p>
     <p class="p-dialog-schedule-repeat-value-dow">
-      <label for="dialog-schedule-repeat-value-dow-16">Jeudi</label><input type="checkbox" name="dialog-schedule-repeat-value-dow-16" id="dialog-schedule-repeat-value-dow-16" day="16"><label for="dialog-schedule-repeat-value-dow-16"></label>
+      <label for="dialog-schedule-repeat-value-dow-16" data-i18n>Thursday</label><input type="checkbox" name="dialog-schedule-repeat-value-dow-16" id="dialog-schedule-repeat-value-dow-16" day="16"><label for="dialog-schedule-repeat-value-dow-16"></label>
     </p>
     <p class="p-dialog-schedule-repeat-value-dow">
-      <label for="dialog-schedule-repeat-value-dow-32">Vendredi</label><input type="checkbox" name="dialog-schedule-repeat-value-dow-32" id="dialog-schedule-repeat-value-dow-32" day="32"><label for="dialog-schedule-repeat-value-dow-32"></label>
+      <label for="dialog-schedule-repeat-value-dow-32" data-i18n>Friday</label><input type="checkbox" name="dialog-schedule-repeat-value-dow-32" id="dialog-schedule-repeat-value-dow-32" day="32"><label for="dialog-schedule-repeat-value-dow-32"></label>
     </p>
     <p class="p-dialog-schedule-repeat-value-dow">
-      <label for="dialog-schedule-repeat-value-dow-64">Samedi</label><input type="checkbox" name="dialog-schedule-repeat-value-dow-64" id="dialog-schedule-repeat-value-dow-64" day="64"><label for="dialog-schedule-repeat-value-dow-64"></label>
+      <label for="dialog-schedule-repeat-value-dow-64" data-i18n>Saturday</label><input type="checkbox" name="dialog-schedule-repeat-value-dow-64" id="dialog-schedule-repeat-value-dow-64" day="64"><label for="dialog-schedule-repeat-value-dow-64"></label>
     </p>
     <p class="p-dialog-schedule-repeat-value-dow">
-      <label for="dialog-schedule-repeat-value-dow-1">Dimanche</label><input type="checkbox" name="dialog-schedule-repeat-value-dow-1" id="dialog-schedule-repeat-value-dow-1" day="1"><label for="dialog-schedule-repeat-value-dow-1"></label>
+      <label for="dialog-schedule-repeat-value-dow-1" data-i18n>Sunday</label><input type="checkbox" name="dialog-schedule-repeat-value-dow-1" id="dialog-schedule-repeat-value-dow-1" day="1"><label for="dialog-schedule-repeat-value-dow-1"></label>
     </p>
   </p>
 </div>

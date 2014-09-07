@@ -143,35 +143,35 @@ input[type=checkbox] {
 }
 
 input[type=checkbox] + label {
-  background: url('images/switch-off.jpg') no-repeat;
+  background: url('../images/switch-off.jpg') no-repeat;
   height: 30px;
   padding-left: 55px;
 }
 
 input[type=checkbox]:checked + label {
-  background: url('images/switch-on.jpg') no-repeat;
+  background: url('../images/switch-on.jpg') no-repeat;
   height: 26px;
 }
 
 .sw-type-nc input[type=checkbox] + label {
-  background: url('images/switch-on.jpg') no-repeat;
+  background: url('../images/switch-on.jpg') no-repeat;
   height: 26px;
   padding-left: 55px;
 }
 
 .sw-type-nc input[type=checkbox]:checked + label {
-  background: url('images/switch-off.jpg') no-repeat;
+  background: url('../images/switch-off.jpg') no-repeat;
   height: 26px;
 }
 
 .sw-type-tw input[type=checkbox] + label {
-  background: url('images/switch-left.jpg') no-repeat;
+  background: url('../images/switch-left.jpg') no-repeat;
   height: 26px;
   padding-left: 55px;
 }
 
 .sw-type-tw input[type=checkbox]:checked + label {
-  background: url('images/switch-right.jpg') no-repeat;
+  background: url('../images/switch-right.jpg') no-repeat;
   height: 26px;
 }
 

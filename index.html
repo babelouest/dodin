@@ -4,18 +4,23 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Angharad Web Client</title>
     <link rel="icon" type="image/png" href="images/favicon.png" />
-        
-        <link rel="stylesheet" href="css/main.css" />
-        <link rel="stylesheet" href="css/jquery-ui-1.10.4.min.css" />
-        
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <link rel="stylesheet" type="text/css" href="css/jquery-ui-1.10.4.min.css" />
+    
     <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
-        <script type="text/javascript" src="js/jquery-ui-1.10.4.min.js"></script>
-        <script type="text/javascript" src="js/i18next-1.7.4.min.js"></script>
-        
+    <script type="text/javascript" src="js/i18next-1.7.4.min.js"></script>
+    <script type="text/javascript" src="js/jquery-ui-1.10.4.min.js"></script>
+    
+    <!-- Charts and graphs -->
+    <script type="text/javascript" src="js/jquery.jqplot.min.js"></script>
+    <script type="text/javascript" src="js/jqplot.canvasTextRenderer.min.js"></script>
+    <script type="text/javascript" src="js/jqplot.canvasAxisLabelRenderer.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/jquery.jqplot.min.css" />
+    
     <script type="text/javascript" src="js/main.js"></script>
     
-        <!-- Context Menu -->
-        <link rel="stylesheet" href="contextMenu/jquery.contextMenu.css" />
+    <!-- Context Menu -->
+    <link rel="stylesheet" href="contextMenu/jquery.contextMenu.css" />
     <script type="text/javascript" src="contextMenu/jquery.contextMenu.js"></script>
     <script type="text/javascript" src="contextMenu/jquery.ui.position.js"></script>
     
@@ -49,34 +54,40 @@
         <div class="inside">
         </div>
       </div>
-      <!--<div id="light-TEMPLATE" class="lights">
+      <!--<div id="light-TEMPLATE" class="lights block">
         <div class="inside">
           <h3 data-i18n>Lights</h3>
         </div>
       </div>-->
-      <div id="heater-TEMPLATE" class="heater">
+      <div id="heater-TEMPLATE" class="heater block">
         <div class="inside">
           <h3 data-i18n>Heater</h3>
         </div>
       </div>
-      <div id="switch-TEMPLATE" class="switches">
+      <div id="switch-TEMPLATE" class="switches block">
         <div class="inside">
           <h3 data-i18n>Switches</h3>
         </div>
       </div>
-      <div id="script-TEMPLATE" class="scripts">
+      <div id="script-TEMPLATE" class="scripts block">
         <div class="inside">
           <h3 data-i18n>Tasks</h3><input type="button" class="admin-button admin-script-add" id="admin-script-add-TEMPLATE" name="admin-script-add-TEMPLATE" value="Add">
         </div>
       </div>
-      <div id="schedule-TEMPLATE" class="schedules">
+      <div id="schedule-TEMPLATE" class="schedules block">
         <div class="inside">
           <h3 data-i18n>Scheduled tasks</h3><input type="button" class="admin-button admin-add" id="admin-schedule-add-TEMPLATE" name="admin-schedule-add-TEMPLATE" value="Add">
         </div>
       </div>
-      <div id="mpc-TEMPLATE" class="mpc">
+      <div id="mpc-TEMPLATE" class="mpc block">
         <div class="inside">
           <h3 data-i18n>Music</h3>
+        </div>
+      </div>
+      <div id="camera-TEMPLATE" class="camera block">
+        <div class="inside">
+          <h3 data-i18n>Camera</h3>
+          <img src="camera/lastone.php?device=TEMPLATE" id="camera-lastone-TEMPLATE">
         </div>
       </div>
       <div id="admin-TEMPLATE" >
@@ -199,6 +210,32 @@
     <label for="dialog-sensor-enabled" data-i18n>Enabled</label>
     <input type="checkbox" name="dialog-sensor-enabled" id="dialog-sensor-enabled"><label for="dialog-sensor-enabled"></label>
   </p>
+  <p>
+    <label for="dialog-sensor-monitored" data-i18n>Monitored</label>
+    <input type="checkbox" name="dialog-sensor-monitored" id="dialog-sensor-monitored"><label for="dialog-sensor-monitored"></label>
+  </p>
+  <p id="p-dialog-sensor-monitored-every">
+    <label for="dialog-sensor-monitored-every" data-i18n>Monitor every</label>
+    <select id="dialog-sensor-monitored-every" name="dialog-sensor-monitored-every">
+      <option value="1" data-i18n>1 minute</option>
+      <option value="2" data-i18n>2 minutes</option>
+      <option value="3" data-i18n>3 minutes</option>
+      <option value="4" data-i18n>4 minutes</option>
+      <option value="5" data-i18n>5 minutes</option>
+      <option value="10" data-i18n>10 minutes</option>
+      <option value="15" data-i18n>15 minutes</option>
+      <option value="20" data-i18n>20 minutes</option>
+      <option value="30" data-i18n>30 minutes</option>
+      <option value="60" data-i18n>1 hour</option>
+      <option value="120" data-i18n>2 hours</option>
+      <option value="180" data-i18n>3 hours</option>
+      <option value="240" data-i18n>4 hours</option>
+      <option value="300" data-i18n>5 hours</option>
+      <option value="360" data-i18n>6 hours</option>
+      <option value="720" data-i18n>12 hours</option>
+      <option value="1440" data-i18n>1 day</option>
+    </select>
+  </p>
 </div>
 
 <div id="dialog-switch" title="Edit a switch" class="template dialog">
@@ -221,6 +258,32 @@
   <p>
     <label for="dialog-switch-enabled" data-i18n>Enabled</label>
     <input type="checkbox" name="dialog-switch-enabled" id="dialog-switch-enabled"><label for="dialog-switch-enabled"></label>
+  </p>
+  <p>
+    <label for="dialog-switch-monitored" data-i18n>Monitored</label>
+    <input type="checkbox" name="dialog-switch-monitored" id="dialog-switch-monitored"><label for="dialog-switch-monitored"></label>
+  </p>
+  <p id="p-dialog-switch-monitored-every">
+    <label for="dialog-switch-monitored-every" data-i18n>Monitor every</label>
+    <select id="dialog-switch-monitored-every" name="dialog-switch-monitored-every">
+      <option value="1" data-i18n>1 minute</option>
+      <option value="2" data-i18n>2 minutes</option>
+      <option value="3" data-i18n>3 minutes</option>
+      <option value="4" data-i18n>4 minutes</option>
+      <option value="5" data-i18n>5 minutes</option>
+      <option value="10" data-i18n>10 minutes</option>
+      <option value="15" data-i18n>15 minutes</option>
+      <option value="20" data-i18n>20 minutes</option>
+      <option value="30" data-i18n>30 minutes</option>
+      <option value="60" data-i18n>1 hour</option>
+      <option value="120" data-i18n>2 hours</option>
+      <option value="180" data-i18n>3 hours</option>
+      <option value="240" data-i18n>4 hours</option>
+      <option value="300" data-i18n>5 hours</option>
+      <option value="360" data-i18n>6 hours</option>
+      <option value="720" data-i18n>12 hours</option>
+      <option value="1440" data-i18n>1 day</option>
+    </select>
   </p>
 </div>
 
@@ -477,4 +540,23 @@
       <label for="dialog-schedule-repeat-value-dow-1" data-i18n>Sunday</label><input type="checkbox" name="dialog-schedule-repeat-value-dow-1" id="dialog-schedule-repeat-value-dow-1" day="1"><label for="dialog-schedule-repeat-value-dow-1"></label>
     </p>
   </p>
+  <p class="p-dialog-schedule-remove-after-done">
+    <label for="dialog-schedule-remove-after-done" data-i18n>Remove when finished</label>
+    <input type="checkbox" name="dialog-schedule-remove-after-done" id="dialog-schedule-remove-after-done"><label for="dialog-schedule-remove-after-done"></label>
+  </p>
+</div>
+
+<div id="dialog-monitor" title="Monitor an element" class="template dialog">
+  <p class="p-monitor-since">
+    <label for="dialog-monitor-since-label" data-i18n>Monitor since</label>
+    <select id="dialog-monitor-since" name="dialog-monitor-since">
+      <option value="0" data-i18n>Last hour</option>
+      <option value="1" data-i18n selected='true'>Last day</option>
+      <option value="2" data-i18n>Last 2 days</option>
+      <option value="3" data-i18n>Last 3 days</option>
+      <option value="4" data-i18n>Last week</option>
+      <option value="5" data-i18n>Last month</option>
+    </select>
+  </p>
+  <div id="dialog-chart" style="height:300px;width:400px;"></div>
 </div>

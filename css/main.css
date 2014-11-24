@@ -68,7 +68,8 @@
 .sensors label {
   margin: 20px;
 }
-.heater {
+
+.block {
   height: 45%;
   margin: 5px;
   border-style: solid;
@@ -76,54 +77,7 @@
   border-color: #004545;
   border-radius:10px;
 }
-.lights {
-  height: 45%;
-  margin: 5px;
-  border-style: solid;
-  border-width: 3px;
-  border-color: #004545;
-  border-radius:10px;
-}
-.switches {
-  height: 45%;
-  margin: 5px;
-  border-style: solid;
-  border-width: 3px;
-  border-color: #004545;
-  border-radius:10px;
-}
-.actions {
-  height: 45%;
-  margin: 5px;
-  border-style: solid;
-  border-width: 3px;
-  border-color: #004545;
-  border-radius:10px;
-}
-.scripts {
-  height: 45%;
-  margin: 5px;
-  border-style: solid;
-  border-width: 3px;
-  border-color: #004545;
-  border-radius:10px;
-}
-.schedules {
-  height: 45%;
-  margin: 5px;
-  border-style: solid;
-  border-width: 3px;
-  border-color: #004545;
-  border-radius:10px;
-}
-.mpc {
-  height: 45%;
-  margin: 5px;
-  border-style: solid;
-  border-width: 3px;
-  border-color: #004545;
-  border-radius:10px;
-}
+
 .header {
   font-size: 80%;
   font-weight: bold;

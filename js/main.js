@@ -70,18 +70,27 @@ $(document).ready(function() {
       selector: '.admin-modify',
       trigger: 'left',
       callback: function (key, options) {
-        if ($(this).attr('name').indexOf('admin-sensor-') == 0) {
-          editSensor($(this));
-        } else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
-          editSwitch($(this));
-        } else if ($(this).attr('name').indexOf('admin-light-') == 0) {
-          editLight($(this));
-        } else if ($(this).attr('name').indexOf('admin-heater-') == 0) {
-          editHeater($(this));
+        if (key == 'graph') {
+          if ($(this).attr('name').indexOf('admin-sensor-') == 0) {
+            monitorElement($(this));
+          } else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
+            monitorElement($(this));
+          }
+        } else {
+          if ($(this).attr('name').indexOf('admin-sensor-') == 0) {
+            editSensor($(this));
+          } else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
+            editSwitch($(this));
+          } else if ($(this).attr('name').indexOf('admin-light-') == 0) {
+            editLight($(this));
+          } else if ($(this).attr('name').indexOf('admin-heater-') == 0) {
+            editHeater($(this));
+          }
         }
       },
       items: {
         'edit': {name: $.t('Edit'), icon: 'edit'},
+        'graph': {name: $.t('Graph'), icon: 'graph'},
       }
     });
   });
@@ -166,6 +175,10 @@ function initDevices() {
     setInterval(function() {
       refresh(false);
     }, 1000*60*5);
+    
+    setInterval(function() {
+      updateMpds();
+    }, 1000*10);
   })
   .fail(function() {
     $('#message').text($.t('Error loading devices')+', '+$.t('network error'));
@@ -532,6 +545,10 @@ function refresh(force) {
   for (var key in devicesTab) {
     if (devicesTab[key].enabled) {
       var deviceId = devicesTab[key].name;
+      var deviceDisplay = devicesTab[key].display;
+      
+      $('#camera-lastone-'+deviceId).attr('src', 'camera/lastone.php?device=' + deviceId + '&dt=' + new Date().getTime());
+      
       var jqxhr = $.get( url+deviceId, function(data) {
         var json = $.parseJSON(data);
         globalOverview[deviceId] = json;
@@ -582,13 +599,9 @@ function refresh(force) {
         $('#header-message-global').text('');
       })
       .fail(function() {
-        footerMessage = $.t('Error when refreshing device ')+devicesTab[key].display;
+        footerMessage = $.t('Error when refreshing device ')+deviceDisplay;
         $('#header-message-global').text(footerMessage);
       });
-      
-      for (var key in globalMpd[deviceId]) {
-        updateMusic(deviceId, globalMpd[deviceId][key].name);
-      }
     }
   }
   
@@ -597,6 +610,14 @@ function refresh(force) {
     $('#footer-message').text($.t('Last sync')+': '+date.toLocaleString()+'<br/>'+footerMessage);
   } else {
     $('#footer-message').text($.t('Last sync')+': '+date.toLocaleString());
+  }
+}
+
+function updateMpds() {
+  for (var device in devicesTab) {
+    for (var key in globalMpd[device]) {
+      updateMusic(device, globalMpd[device][key].name);
+    }
   }
 }
 
@@ -660,6 +681,94 @@ function okDialogDevice(curName, curDisplay, curEnabled) {
   });
 }
 
+function monitorElement($button) {
+  var device = $button.attr('data-an-device');
+  var sensor = $button.attr('data-an-sensor');
+  var pin = $button.attr('data-an-switch');
+  var startDate = '';
+  var title = '';
+
+  if (sensor === undefined) {
+    sensor = '0';
+    pins = globalOverview[device].pins;
+    for (var i=0; i<pins.length; i++) {
+      if (pin == pins[i].name) {
+        title = pins[i].display;
+      }
+    }
+  }
+  if (pin === undefined) {
+    pin = '0';
+    sensors = globalOverview[device].sensors;
+    for (var i=0; i<sensors.length; i++) {
+      if (sensor == sensors[i].name) {
+        title = sensors[i].display;
+      }
+    }
+  }
+  
+  var curDate = new Date();
+  var $dialog = $('#dialog-monitor');
+  $dialog.find('#dialog-monitor-since').find('option[value="1"]').prop('selected', true);
+  
+  var iframe = '<iframe border="0" src="graph.html?device='+device+'&pin='+pin+'&sensor='+sensor+'&startDate='+startDate+'" width="430px" height="350px"></iframe>';
+  $dialog.find('#dialog-chart').html(iframe);
+  
+  $dialog.dialog({
+    autoOpen: false,
+    width: 460,
+    height: 575,
+    modal: true,
+    title: title,
+    buttons: [{
+    text:$.t('Close'),
+      open:function() {
+        $select = $('#dialog-monitor-since');
+        $select.unbind();
+        $select.change(function() {
+          switch ($select.val()) {
+            case '0':
+              // Last hour
+              startDate = parseInt((new Date(curDate.getTime() - (1000*60*60))).getTime()/1000);
+              break;
+            case '1':
+              // Last day
+              startDate = parseInt((new Date(curDate.getTime() - (24*1000*60*60))).getTime()/1000);
+              break;
+            case '2':
+              // Last 2 days
+              startDate = parseInt((new Date(curDate.getTime() - (48*1000*60*60))).getTime()/1000);
+              break;
+            case '3':
+              // Last 3 days
+              startDate = parseInt((new Date(curDate.getTime() - (72*1000*60*60))).getTime()/1000);
+              break;
+            case '4':
+              // Last week
+              startDate = parseInt((new Date(curDate.getTime() - (168*1000*60*60))).getTime()/1000);
+              break;
+            case '5':
+              // Last month
+              startDate = parseInt((new Date(curDate.getTime() - (720*1000*60*60))).getTime()/1000);
+              break;
+            default:
+              break;
+          }
+          
+          var iframe = '<iframe border="0" src="graph.html?device='+device+'&pin='+pin+'&sensor='+sensor+'&startDate='+startDate+'" width="430px" height="350px"></iframe>';
+          $('#dialog-chart').html(iframe);
+          
+        });
+      },
+      click:function() {
+        $( this ).dialog( 'close' );
+      }
+    }]
+  });
+
+  $dialog.dialog('open');
+}
+
 function editSensor($sensorAdminButton) {
   for (var i=0; i<globalOverview[$sensorAdminButton.attr('data-an-device')].sensors.length; i++) {
     if ($sensorAdminButton.attr('data-an-sensor') == globalOverview[$sensorAdminButton.attr('data-an-device')].sensors[i].name) {
@@ -669,6 +778,18 @@ function editSensor($sensorAdminButton) {
       $dialog.find('#dialog-sensor-display').val(curSensor.display);
       $dialog.find('#dialog-sensor-unit').val(curSensor.unit);
       $dialog.find('#dialog-sensor-enabled').prop('checked', curSensor.enabled);
+      $dialog.find('#dialog-sensor-monitored').prop('checked', curSensor.monitored);
+      $dialog.find('#dialog-sensor-monitored-every').find('option[value="'+(curSensor.monitored_every==0?1:curSensor.monitored_every)+'"]').prop('selected', true);
+      
+      if (!curSensor.monitored) {
+        $dialog.find('#p-dialog-sensor-monitored-every').hide();
+      } else {
+        $dialog.find('#p-dialog-sensor-monitored-every').show();
+      }
+      
+      $dialog.find('#dialog-sensor-monitored').unbind('change').change(function() {
+        $dialog.find('#p-dialog-sensor-monitored-every').slideToggle();
+      });
       
       $dialog.on('keypress', function(e) {
         var code = (e.keyCode ? e.keyCode : e.which);
@@ -677,8 +798,10 @@ function editSensor($sensorAdminButton) {
           var curDisplay=$(this).find('#dialog-sensor-display').val();
           var curUnit=$(this).find('#dialog-sensor-unit').val();
           var curEnabled=$(this).find('#dialog-sensor-enabled').prop('checked')?'true':'false';
+          var curMonitored=$(this).find('#dialog-sensor-monitored').prop('checked')?'true':'false';
+          var curMonitoredEvery=$(this).find('#dialog-sensor-monitored-every').val();
           
-          okDialogSensor($sensorAdminButton.attr('data-an-device'), curName, curDisplay, curUnit, curEnabled);
+          okDialogSensor($sensorAdminButton.attr('data-an-device'), curName, curDisplay, curUnit, curEnabled, curMonitored, curMonitoredEvery);
           
           $( this ).dialog( 'close' );
         }
@@ -695,8 +818,10 @@ function editSensor($sensorAdminButton) {
             var curDisplay=$(this).find('#dialog-sensor-display').val();
             var curUnit=$(this).find('#dialog-sensor-unit').val();
             var curEnabled=$(this).find('#dialog-sensor-enabled').prop('checked')?'true':'false';
+            var curMonitored=$(this).find('#dialog-sensor-monitored').prop('checked')?'true':'false';
+            var curMonitoredEvery=$(this).find('#dialog-sensor-monitored-every').val();
             
-            okDialogSensor($sensorAdminButton.attr('data-an-device'), curName, curDisplay, curUnit, curEnabled);
+            okDialogSensor($sensorAdminButton.attr('data-an-device'), curName, curDisplay, curUnit, curEnabled, curMonitored, curMonitoredEvery);
             
             $( this ).dialog( 'close' );
           }
@@ -708,10 +833,10 @@ function editSensor($sensorAdminButton) {
   }
 }
 
-function okDialogSensor(curDevice, curName, curDisplay, curUnit, curEnabled) {
+function okDialogSensor(curDevice, curName, curDisplay, curUnit, curEnabled, curMonitored, curMonitoredEvery) {
   var url = prefix+'/SETSENSORDATA/';
   var $posting = $.post(url,
-                        {name: curName, device: curDevice, display: curDisplay, unit: curUnit, enabled: curEnabled}
+    {name: curName, device: curDevice, display: curDisplay, unit: curUnit, enabled: curEnabled, monitored: curMonitored, monitored_every: curMonitoredEvery}
   );
   
   $posting.done(function(data) {
@@ -732,6 +857,8 @@ function okDialogSensor(curDevice, curName, curDisplay, curUnit, curEnabled) {
         globalOverview[curDevice].sensors[i].display = curDisplay;
         globalOverview[curDevice].sensors[i].unit = curUnit;
         globalOverview[curDevice].sensors[i].enabled = curEnabled;
+        globalOverview[curDevice].sensors[i].monitored = curMonitored;
+        globalOverview[curDevice].sensors[i].monitoredEvery = curMonitoredEvery;
       }
     }
   });
@@ -900,6 +1027,18 @@ function editSwitch($switchAdminButton) {
       $dialog.find('#dialog-switch-display').val(curSwitch.display);
       $dialog.find('#dialog-switch-type').find('option[value="'+curSwitch.type+'"]').prop('selected', true);
       $dialog.find('#dialog-switch-enabled').prop('checked', curSwitch.enabled);
+      $dialog.find('#dialog-switch-monitored').prop('checked', curSwitch.monitored);
+      $dialog.find('#dialog-switch-monitored-every').find('option[value="'+(curSwitch.monitored_every==0?1:curSwitch.monitored_every)+'"]').prop('selected', true);
+      
+      if (!curSwitch.monitored) {
+        $dialog.find('#p-dialog-switch-monitored-every').hide();
+      } else {
+        $dialog.find('#p-dialog-switch-monitored-every').show();
+      }
+      
+      $dialog.find('#dialog-switch-monitored').unbind('change').change(function() {
+        $dialog.find('#p-dialog-switch-monitored-every').slideToggle();
+      });
       
       $dialog.on('keypress', function(e) {
         var code = (e.keyCode ? e.keyCode : e.which);
@@ -908,8 +1047,10 @@ function editSwitch($switchAdminButton) {
           var curDisplay=$(this).find('#dialog-switch-display').val();
           var curType=$(this).find('#dialog-switch-type').val();
           var curEnabled=$(this).find('#dialog-switch-enabled').prop('checked')?'true':'false';
+          var curMonitored=$(this).find('#dialog-switch-monitored').prop('checked')?'true':'false';
+          var curMonitoredEvery=$(this).find('#dialog-switch-monitored-every').val();
           
-          okDialogSwitch($switchAdminButton.attr('data-an-device'), curName, curDisplay, curType, curEnabled);
+          okDialogSwitch($switchAdminButton.attr('data-an-device'), curName, curDisplay, curType, curEnabled, curMonitored, curMonitoredEvery);
           
           $( this ).dialog( 'close' );
         }
@@ -927,8 +1068,10 @@ function editSwitch($switchAdminButton) {
             var curDisplay=$(this).find('#dialog-switch-display').val();
             var curType=$(this).find('#dialog-switch-type').val();
             var curEnabled=$(this).find('#dialog-switch-enabled').prop('checked')?'true':'false';
+            var curMonitored=$(this).find('#dialog-switch-monitored').prop('checked')?'true':'false';
+            var curMonitoredEvery=$(this).find('#dialog-switch-monitored-every').val();
             
-            okDialogSwitch($switchAdminButton.attr('data-an-device'), curName, curDisplay, curType, curEnabled);
+            okDialogSwitch($switchAdminButton.attr('data-an-device'), curName, curDisplay, curType, curEnabled, curMonitored, curMonitoredEvery);
             
             $( this ).dialog( 'close' );
           }
@@ -940,10 +1083,10 @@ function editSwitch($switchAdminButton) {
   }
 }
 
-function okDialogSwitch(curDevice, curName, curDisplay, curType, curEnabled) {
+function okDialogSwitch(curDevice, curName, curDisplay, curType, curEnabled, curMonitored, curMonitoredEvery) {
   var url = prefix+'/SETPINDATA/';
   var $posting = $.post(url,
-    {name: curName, device: curDevice, display: curDisplay, type: curType, enabled: curEnabled}
+    {name: curName, device: curDevice, display: curDisplay, type: curType, enabled: curEnabled, monitored: curMonitored, monitored_every: curMonitoredEvery}
   );
   
   $posting.done(function(data) {
@@ -972,6 +1115,8 @@ function okDialogSwitch(curDevice, curName, curDisplay, curType, curEnabled) {
       if (globalOverview[curDevice].pins[i].name == curName) {
         globalOverview[curDevice].pins[i].display = curDisplay;
         globalOverview[curDevice].pins[i].enabled = curEnabled;
+        globalOverview[curDevice].pins[i].monitored = curMonitored;
+        globalOverview[curDevice].pins[i].monitoredEvery = curMonitoredEvery;
       }
     }
   });
@@ -1543,11 +1688,11 @@ function editSchedule($schedule) {
   
   $dialog.dialog('open');
   
-  initScriptSchedule($dialog, $schedule);
+  initDialogSchedule($dialog, $schedule);
         
 }
 
-function initScriptSchedule($dialog, $schedule) {
+function initDialogSchedule($dialog, $schedule) {
   $('#dialog-schedule-date').datepicker({
     showOn: "button",
     buttonImage: "images/calendar.gif",
@@ -1577,9 +1722,11 @@ function initScriptSchedule($dialog, $schedule) {
     if ($(this).prop('checked')) {
       $('.p-dialog-schedule-repeat-every').slideDown();
       $('#dialog-schedule-repeat-every').trigger('change');
+      $('.p-dialog-schedule-remove-after-done').slideUp();
     } else {
       $('.p-dialog-schedule-repeat-every').slideUp();
       $('.p-dialog-schedule-repeat-value-dow').slideUp();
+      $('.p-dialog-schedule-remove-after-done').slideDown();
     }
   });
   
@@ -1601,6 +1748,7 @@ function initScriptSchedule($dialog, $schedule) {
     setDateDisplay(new Date());
     $('#dialog-schedule-repeat').prop('checked', false);
     $('#dialog-schedule-repeat-every option[value="0"]').prop('selected', true);
+    $('#dialog-schedule-remove-after-done').prop('checked', false);
     $('.p-dialog-schedule-repeat-every').hide();
     $('.p-dialog-schedule-repeat-value-dow').hide();
   } else {
@@ -1609,6 +1757,7 @@ function initScriptSchedule($dialog, $schedule) {
     $('#dialog-schedule-id').val(curSchedule.id);
     $('#dialog-schedule-name').val(curSchedule.name);
     $('#dialog-schedule-enabled').prop('checked', curSchedule.enabled);
+    $('#dialog-schedule-remove-after-done').prop('checked', curSchedule.remove_after_done);
     $('#dialog-schedule-script option[value="'+curSchedule.script.id+'"]').prop('selected', true);
     $('#dialog-schedule-device option[value="'+curSchedule.device+'"]').prop('selected', true);
     curDate.setUTCSeconds(curSchedule.next_time);
@@ -1672,6 +1821,7 @@ function okSchedule($dialog) {
     return false;
   }
   postParams.next_time = nextTime.getTime() / 1000;
+  postParams.remove_after_done = $dialog.find('#dialog-schedule-remove-after-done').prop('checked')?1:0;
   
   if ($dialog.find('#dialog-schedule-repeat').prop('checked')) {
     postParams.repeat_schedule = $dialog.find('#dialog-schedule-repeat-every').val();

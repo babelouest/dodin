@@ -19,6 +19,14 @@ $servers[] = array(
                 "password" => "");
 
 $servers[] = array(
+                "device" => "DEV1",
+                "name" => "mellant",
+                "display" => "Cuisine",
+                "host" => "mellant",
+                "port" => 6600,
+                "password" => "");
+
+$servers[] = array(
                 "device" => "DEV2",
                 "name" => "amanguin",
                 "display" => "Chambre du fond",

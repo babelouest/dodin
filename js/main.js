@@ -318,6 +318,7 @@ function overviewDevice(deviceId) {
           var heaterId = $(this).attr('data-an-heater');
           var deviceId = $(this).attr('data-an-device');
           var isChecked = $(this).prop('checked');
+          var $check = $(this);
           var url = prefix+'/SETHEATER/'+deviceId+'/'+heaterId+'/'+(isChecked?'1':'0')+'/'+$('#he-slide-'+deviceId+'-'+heaterId).slider( 'value' );
           var jqxhr = $.get( url, function(data) {
             //var json = $.parseJSON(data);
@@ -326,6 +327,8 @@ function overviewDevice(deviceId) {
             var $label = $('#label-heater-'+deviceId+'-'+heaterId);
             var curLabel = $label.text();
             $label.text($.t('Error setting heater'));
+            $check.prop('checked', !isChecked);
+            $('#he-slide-'+deviceId+'-'+$check.attr('data-an-heater')).slider('option', 'disabled', isChecked);
             setTimeout(function() {
               $label.text(curLabel);
             }, 10000);
@@ -561,18 +564,18 @@ function enableSchedule($schedule, value) {
       }
     } else {
       $message.text($.t('Error setting schedule'));
+      $schedule.prop('checked', !isChecked);
       setTimeout(function() {
         $message.text(curMessage);
       }, 10000);
-      $schedule.prop('checked', isChecked);
     }
   })
   .fail(function() {
     $message.text($.t('Error setting schedule')+', '+$.t('network error'));
+    $schedule.prop('checked', !isChecked);
     setTimeout(function() {
       $message.text(curMessage);
     }, 10000);
-    $schedule.prop('checked', isChecked);
   })
 }
 

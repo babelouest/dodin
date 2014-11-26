@@ -23,6 +23,7 @@ function htmlI18n() {
   $('#admin-action-global-add').attr('value', $.t('Add'));
   $('#dialog-script-action-add').attr('value', $.t('Add'));
   $('#refresh').attr('value', $.t('Refresh'));
+  $('#archive').attr('value', $.t('Run archive'));
   $('#dialog-script-action-up').attr('value', $.t('Up'));
   $('#dialog-script-action-down').attr('value', $.t('Down'));
   $('#dialog-script-action-remove').attr('value', $.t('Remove'));
@@ -67,7 +68,7 @@ $(document).ready(function() {
 
   $(function() {
     $.contextMenu({
-      selector: '.admin-modify',
+      selector: '.admin-modify-graph',
       trigger: 'left',
       callback: function (key, options) {
         if (key == 'graph') {
@@ -91,6 +92,27 @@ $(document).ready(function() {
       items: {
         'edit': {name: $.t('Edit'), icon: 'edit'},
         'graph': {name: $.t('Graph'), icon: 'graph'},
+      }
+    });
+  });
+
+  $(function() {
+    $.contextMenu({
+      selector: '.admin-modify',
+      trigger: 'left',
+      callback: function (key, options) {
+        if ($(this).attr('name').indexOf('admin-sensor-') == 0) {
+          editSensor($(this));
+        } else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
+          editSwitch($(this));
+        } else if ($(this).attr('name').indexOf('admin-light-') == 0) {
+          editLight($(this));
+        } else if ($(this).attr('name').indexOf('admin-heater-') == 0) {
+          editHeater($(this));
+        }
+      },
+      items: {
+        'edit': {name: $.t('Edit'), icon: 'edit'},
       }
     });
   });
@@ -146,6 +168,10 @@ function initDevices() {
       
       $('#refresh').click(function () {
         refresh(true);
+      });
+
+      $('#archive').click(function() {
+        archive();
       });
       
       $('#global-lang-select option[value="'+$.i18n.options.lng+'"]').prop('selected', true);
@@ -203,7 +229,7 @@ function overviewDevice(deviceId) {
           // Three-way
           pinClass = 'sw-type-tw';
         }
-        var htmlPin = '<p id="p-switch-'+deviceId+'-'+pin.name+'" class="'+(!pin.enabled?'p-hidden':'')+' '+pinClass+'"><input type="button" class="admin-button admin-modify" value="+" name="admin-switch-'+deviceId+'-'+pin.name+'" id="admin-switch-'+deviceId+'-'+pin.name+'" data-an-device="'+deviceId+'" data-an-switch="'+pin.name+'"/><input type="checkbox" value="sw-'+deviceId+'-'+pin.name+'" data-an-device="'+deviceId+'" data-an-pin="'+pin.name+'" name="sw-'+deviceId+'-'+pin.name+'" id="sw-'+deviceId+'-'+pin.name+'" '+isChecked+' data-an-display="'+pin.enabled+'"/>';
+        var htmlPin = '<p id="p-switch-'+deviceId+'-'+pin.name+'" class="'+(!pin.enabled?'p-hidden':'')+' '+pinClass+'"><input type="button" class="admin-button admin-modify-graph" value="+" name="admin-switch-'+deviceId+'-'+pin.name+'" id="admin-switch-'+deviceId+'-'+pin.name+'" data-an-device="'+deviceId+'" data-an-switch="'+pin.name+'"/><input type="checkbox" value="sw-'+deviceId+'-'+pin.name+'" data-an-device="'+deviceId+'" data-an-pin="'+pin.name+'" name="sw-'+deviceId+'-'+pin.name+'" id="sw-'+deviceId+'-'+pin.name+'" '+isChecked+' data-an-display="'+pin.enabled+'"/>';
         htmlPin += '<label for="sw-'+deviceId+'-'+pin.name+'" id="label-sw-'+deviceId+'-'+pin.name+'" >'+pin.display+'</label>';
         htmlPin += '<label id="message-'+deviceId+'-'+pin.name+'"></label></p>\n';
         $switches.append(htmlPin);
@@ -233,12 +259,17 @@ function overviewDevice(deviceId) {
       var $sensor = $('#sensor-'+deviceId+' .inside');
       for (var i=0; i<json.sensors.length; i++) {
         var sensor = json.sensors[i];
-        var htmlSensor = '<p id="p-sensor-'+deviceId+'-'+sensor.name+'" class="'+(!sensor.enabled?'p-hidden':'')+'"><input type="button" class="admin-button admin-modify" value="+" name="admin-sensor-'+deviceId+'-'+sensor.name+'" id="admin-sensor-'+deviceId+'-'+sensor.name+'" data-an-device="'+deviceId+'" data-an-sensor="'+sensor.name+'"/><label id="label-'+deviceId+'-'+sensor.name+'" for="'+deviceId+'-'+sensor.name+'">'+sensor.display+': </label>';
+        var htmlSensor = '<p id="p-sensor-'+deviceId+'-'+sensor.name+'" class="'+(!sensor.enabled?'p-hidden':'')+'"><input type="button" class="admin-button admin-modify-graph" value="+" name="admin-sensor-'+deviceId+'-'+sensor.name+'" id="admin-sensor-'+deviceId+'-'+sensor.name+'" data-an-device="'+deviceId+'" data-an-sensor="'+sensor.name+'"/><label id="label-'+deviceId+'-'+sensor.name+'" for="'+deviceId+'-'+sensor.name+'">'+sensor.display+': </label>';
         htmlSensor += '<label id="value-'+deviceId+'-'+sensor.name+'" value="'+sensor.value+'">'+sensor.value+' '+sensor.unit+'</label></p>\n';
         $sensor.append($(htmlSensor));
         if (!sensor.enabled) {
           $('#p-sensor'+deviceId+'-'+sensor.name).hide();
         }
+        $('#value-'+deviceId+'-'+sensor.name).click(function() {
+          var curIdSplit = $(this).attr('id').split('-');
+          var $fakeButton = $('<input type="button" data-an-device="'+curIdSplit[1]+'" data-an-sensor="'+curIdSplit[2]+'"/>');
+          monitorElement($fakeButton);
+        });
       }
       
       var $heater = $('#heater-'+deviceId+' .inside');
@@ -264,12 +295,19 @@ function overviewDevice(deviceId) {
             },
             change:function( event, ui ) {
               if (event.originalEvent) {
-                var url = prefix+'/SETHEATER/'+$(this).attr('data-an-device')+'/'+$(this).attr('data-an-heater')+'/1/'+$(this).slider( 'value' );
+                var heaterId = $(this).attr('data-an-heater');
+                var deviceId = $(this).attr('data-an-device');
+                var url = prefix+'/SETHEATER/'+deviceId+'/'+heaterId+'/1/'+$(this).slider( 'value' );
                 var jqxhr = $.get( url, function(data) {
                   //var json = $.parseJSON(data);
                 })
                 .fail(function() {
-                  $('#message-'+deviceId).text($.t('Error setting heater'));
+                  var $label = $('#label-heater-'+deviceId+'-'+heaterId);
+                  var curLabel = $label.text();
+                  $label.text($.t('Error setting heater'));
+                  setTimeout(function() {
+                    $label.text(curLabel);
+                  }, 10000);
                 });
               }
             }
@@ -277,12 +315,20 @@ function overviewDevice(deviceId) {
         });
         $('#he-'+deviceId+'-'+heater.name).change(function() {
           var $check = $('#he-'+deviceId+'-'+$(this).attr('data-an-heater'));
-          var url = prefix+'/SETHEATER/'+deviceId+'/'+$(this).attr('data-an-heater')+'/'+($(this).prop('checked')?'1':'0')+'/'+$('#he-slide-'+deviceId+'-'+$(this).attr('data-an-heater')).slider( 'value' );
+          var heaterId = $(this).attr('data-an-heater');
+          var deviceId = $(this).attr('data-an-device');
+          var isChecked = $(this).prop('checked');
+          var url = prefix+'/SETHEATER/'+deviceId+'/'+heaterId+'/'+(isChecked?'1':'0')+'/'+$('#he-slide-'+deviceId+'-'+heaterId).slider( 'value' );
           var jqxhr = $.get( url, function(data) {
             //var json = $.parseJSON(data);
           })
           .fail(function() {
-            $('#message-'+deviceId).text($.t('Error setting heater')+', '+$.t('network error'));
+            var $label = $('#label-heater-'+deviceId+'-'+heaterId);
+            var curLabel = $label.text();
+            $label.text($.t('Error setting heater'));
+            setTimeout(function() {
+              $label.text(curLabel);
+            }, 10000);
           });
           $('#he-slide-'+deviceId+'-'+$(this).attr('data-an-heater')).slider('option', 'disabled', !$(this).prop('checked'));
         });
@@ -351,11 +397,17 @@ function setSwitchValue(device, pin, value) {
     if (json.result.response == 1 || json.result.response == 0) {
       $message.text('');
     } else {
-      $message.text($.t('Error setting switch'));
+      $message.text(' '+$.t('Error setting switch'));
+      setTimeout(function() {
+        $message.text('');
+      }, 10000);
     }
   })
   .fail(function() {
-    $message.text($.t('Error setting switch')+', '+$.t('network error'));
+    $message.text(' '+$.t('Error setting switch')+', '+$.t('network error'));
+    setTimeout(function() {
+      $message.text('');
+    }, 10000);
   })
 }
 
@@ -415,19 +467,25 @@ function runScript(scriptButton) {
   if ($(scriptButton).attr('data-an-device') != "") {
     $message = $('#message-script-'+$(scriptButton).attr('data-an-device')+'-'+scriptId);
   }
-  $message.text($.t('Running')+'...');
+  $message.text(' '+$.t('Running')+'...');
   var url = prefix+'/RUNSCRIPT/'+scriptId;
   var jqxhr = $.get( url, function(data) {
     var json = $.parseJSON(data);
     if (json.result == 'ok') {
       $message.text('');
     } else {
-      $message.text($.t('Error running task'));
+      $message.text(' '+$.t('Error running task'));
+      setTimeout(function() {
+        $message.text('');
+      }, 10000);
     }
     refresh(false);
   })
   .fail(function() {
-    $message.text($.t('Error running task')+', '+$.t('network error'));
+    $message.text(' '+$.t('Error running task')+', '+$.t('network error'));
+    setTimeout(function() {
+      $message.text('');
+    }, 10000);
   })
 }
 
@@ -484,6 +542,8 @@ function initSchedules() {
 function enableSchedule($schedule, value) {
   var scheduleId = $schedule.attr('data-an-schedule');
   var $message = $('#message-schedule-'+scheduleId);
+  var curMessage = $message.text();
+  var isChecked = $schedule.prop('checked');
   if ($schedule.attr('data-an-device') != "") {
     $message = $('#message-schedule-'+$schedule.attr('data-an-device')+'-'+scheduleId);
   }
@@ -501,10 +561,18 @@ function enableSchedule($schedule, value) {
       }
     } else {
       $message.text($.t('Error setting schedule'));
+      setTimeout(function() {
+        $message.text(curMessage);
+      }, 10000);
+      $schedule.prop('checked', isChecked);
     }
   })
   .fail(function() {
     $message.text($.t('Error setting schedule')+', '+$.t('network error'));
+    setTimeout(function() {
+      $message.text(curMessage);
+    }, 10000);
+    $schedule.prop('checked', isChecked);
   })
 }
 
@@ -611,6 +679,52 @@ function refresh(force) {
   } else {
     $('#footer-message').text($.t('Last sync')+': '+date.toLocaleString());
   }
+}
+
+function archive() {
+  var url = prefix+'/ARCHIVE/';
+  var $message = $('#header-message-global');
+  $message.text($.t('Archiving')+'...');
+  var archiveUpTo = $('#global-archive-up-to').val();
+  var curDate = new Date();
+  curDate.setHours(0);
+  curDate.setMinutes(0);
+  curDate.setSeconds(0);
+  switch (archiveUpTo) {
+    case "1-week":
+      curDate.setDate(curDate.getDate() - 7);
+      break;
+    case "2-weeks":
+      curDate.setDate(curDate.getDate() - 14);
+      break;
+    case "1-month":
+      curDate.setMonth(curDate.getMonth() - 1);
+      break;
+    case "3-months":
+      curDate.setMonth(curDate.getMonth() - 3);
+      break;
+    case "1-year":
+      curDate.setFullYear(curDate.getFullYear() - 1);
+      break;
+  }
+  url += parseInt(curDate.getTime() / 1000);
+  var jqxhr = $.get( url, function(data) {
+    var json = $.parseJSON(data);
+    if (json.result != 'error') {
+      $message.text($.t('Archve complete'));
+    } else {
+      $message.text($.t('Error archiving'));
+    }
+    setTimeout(function() {
+      $message.text('');
+    }, 10000);
+  })
+  .fail(function() {
+    $message.text($.t('Error archiving')+', '+$.t('network error'));
+    setTimeout(function() {
+      $message.text('');
+    }, 10000);
+  });
 }
 
 function updateMpds() {

@@ -111,11 +111,30 @@
           </select>
         </p>
         <p>
-          <input type="button" name="refresh" id="refresh" value="Refresh" />
+          <label for="refresh" data-i18n>Refresh data</label>
+          <input type="button" name="refresh" id="refresh" value="Refresh" data-i18n />
         </p>
         <p>
           <label id="header-message-global"></label>
         </p>
+      </div>
+      <div id="archive-global" class="archive">
+        <div class="inside">
+          <h3 data-i18n>Archive</h3>
+          <p>
+            <label for="global-archive-up-to" data-i18n>Archive up to</label>
+            <select id="global-archive-up-to" name="global-archive-up-to">
+              <option value="1-week" data-i18n>Last week</option>
+              <option value="2-weeks" data-i18n>Last 2 weeks</option>
+              <option value="1-month" data-i18n>Last month</option>
+              <option value="3-months" data-i18n>Last 3 months</option>
+              <option value="1-year" data-i18n>Last year</option>
+            </select>
+          </p>
+          <p>
+            <input type="button" name="archive" id="archive" value="Run archive" data-i18n />
+          </p>
+        </div>
       </div>
       <div id="script-global" class="scripts">
         <div class="inside">

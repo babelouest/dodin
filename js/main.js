@@ -305,8 +305,10 @@ function overviewDevice(deviceId) {
                   var $label = $('#label-heater-'+deviceId+'-'+heaterId);
                   var curLabel = $label.text();
                   $label.text($.t('Error setting heater'));
+                  $(this).slider('option', 'disabled', true);
                   setTimeout(function() {
                     $label.text(curLabel);
+                    $(this).slider('option', 'disabled', false);
                   }, 10000);
                 });
               }
@@ -328,9 +330,12 @@ function overviewDevice(deviceId) {
             var curLabel = $label.text();
             $label.text($.t('Error setting heater'));
             $check.prop('checked', !isChecked);
-            $('#he-slide-'+deviceId+'-'+$check.attr('data-an-heater')).slider('option', 'disabled', isChecked);
+            $check.prop('disabled', true);
+            $('#he-slide-'+deviceId+'-'+$check.attr('data-an-heater')).slider('option', 'disabled', true);
             setTimeout(function() {
               $label.text(curLabel);
+              $check.prop('disabled', false);
+              $('#he-slide-'+deviceId+'-'+$check.attr('data-an-heater')).slider('option', 'disabled', isChecked);
             }, 10000);
           });
           $('#he-slide-'+deviceId+'-'+$(this).attr('data-an-heater')).slider('option', 'disabled', !$(this).prop('checked'));
@@ -393,6 +398,7 @@ function resetDevice(device) {
 
 function setSwitchValue(device, pin, value) {
   var $message = $('#message-'+device+'-PIN'+pin);
+  var $switch = $('#sw-'+device+'-PIN'+pin);
   $message.text('...');
   var url = prefix+'/SETPIN/'+device+'/'+pin+'/'+value;
   var jqxhr = $.get( url, function(data) {
@@ -401,15 +407,21 @@ function setSwitchValue(device, pin, value) {
       $message.text('');
     } else {
       $message.text(' '+$.t('Error setting switch'));
+      $switch.prop('checked', !$switch.prop('checked'));
+      $switch.prop('disabled', true);
       setTimeout(function() {
         $message.text('');
+        $switch.prop('disabled', false);
       }, 10000);
     }
   })
   .fail(function() {
     $message.text(' '+$.t('Error setting switch')+', '+$.t('network error'));
+    $switch.prop('checked', !$switch.prop('checked'));
+    $switch.prop('disabled', true);
     setTimeout(function() {
       $message.text('');
+      $switch.prop('disabled', false);
     }, 10000);
   })
 }
@@ -565,16 +577,20 @@ function enableSchedule($schedule, value) {
     } else {
       $message.text($.t('Error setting schedule'));
       $schedule.prop('checked', !isChecked);
+      $schedule.prop('disabled', true);
       setTimeout(function() {
         $message.text(curMessage);
+        $schedule.prop('disabled', false);
       }, 10000);
     }
   })
   .fail(function() {
     $message.text($.t('Error setting schedule')+', '+$.t('network error'));
     $schedule.prop('checked', !isChecked);
+    $schedule.prop('disabled', true);
     setTimeout(function() {
       $message.text(curMessage);
+      $schedule.prop('disabled', false);
     }, 10000);
   })
 }

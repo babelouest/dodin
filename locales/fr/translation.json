@@ -75,6 +75,7 @@
     "Refresh device": "Rafraîchir les données d'un contrôleur",
     "Get switch status": "Etat d'un interrupteur",
     "Set switch status": "Modifier l'état d'un interrupteur",
+    "Toggle switch": "Basculer un interrupteur",
     "Get sensor status": "Etat d'un capteur",
     "Set heater status": "Modifier le chauffage",
     "Sleep (milliseconds)": "Attendre (millisecondes)",
@@ -157,5 +158,10 @@
     "Close": "Fermer",
     "Archive": "Archive",
     "Archive up to": "Archiver jusqu'à",
-    "Run archive": "Lancer l'archivage"
+    "Run archive": "Lancer l'archivage",
+    "Last snapshot": "Dernière image",
+    "Pictures list": "Liste des images",
+    "Pictures type": "Types d'images",
+    "Scheduled": "Programmée",
+    "Triggered": "Déclenchée"
 }

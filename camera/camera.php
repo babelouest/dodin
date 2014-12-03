@@ -11,16 +11,15 @@ header("Content-type: image/png");
 header("Cache-Control: no-cache, must-revalidate");
 if (isset($camera[$device])) {
   $photoDir = $sourcePath.$camera[$device];
-  $lastFile = "lastsnap.jpg";
-  /*$files = scandir($photoDir, SCANDIR_SORT_DESCENDING);
-  $ext = ".jpg";
-  for ($i=0; $i<count($files); $i++) {
-    if (substr($files[$i], -strlen($ext)) === $ext) {
-      $lastFile = $files[$i];
-      break;
-    }
-  }*/
-  $im = imagecreatefromjpeg("$photoDir/" . $lastFile);
+  $curFile = "lastsnap.jpg";
+  if (isset($_GET['file'])) {
+    $curFile = $_GET['file'];
+  }
+  if (isset($_GET['alert']) && $_GET['alert'] == 'true') {
+    $photoDir .= ('/'.$triggered);
+  }
+error_log($photoDir);
+  $im = imagecreatefromjpeg("$photoDir/" . $curFile);
   $rsr_scl = imagecreatetruecolor(640, 480);
   imagecopyresized($rsr_scl, $im, 0, 0, 0, 0, 640, 480, 1280, 1024);
   imagejpeg($rsr_scl);

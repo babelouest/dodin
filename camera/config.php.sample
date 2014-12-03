@@ -5,3 +5,5 @@ $camera = array();
 $camera["DEV1"] = "host1";
 
 $sourcePath = "/path_to_pictures/";
+
+$triggered = "relative_path_to_triggered_files"; // Format is $sourcePath/$camera[$current]/$triggered

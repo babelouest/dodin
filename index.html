@@ -87,7 +87,18 @@
       <div id="camera-TEMPLATE" class="camera block">
         <div class="inside">
           <h3 data-i18n>Camera</h3>
-          <img src="camera/lastone.php?device=TEMPLATE" id="camera-lastone-TEMPLATE">
+          <p>
+            <label for="camera-list-TEMPLATE" data-i18n>Pictures list</label>
+            <select name="camera-list-TEMPLATE" id="camera-list-TEMPLATE"></select>
+            <label data-i18n>Pictures type</label>
+            <input type="radio" name="camera-switch-TEMPLATE" id="camera-switch-TEMPLATE-sched" checked="checked" />
+            <label for="camera-switch-TEMPLATE-sched" data-i18n>Scheduled</label>
+            <input type="radio" name="camera-switch-TEMPLATE" id="camera-switch-TEMPLATE-trigg" />
+            <label for="camera-switch-TEMPLATE-trigg" data-i18n>Triggered</label>
+          </p>
+          <p>
+            <img src="camera/camera.php?device=TEMPLATE" id="camera-photo-TEMPLATE">
+          </p>
         </div>
       </div>
       <div id="admin-TEMPLATE" >
@@ -320,6 +331,7 @@
       <option value="2" data-i18n>Refresh device</option>
       <option value="3" data-i18n>Get switch status</option>
       <option value="4" data-i18n>Set switch status</option>
+      <option value="7" data-i18n>Toggle switch</option>
       <option value="5" data-i18n>Get sensor status</option>
       <option value="6" data-i18n>Set heater status</option>
       <option value="88" data-i18n>Sleep (milliseconds)</option>

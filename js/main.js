@@ -5,6 +5,8 @@ var globalOverview = [];
 var globalActions = [];
 var globalScripts = [];
 var globalSchedules = [];
+var globalImages = [];
+var globalAlerts = [];
 var adminGlobal = false;
 var userLang = navigator.language || navigator.userLanguage;
 var globalMpd = [];
@@ -189,6 +191,8 @@ function initDevices() {
       initScripts();
       
       initSchedules();
+
+      initCameras();
       
       $('#message').text('');
       
@@ -348,6 +352,15 @@ function overviewDevice(deviceId) {
     }
 
     initMusic(deviceId);
+
+    $('#camera-list-'+deviceId).change(function () {
+      $('#camera-photo-'+deviceId).attr('src', 'camera/camera.php?device=' + deviceId + '&file=' + $(this).val() + '&alert=' + ($('#camera-switch-'+deviceId+'-trigg').prop('checked')?'true':'false'));
+    });
+
+    $('input[name=camera-switch-'+deviceId+']').change(function() {
+      triggerImagesListChange($(this).attr('name').split('-').slice(-1).pop(), ($(this).attr('id').split('-').slice(-1).pop() == 'trigg'));
+      $('#camera-list-'+deviceId).trigger('change');
+    });
   })
   .fail(function() {
     $('#message-'+deviceId).text($.t('Error getting device values'));
@@ -634,7 +647,13 @@ function refresh(force) {
       var deviceId = devicesTab[key].name;
       var deviceDisplay = devicesTab[key].display;
       
-      $('#camera-lastone-'+deviceId).attr('src', 'camera/lastone.php?device=' + deviceId + '&dt=' + new Date().getTime());
+      var selected = $('#camera-list-'+deviceId).val();
+      var urlImages = 'camera/listfiles.php?device='+deviceId;
+      getImages(urlImages, deviceId, false);
+      var urlAlerts = 'camera/listfiles.php?device='+deviceId+'&alert=true';
+      getImages(urlAlerts, deviceId, true);
+      $('#camera-list-'+deviceId+' option [value="'+selected+'"]').prop('selected', true);
+      $('#camera-list-'+deviceId).trigger('change');
       
       var jqxhr = $.get( url+deviceId, function(data) {
         var json = $.parseJSON(data);
@@ -1398,6 +1417,16 @@ function initActionDialog($dialog, $action) {
         $pParams.slideUp();
         $pParamsSetpin.slideDown();
         $pParamsValue.slideDown();
+        break;
+      case "7":
+        // TOGGLE
+        $devicesList.prop('disabled', false);
+        $pinsList.prop('disabled', false);
+        $sensorsList.prop('disabled', true);
+        $heatersList.prop('disabled', true);
+        $pParams.slideUp();
+        $pParamsSetpin.slideUp();
+        $pParamsValue.slideUp();
         break;
       case "88":
         // SLEEP
@@ -2167,6 +2196,53 @@ function updateMusic(deviceId, mpdName) {
   .fail(function() {
     $('#footer-message-global').text($.t('Error setting music')+', '+$.t('network error'));
   });
+}
+
+function initCameras() {
+  for (key in devicesTab) {
+    var curDevice = devicesTab[key];
+    var urlImages = 'camera/listfiles.php?device='+curDevice.name;
+
+    getImages(urlImages, curDevice.name, false);
+    var $selectList = $('#camera-list-'+curDevice.name);
+    $selectList.append('<option value="lastsnap.jpg">Last snapshot</option>');
+    for (image in globalImages[curDevice.name]) {
+      $selectList.append('<option>'+image+'</option>');
+    }
+
+    var urlAlerts = 'camera/listfiles.php?device='+curDevice.name+'&alert=true';
+    getImages(urlAlerts, curDevice.name, true);
+  }
+}
+
+function getImages(url, device, alert) {
+  var jqxhr = $.get( url, function(data) {
+    var images = $.parseJSON(data);
+    if (images.result == 'ok') {
+      if (alert) {
+        globalAlerts[device] = images.list;
+      } else {
+        globalImages[device] = images.list;
+      }
+      triggerImagesListChange(device, alert);
+    }
+  });
+}
+
+function triggerImagesListChange(device, alert) {
+  var $selectList = $('#camera-list-'+device);
+  if (!alert && $('#camera-switch-'+device+'-sched').prop('checked')) {
+    $selectList.empty();
+    $selectList.append('<option value="lastsnap.jpg">'+$.t('Last snapshot')+'</option>');
+    for (index in globalImages[device]) {
+      $selectList.append('<option>'+globalImages[device][index]+'</option>');
+    }
+  } else if (alert && $('#camera-switch-'+device+'-trigg').prop('checked')) {
+    $selectList.empty();
+    for (index in globalAlerts[device]) {
+      $selectList.append('<option>'+globalAlerts[device][index]+'</option>');
+    }
+  }
 }
 
 });

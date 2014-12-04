@@ -6,7 +6,7 @@
     <link rel="icon" type="image/png" href="images/favicon.png" />
     <link rel="stylesheet" type="text/css" href="css/main.css" />
     <link rel="stylesheet" type="text/css" href="css/jquery-ui-1.10.4.min.css" />
-    
+
     <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="js/i18next-1.7.4.min.js"></script>
     <script type="text/javascript" src="js/jquery-ui-1.10.4.min.js"></script>
@@ -24,6 +24,9 @@
     <script type="text/javascript" src="contextMenu/jquery.contextMenu.js"></script>
     <script type="text/javascript" src="contextMenu/jquery.ui.position.js"></script>
     
+    <!-- lightbox -->
+    <script src="lightbox/js/lightbox-2.6.min.js"></script>
+    <link href="lightbox/css/lightbox.css" rel="stylesheet" />    
   </head>
   <body>
     <div id="container">
@@ -95,9 +98,13 @@
             <label for="camera-switch-TEMPLATE-sched" data-i18n>Scheduled</label>
             <input type="radio" name="camera-switch-TEMPLATE" id="camera-switch-TEMPLATE-trigg" />
             <label for="camera-switch-TEMPLATE-trigg" data-i18n>Triggered</label>
+            <input type="radio" name="camera-switch-TEMPLATE" id="camera-switch-TEMPLATE-stream" />
+            <label for="camera-switch-TEMPLATE-stream" data-i18n>Real-time stream</label>
           </p>
           <p>
-            <img src="camera/camera.php?device=TEMPLATE" id="camera-photo-TEMPLATE">
+            <a data-lightbox="camera-TEMPLATE" id="camera-photo-large-TEMPLATE" href="camera/camera.php?device=TEMPLATE&large">
+              <img src="camera/camera.php?device=TEMPLATE" id="camera-photo-TEMPLATE">
+            </a>
           </p>
         </div>
       </div>

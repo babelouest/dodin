@@ -354,13 +354,21 @@ function overviewDevice(deviceId) {
     initMusic(deviceId);
 
     $('#camera-list-'+deviceId).change(function () {
-      $('#camera-photo-'+deviceId).attr('src', 'camera/camera.php?device=' + deviceId + '&file=' + $(this).val() + '&alert=' + ($('#camera-switch-'+deviceId+'-trigg').prop('checked')?'true':'false'));
+      if (!$('#camera-switch-'+deviceId+'-stream').prop('checked')) {
+        var url = 'camera/camera.php?device=' + deviceId + '&file=' + $(this).val() + '&alert=' + ($('#camera-switch-'+deviceId+'-trigg').prop('checked')?'true':'false') + '&no-cache=' + Math.floor((Math.random() * 100) + 1);
+        $('#camera-photo-'+deviceId).attr('src', url);
+        $('#camera-photo-large-'+deviceId).attr('href', url+'&large');
+      } else {
+        $('#camera-photo-'+deviceId).attr('src', 'camera/stream.php?device=' + deviceId).width('640').height('480');
+        $('#camera-photo-large-'+deviceId).attr('href', 'camera/stream.php?device=' + deviceId);
+      }
     });
 
     $('input[name=camera-switch-'+deviceId+']').change(function() {
-      triggerImagesListChange($(this).attr('name').split('-').slice(-1).pop(), ($(this).attr('id').split('-').slice(-1).pop() == 'trigg'));
+      triggerImagesListChange($(this).attr('name').split('-').slice(-1).pop(), ($(this).attr('id').split('-').slice(-1).pop() == 'trigg'), ($(this).attr('id').split('-').slice(-1).pop() == 'stream'));
       $('#camera-list-'+deviceId).trigger('change');
     });
+    
   })
   .fail(function() {
     $('#message-'+deviceId).text($.t('Error getting device values'));
@@ -2224,12 +2232,12 @@ function getImages(url, device, alert) {
       } else {
         globalImages[device] = images.list;
       }
-      triggerImagesListChange(device, alert);
+      triggerImagesListChange(device, alert, false);
     }
   });
 }
 
-function triggerImagesListChange(device, alert) {
+function triggerImagesListChange(device, alert, stream) {
   var $selectList = $('#camera-list-'+device);
   if (!alert && $('#camera-switch-'+device+'-sched').prop('checked')) {
     $selectList.empty();

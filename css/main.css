@@ -172,3 +172,8 @@ input[type=checkbox]:checked + label {
   font-weight: bold;
   font-style: italic;
 }
+
+.radio-metatada-song {
+  font-size: 100%;
+  font-weight: bold;
+}

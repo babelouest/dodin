@@ -8,6 +8,8 @@
 
   <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
   <script type="text/javascript" src="js/jquery.jqplot.min.js"></script>
+  <script type="text/javascript" src="js/jqplot.highlighter.min.js"></script>
+  <script type="text/javascript" src="js/jqplot.cursor.min.js"></script>
   <script type="text/javascript" src="js/jqplot.canvasTextRenderer.min.js"></script>
   <script type="text/javascript" src="js/jqplot.canvasAxisLabelRenderer.min.js"></script>
   <script type="text/javascript" src="js/jqplot.dateAxisRenderer.min.js"></script>
@@ -42,7 +44,8 @@ $.i18n.init({fallbackLng:'en'}, function() {
     var sensor = getUrlParameter('sensor')?getUrlParameter('sensor'):'0';
     var startDate = getUrlParameter('startDate')?getUrlParameter('startDate'):'';
     var url = prefix + '/MONITOR/'+device+'/'+pin+'/'+sensor+'/'+startDate;
-    
+    var unit = decodeURIComponent(getUrlParameter('unit'));
+
     var jqxhr = $.get( url, function(data) {
       var jsonData = $.parseJSON(data);
       var heatPoints = [];
@@ -59,8 +62,18 @@ $.i18n.init({fallbackLng:'en'}, function() {
           axes:{
             xaxis:{
               renderer:$.jqplot.DateAxisRenderer,
-              tickOptions:{formatString:'%m/%d\n%H:%M:%S'},
+              tickOptions:{formatString:'%d/%m\n%H:%M'}
+            },
+            yaxis:{
+              tickOptions:{formatString:'%.2f'+unit}
             }
+          },
+          highlighter:{
+            show: true,
+            sizeAdjust: 7.5
+          },
+          cursor:{
+            show: false
           },
           series:[{showMarker:false}],
           seriesDefaults: {

@@ -136,6 +136,41 @@
           <label id="header-message-global"></label>
         </p>
       </div>
+      <div id="radio-global" class="radio">
+        <h3 data-i18n>Webradio</h3>
+        <p>
+          <input type="button" id="radio-toggle" name="radio-toggle" value="Show" data-i18n />
+        </p>
+				<p id="p-radio-list">
+					<select id="radio-list" name="radio-list"></select>
+				</p>
+        <p id="p-radio-stream">
+          <audio controls preload="auto" id="radio-stream">
+            <em>Sorry, no source defined.</em>
+          </audio>
+        </p>
+        <p id="p-radio-commands">
+          <a href="#" id="a-radio-command-stop"><img src="images/media-playback-stop-big.png" /></a>
+          <a href="#" id="a-radio-command-start"><img src="images/media-playback-start-big.png" /></a>
+          <a href="#" id="a-radio-command-next"><img src="images/media-playback-next-big.png" /></a>
+        </p>
+        <p id="p-radio-list-songs">
+          <label for="radio-list-song" data-i18n>Song list</label>
+          <select id="radio-list-song" name="radio-list-song"></select>
+        </p>
+        <p id="p-radio-metadata-song">
+          <label data-i18n>Title</label>
+          <label id="radio-metadata-song-title" class="radio-metatada-song"></label><br/>
+          <label data-i18n>Artist</label>
+          <label id="radio-metadata-song-artist" class="radio-metatada-song"></label><br/>
+          <label data-i18n id="label-radio-metadata-song-albumartist">Album artist</label>
+          <label id="radio-metadata-song-albumartist" class="radio-metatada-song"></label><br/>
+          <label data-i18n>Album</label>
+          <label id="radio-metadata-song-album" class="radio-metatada-song"></label><br/>
+          <label data-i18n>Year</label>
+          <label id="radio-metadata-song-year" class="radio-metatada-song"></label><br/>
+        </p>
+      </div>
       <div id="archive-global" class="archive">
         <div class="inside">
           <h3 data-i18n>Archive</h3>

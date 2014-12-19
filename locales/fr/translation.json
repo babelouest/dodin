@@ -164,5 +164,14 @@
     "Pictures type": "Types d'images",
     "Scheduled": "Programmée",
     "Triggered": "Déclenchée",
-    "Real-time stream": "Flux actuel"
+    "Real-time stream": "Flux actuel",
+    "Song list": "Liste des chansons",
+    "Title": "Titre",
+    "Artist": "Artiste",
+    "Album artist": "Artiste de l'album",
+    "Album": "Album",
+    "Year": "Année",
+    "Current song": "Chanson en cours",
+    "Show": "Montrer",
+    "Hide": "Cacher"
 }

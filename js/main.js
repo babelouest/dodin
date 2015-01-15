@@ -251,7 +251,7 @@ function overviewDevice(deviceId) {
 					// Three-way
 					pinClass = 'sw-type-tw';
 				}
-				var htmlPin = '<p id="p-switch-'+deviceId+'-'+pin.name+'" class="'+(!pin.enabled?'p-hidden':'')+' '+pinClass+'"><input type="button" class="admin-button admin-modify-graph" value="+" name="admin-switch-'+deviceId+'-'+pin.name+'" id="admin-switch-'+deviceId+'-'+pin.name+'" data-an-device="'+deviceId+'" data-an-switch="'+pin.name+'"/><input type="checkbox" value="sw-'+deviceId+'-'+pin.name+'" data-an-device="'+deviceId+'" data-an-pin="'+pin.name+'" name="sw-'+deviceId+'-'+pin.name+'" id="sw-'+deviceId+'-'+pin.name+'" '+isChecked+' data-an-display="'+pin.enabled+'"/>';
+				var htmlPin = '<p id="p-switch-'+deviceId+'-'+pin.name+'" class="'+(!pin.enabled?'p-hidden':'')+' '+pinClass+'"><input type="button" class="admin-button admin-modify-graph" value="+" name="admin-switch-'+deviceId+'-'+pin.name+'" id="admin-switch-'+deviceId+'-'+pin.name+'" data-an-device="'+deviceId+'" data-an-switch="'+pin.name+'" data-an-unit=""/><input type="checkbox" value="sw-'+deviceId+'-'+pin.name+'" data-an-device="'+deviceId+'" data-an-pin="'+pin.name+'" name="sw-'+deviceId+'-'+pin.name+'" id="sw-'+deviceId+'-'+pin.name+'" '+isChecked+' data-an-display="'+pin.enabled+'"/>';
 				htmlPin += '<label for="sw-'+deviceId+'-'+pin.name+'" id="label-sw-'+deviceId+'-'+pin.name+'" >'+pin.display+'</label>';
 				htmlPin += '<label id="message-'+deviceId+'-'+pin.name+'"></label></p>\n';
 				$switches.append(htmlPin);
@@ -299,7 +299,7 @@ function overviewDevice(deviceId) {
 				var heater = json.heaters[i];
 				var isSet = heater.set?'checked="checked"':'';
 				var htmlHeater = '<p id="p-heater-'+deviceId+'-'+heater.name+'" class="'+(!heater.enabled?'p-hidden':'')+'"><input type="button" class="admin-button admin-modify" value="+" name="admin-heater-'+deviceId+'-'+heater.name+'" id="admin-heater-'+deviceId+'-'+heater.name+'" data-an-device="'+deviceId+'" data-an-heater="'+heater.name+'"/>\n'
-				htmlHeater += '<input type="checkbox" value="he-'+deviceId+'-'+heater.name+'" data-an-device="'+deviceId+'" data-an-heater="'+heater.name+'" name="he-'+deviceId+'-'+heater.name+'" id="he-'+deviceId+'-'+heater.name+'" '+isSet+' /><label id="label-heater-'+deviceId+'-'+heater.name+'" for="he-'+deviceId+'-'+heater.name+'">'+heater.display+'</label>';
+				htmlHeater += '<input type="checkbox" value="he-'+deviceId+'-'+heater.name+'" data-an-device="'+deviceId+'" data-an-heater="'+heater.name+'" name="he-'+deviceId+'-'+heater.name+'" id="he-'+deviceId+'-'+heater.name+'" '+isSet+' /><label id="label-heater-'+deviceId+'-'+heater.name+'" for="he-'+deviceId+'-'+heater.name+'" data-an-label="'+heater.display+'">'+heater.display+'</label>';
 				htmlHeater += '<div id="label-he-slide-'+deviceId+'-'+heater.name+'"></div><div class="heater" data-an-device="'+deviceId+'" data-an-heater="'+heater.name+'" id="he-slide-'+deviceId+'-'+heater.name+'" ></div>\n';
 				htmlHeater += '</p>\n';
 				$heater.append(htmlHeater);
@@ -325,12 +325,10 @@ function overviewDevice(deviceId) {
 								})
 								.fail(function() {
 									var $label = $('#label-heater-'+deviceId+'-'+heaterId);
-									var curLabel = $label.text();
-									$label.text($.t('Error setting heater'));
-									$(this).slider('option', 'disabled', true);
+									$label.text($label.attr('data-an-label') + ' - ' + $.t('Error setting heater'));
 									setTimeout(function() {
-										$label.text(curLabel);
-										$(this).slider('option', 'disabled', false);
+										$label.text($label.attr('data-an-label'));
+										//$(this).slider('option', 'disabled', false);
 									}, 10000);
 								});
 							}
@@ -349,13 +347,12 @@ function overviewDevice(deviceId) {
 					})
 					.fail(function() {
 						var $label = $('#label-heater-'+deviceId+'-'+heaterId);
-						var curLabel = $label.text();
-						$label.text($.t('Error setting heater'));
+						$label.text($label.attr('data-an-label') + ' - ' + $.t('Error setting heater'));
 						$check.prop('checked', !isChecked);
 						$check.prop('disabled', true);
 						$('#he-slide-'+deviceId+'-'+$check.attr('data-an-heater')).slider('option', 'disabled', true);
 						setTimeout(function() {
-							$label.text(curLabel);
+							$label.text($label.attr('data-an-label'));
 							$check.prop('disabled', false);
 							$('#he-slide-'+deviceId+'-'+$check.attr('data-an-heater')).slider('option', 'disabled', isChecked);
 						}, 10000);
@@ -863,7 +860,7 @@ function monitorElement($button) {
 	var device = $button.attr('data-an-device');
 	var sensor = $button.attr('data-an-sensor');
 	var pin = $button.attr('data-an-switch');
-	var unit = $button.attr('data-an-unit');
+	var unit = encodeURIComponent($button.attr('data-an-unit'));
 	var startDate = '';
 	var title = '';
 
@@ -990,6 +987,7 @@ function editSensor($sensorAdminButton) {
 				autoOpen: false,
 				width: 400,
 				modal: true,
+				title: $.t('Edit a sensor'),
 				buttons: [{
 					text:$.t('Ok'),
 					click:function() {
@@ -1071,6 +1069,7 @@ function editHeater($heaterAdminButton) {
 				autoOpen: false,
 				width: 400,
 				modal: true,
+				title: $.t('Edit a heater'),
 				buttons: [{
 					text:$.t('Ok'),
 					click:function() {
@@ -1078,9 +1077,7 @@ function editHeater($heaterAdminButton) {
 						var curDisplay=$(this).find('#dialog-heater-display').val();
 						var curUnit=$(this).find('#dialog-heater-unit').val();
 						var curEnabled=$(this).find('#dialog-heater-enabled').prop('checked')?'true':'false';
-						
 						okDialogHeater($heaterAdminButton.attr('data-an-device'), curName, curDisplay, curUnit, curEnabled);
-						
 						$( this ).dialog( 'close' );
 					}
 				}]
@@ -2152,6 +2149,7 @@ function buildMusic(deviceId, mpdName, mpdDisplay) {
 				if (globalMpdIntervalHandle[deviceId] == undefined) {
 					globalMpdIntervalHandle[deviceId] = [];
 				}
+				updateMusic(deviceId, mpdName);
 				globalMpdIntervalHandle[deviceId][mpdName] = setInterval(function() {
 					updateMusic(deviceId, mpdName);
 				}, 1000 * 10);

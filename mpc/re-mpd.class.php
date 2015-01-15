@@ -1191,7 +1191,7 @@ class Mpd {
 		$this->DebugPrintMessage("host: " . $this->host . ", port: " . $this->port);
 		$error_number = 0;
 		$error_str = "";
-		$this->mpdSocket = fsockopen($this->host, $this->port, $error_number, $error_str, 10);
+		$this->mpdSocket = @fsockopen($this->host, $this->port, $error_number, $error_str, 10);
 
 		if (!$this->mpdSocket) {
 			$this->SetError("Connection failed, socket error: '" . $error_str . "' (" . $error_number . ").");

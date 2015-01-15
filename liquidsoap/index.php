@@ -54,7 +54,7 @@ if (isset($_GET['action'])) {
 						} else if ($line !== 'END' && $line != 'Bye!') {
 							$curElt = explode('=', $line);
 							if (count($curElt) > 1 && in_array($curElt[0], $fields)) {
-								$curSong[$curElt[0]] = substr($curElt[1], 1, -1);
+								$curSong[$curElt[0]] = trim($curElt[1], " \t\n\r\0\x0B\"");
 							}
 						}
 					}
@@ -86,7 +86,7 @@ if (isset($_GET['action'])) {
 						if ($line !== 'END' && $line != 'Bye!') {
 							$curElt = explode('=', $line);
 							if (count($curElt) > 1 && in_array($curElt[0], $fields)) {
-								$curSong[$curElt[0]] = substr($curElt[1], 1, -1);
+							$curSong[$curElt[0]] = trim($curElt[1], " \t\n\r\0\x0B\"");
 							}
 						}
 					}

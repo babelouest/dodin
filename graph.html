@@ -44,7 +44,7 @@ $.i18n.init({fallbackLng:'en'}, function() {
     var sensor = getUrlParameter('sensor')?getUrlParameter('sensor'):'0';
     var startDate = getUrlParameter('startDate')?getUrlParameter('startDate'):'';
     var url = prefix + '/MONITOR/'+device+'/'+pin+'/'+sensor+'/'+startDate;
-    var unit = decodeURIComponent(getUrlParameter('unit'));
+    var unit = getUrlParameter('unit')==undefined?'':decodeURIComponent(getUrlParameter('unit'));
 
     var jqxhr = $.get( url, function(data) {
       var jsonData = $.parseJSON(data);

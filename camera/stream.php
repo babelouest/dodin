@@ -1,14 +1,14 @@
 <?php
 require_once 'config.php';
 
-if (isset($_GET['device'])) {
-  $device = $_GET['device'];
+if (isset($_GET['camera'])) {
+  $name = $_GET['camera'];
 } else {
-  $device = "";
+  $name = "";
 }
 
-if (isset($camera[$device])) {
-  $url = $streamURL.'/'.$camera[$device].'/';
+if (isset($configCameras[$name])) {
+  $url = $configCameras[$name]['stream-url'];
   header('Location: '.$url);
 } else {
   header('Location: no_image.jpg');

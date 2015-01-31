@@ -17,6 +17,7 @@ var globalRadioIntervalHandle = '';
 var globalRadioToggle = false;
 var globalRadioSources = [];
 var globalCurrentRadioStream = '';
+var globalCameras = [];
 
 // Init translation module and run application inside
 $.i18n.init({fallbackLng:'en'}, function() {
@@ -156,6 +157,24 @@ function initDevices() {
 				});
 				overviewDevice(device.name);
 			}
+			$('#tabs ul').append('<li><a href="#tab-cameras" id="href-cameras">'+$.t('Cameras')+'</a></li>');
+			var template = $('#template-cameras').html();
+			$('#tabs').append(template);
+			$('#href-cameras').click(function(){
+				$('#tabs ul li').removeClass('active');
+				$(this).parent().addClass('active'); 
+				var currentTab = $(this).attr('href'); 
+				$('#tabs .tab').hide();
+				$(currentTab).show();
+				return false;
+			});
+			$('#a-admin-cameras').click(function() {
+				adminGlobal = !adminGlobal;
+				$('#tab-cameras .admin-button').slideToggle();
+				$('#tab-cameras .p-hidden').slideToggle();
+				return false;
+			});
+			
 			$('#tabs ul').append('<li><a href="#tab-global" id="href-global">'+$.t('Global')+'</a></li>');
 			var template = $('#template-global').html();
 			$('#tabs').append(template);
@@ -167,7 +186,6 @@ function initDevices() {
 				$(currentTab).show();
 				return false;
 			});
-			
 			$('#a-admin-global').click(function() {
 				adminGlobal = !adminGlobal;
 				$('#tab-global .admin-button').slideToggle();
@@ -199,8 +217,6 @@ function initDevices() {
 			
 			initSchedules();
 
-			initCameras();
-			
 			toggleRadio(globalRadioToggle);
 
 			$('#radio-toggle').click(function() {
@@ -222,11 +238,8 @@ function initDevices() {
 		setInterval(function() {
 			refresh(false);
 		}, 1000*60*5);
+		initCameras();
 		
-		/*setInterval(function() {
-			updateMpds();
-		}, 1000*10);*/
-
 	})
 	.fail(function() {
 		$('#message').text($.t('Error loading devices')+', '+$.t('network error'));
@@ -379,11 +392,6 @@ function overviewDevice(deviceId) {
 			}
 		});
 
-		$('input[name=camera-switch-'+deviceId+']').change(function() {
-			triggerImagesListChange($(this).attr('name').split('-').slice(-1).pop(), ($(this).attr('id').split('-').slice(-1).pop() == 'trigg'), ($(this).attr('id').split('-').slice(-1).pop() == 'stream'));
-			$('#camera-list-'+deviceId).trigger('change');
-		});
-		
 	})
 	.fail(function() {
 		$('#message-'+deviceId).text($.t('Error getting device values'));
@@ -670,14 +678,6 @@ function refresh(force) {
 			var deviceId = devicesTab[key].name;
 			var deviceDisplay = devicesTab[key].display;
 			
-			var selected = $('#camera-list-'+deviceId).val();
-			var urlImages = 'camera/listfiles.php?device='+deviceId;
-			getImages(urlImages, deviceId, false);
-			var urlAlerts = 'camera/listfiles.php?device='+deviceId+'&alert=true';
-			getImages(urlAlerts, deviceId, true);
-			$('#camera-list-'+deviceId+' option [value="'+selected+'"]').prop('selected', true);
-			$('#camera-list-'+deviceId).trigger('change');
-			
 			var jqxhr = $.get( url+deviceId, function(data) {
 				var json = $.parseJSON(data);
 				globalOverview[deviceId] = json;
@@ -732,6 +732,16 @@ function refresh(force) {
 				$('#header-message-global').text(footerMessage);
 			});
 		}
+	}
+	
+	// Refresh camera files
+	for (camera in globalCameras) {
+		var selected = $('#camera-list-'+camera).val();
+		getCameraFiles(camera, false);
+		triggerImagesListChange(camera, false, false);
+		getCameraFiles(camera, true);
+		triggerImagesListChange(camera, true, true);
+		$('#camera-list-'+camera+' option[value="'+selected+'"]').prop('selected', true);
 	}
 	
 	var date = new Date();
@@ -2206,9 +2216,7 @@ function buildMusic(deviceId, mpdName, mpdDisplay) {
 		$('#mpc-'+deviceId+'-'+mpdName+'-play').click(function() {
 			var url = 'mpc/control.php?device='+deviceId+'&server='+mpdName+'&play';
 			var jqxhr = $.get( url, function(data) {
-				/*setTimeout(function() {
-					updateMusic(deviceId, mpdName);
-				}, 100);*/
+				updateMusic(deviceId, mpdName);
 			})
 			.fail(function() {
 				$('#message-'+deviceId).text($.t('Error setting music'));
@@ -2246,50 +2254,80 @@ function updateMusic(deviceId, mpdName) {
 }
 
 function initCameras() {
-	for (key in devicesTab) {
-		var curDevice = devicesTab[key];
-		var urlImages = 'camera/listfiles.php?device='+curDevice.name;
-
-		getImages(urlImages, curDevice.name, false);
-		var $selectList = $('#camera-list-'+curDevice.name);
-		$selectList.append('<option value="lastsnap.jpg">Last snapshot</option>');
-		for (image in globalImages[curDevice.name]) {
-			$selectList.append('<option>'+image+'</option>');
+	var urlCameras = 'camera/listfiles.php';
+	var jqxhr = $.get( urlCameras, function(data) {
+		var cameras = $.parseJSON(data);
+		for (i in cameras.cameras) {
+			var camera = cameras.cameras[i];
+			getCameraFiles(camera.name, false);
+			getCameraFiles(camera.name, true);
+			var divCamera = $('#div-camera').html().replace(/CAMERA/g, camera.name).replace(/DESCRIPTION/g, camera.description);
+			$('#list-cameras').append(divCamera);
+			$('input[name=camera-switch-'+camera.name+']').unbind().change(function() {
+				triggerImagesListChange($(this).attr('name').split('-').slice(-1).pop(), ($(this).attr('id').split('-').slice(-1).pop() == 'trigg'), ($(this).attr('id').split('-').slice(-1).pop() == 'stream'));
+				$('#camera-list-'+camera.name).trigger('change');
+			});
+			
 		}
-
-		var urlAlerts = 'camera/listfiles.php?device='+curDevice.name+'&alert=true';
-		getImages(urlAlerts, curDevice.name, true);
-	}
-}
-
-function getImages(url, device, alert) {
-	var jqxhr = $.get( url, function(data) {
-		var images = $.parseJSON(data);
-		if (images.result == 'ok') {
-			if (alert) {
-				globalAlerts[device] = images.list;
-			} else {
-				globalImages[device] = images.list;
-			}
-			triggerImagesListChange(device, alert, false);
-		}
+	})
+	.fail(function() {
+		$('#footer-message-global').text($.t('Error getting cameras')+', '+$.t('network error'));
 	});
 }
 
-function triggerImagesListChange(device, alert, stream) {
-	var $selectList = $('#camera-list-'+device);
-	if (!alert && $('#camera-switch-'+device+'-sched').prop('checked')) {
+function getCameraFiles(camera, alert) {
+	globalCameras[camera] = [];
+	var url = 'camera/listfiles.php?camera='+camera;
+	var type = (alert?'alert':'sched');
+	url += (alert?'&alert':'');
+	
+	var jqxhr = $.get( url, function(data) {
+		var listFiles = $.parseJSON(data);
+		if (listFiles.result == 'ok') {
+			globalCameras[camera][type] = listFiles.list;
+			triggerImagesListChange(camera, alert, false);
+		} else {
+			$('#footer-message-global').text($.t('Error getting camera '+camera)+', '+$.t('server error'));
+		}
+	})
+	.fail(function() {
+		$('#footer-message-global').text($.t('Error getting camera '+camera)+', '+$.t('network error'));
+	});
+}
+
+function triggerImagesListChange(camera, alert, stream) {
+	var $selectList = $('#camera-list-'+camera);
+	if (!alert && $('#camera-switch-'+camera+'-sched').prop('checked')) {
 		$selectList.empty();
 		$selectList.append('<option value="lastsnap.jpg">'+$.t('Last snapshot')+'</option>\n');
-		for (index in globalImages[device]) {
-			$selectList.append('<option>'+globalImages[device][index]+'</option>\n');
+		for (index in globalCameras[camera]['sched']) {
+			$selectList.append('<option>'+globalCameras[camera]['sched'][index]+'</option>\n');
 		}
-	} else if (alert && $('#camera-switch-'+device+'-trigg').prop('checked')) {
+	} else if (alert && $('#camera-switch-'+camera+'-trigg').prop('checked')) {
 		$selectList.empty();
-		for (index in globalAlerts[device]) {
-			$selectList.append('<option>'+globalAlerts[device][index]+'</option>\n');
+		for (index in globalCameras[camera]['alert']) {
+			$selectList.append('<option>'+globalCameras[camera]['alert'][index]+'</option>\n');
 		}
+	} else if (stream && $('#camera-switch-'+camera+'-stream').prop('checked')) {
+		$selectList.empty();
+		$selectList.append('<option data-i18n>Real-time stream</option>\n');
+		var url = 'camera/stream.php?camera='+camera;
+		$('#camera-photo-'+camera).attr('src', url);
+		$('#camera-photo-large-'+camera).attr('href', url+'&large');
+		console.log(url, $('#camera-photo-'+camera).attr('src'));
 	}
+	$selectList.unbind().change(function() {
+		if (!$('#camera-switch-'+camera+'-stream').prop('checked')) {
+			var cameraName = $(this).attr('name').split('-').slice(-1).pop();
+			var url = 'camera/camera.php?camera='+cameraName+'&file='+$(this).val();
+			if ($('#camera-switch-'+cameraName+'-trigg').prop('checked')) {
+				url += '&alert';
+			}
+			$('#camera-photo-'+cameraName).attr('src', url);
+			$('#camera-photo-large-'+cameraName).attr('href', url+'&large');
+		}
+	});
+	$selectList.trigger('change');
 }
 
 function updateRadioSongList() {

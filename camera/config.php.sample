@@ -1,9 +1,20 @@
 <?php
 
-$camera = array();
-
-$camera["DEV1"] = "host1";
-
-$sourcePath = "/path_to_pictures/";
-
-$triggered = "relative_path_to_triggered_files"; // Format is $sourcePath/$camera[$current]/$triggered
+$configCameras = array(
+	"camera1" =>	array(	"name" => "camera1",
+		"description" => "first camera",
+		"source-path" => "/path/to/camera1",
+		"triggered-path" => "/path/to/camera1/alert",
+		"scheduled-files-filter" => "*-snapshot.jpg",
+		"triggered-files-filter" => "*.jpg",
+		"stream-url" => "/stream/camera1/"
+	),
+	"camera2" =>	array(	"name" => "camera2",
+		"description" => "second camera",
+		"source-path" => "/path/to/camera2",
+		"triggered-path" => "/path/to/camera2/alert",
+		"scheduled-files-filter" => "*-snapshot.jpg",
+		"triggered-files-filter" => "*.jpg",
+		"stream-url" => "/stream/camera2/"
+	),
+);

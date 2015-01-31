@@ -1,13 +1,14 @@
 <?php
 require_once 'config.php';
 
-if (isset($_GET['device']) && isset($camera[$_GET['device']])) {
-  $photoDir = $sourcePath.$camera[$_GET['device']].'/';
-  if (isset($_GET['alert']) && ($_GET['alert'] == 'true')) {
-    $photoDir .= ($triggered.'/');
-    $filesFilter = $triggFilesFilter;
+if (isset($_GET['camera']) && isset($configCameras[$_GET['camera']])) {
+  $camera = $configCameras[$_GET['camera']];
+  $photoDir = $camera['source-path'].'/';
+  if (isset($_GET['alert'])) {
+    $photoDir = $camera['triggered-path'].'/';
+    $filesFilter = $camera['triggered-files-filter'];
   } else {
-    $filesFilter = $schedFilesFilter;
+    $filesFilter = $camera['scheduled-files-filter'];
   }
   $fileList = array_reverse(glob($photoDir.$filesFilter));
   $output = array();
@@ -16,5 +17,9 @@ if (isset($_GET['device']) && isset($camera[$_GET['device']])) {
   }
   print json_encode(array('result' => 'ok', 'list' => $output));
 } else {
-  print(json_encode(array('result' => 'error', 'message' => 'no device specified')));
+  $cameras = array();
+  foreach ($configCameras as $oneCamera) {
+    $cameras[] = array('name' => $oneCamera['name'], 'description' => $oneCamera['description']);
+  }
+  print(json_encode(array('result' => 'ok', 'cameras' => $cameras)));
 }

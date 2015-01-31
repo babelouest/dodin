@@ -47,46 +47,56 @@ $.i18n.init({fallbackLng:'en'}, function() {
     var unit = getUrlParameter('unit')==undefined?'':decodeURIComponent(getUrlParameter('unit'));
 
     var jqxhr = $.get( url, function(data) {
-      var jsonData = $.parseJSON(data);
-      var heatPoints = [];
+      try {
+        var jsonData = $.parseJSON(data);
+        var heatPoints = [];
       
-      $('#loading').remove();
-      $('body').append('<div id="chart" style="height:300px; width:400px;"></div>');
-      if (jsonData.values.length > 0) {
-        for (var i=0; i<jsonData.values.length; i++){
-          var d = new Date(0);
-          d.setUTCSeconds(jsonData.values[i].date_time);
-          heatPoints.push([d, parseFloat(jsonData.values[i].value)]); 
-        }
-        var plot3 = $.jqplot('chart', [heatPoints], {
-          axes:{
-            xaxis:{
-              renderer:$.jqplot.DateAxisRenderer,
-              tickOptions:{formatString:'%d/%m\n%H:%M'}
+        $('#loading').remove();
+        $('body').append('<div id="chart" style="height:300px; width:400px;"></div>');
+        if (jsonData.values.length > 0) {
+          for (var i=0; i<jsonData.values.length; i++){
+            var d = new Date(0);
+            d.setUTCSeconds(jsonData.values[i].date_time);
+            heatPoints.push([d, parseFloat(jsonData.values[i].value)]); 
+          }
+          var plot3 = $.jqplot('chart', [heatPoints], {
+            axes:{
+              xaxis:{
+                renderer:$.jqplot.DateAxisRenderer,
+                tickOptions:{formatString:'%d/%m\n%H:%M'}
+              },
+              yaxis:{
+                tickOptions:{formatString:'%.2f'+unit}
+              }
             },
-            yaxis:{
-              tickOptions:{formatString:'%.2f'+unit}
-            }
-          },
-          highlighter:{
-            show: true,
-            sizeAdjust: 7.5
-          },
-          cursor:{
-            show: false
-          },
-          series:[{showMarker:false}],
-          seriesDefaults: {
-            rendererOptions: {
-              smooth: true
-            }
-          },
-        });
-      } else {
-        $('#chart').text($.t('No data monitored'));
+            highlighter:{
+              show: true,
+              sizeAdjust: 7.5
+            },
+            cursor:{
+              show: false
+            },
+            series:[{showMarker:false}],
+            seriesDefaults: {
+              rendererOptions: {
+                smooth: true
+              }
+            },
+          });
+        } else {
+          $('#loading').remove();
+          $('body').append('<div id="chart" style="height:300px; width:400px;"></div>');
+          $('#chart').text($.t('No data monitored'));
+        }
+      } catch (e) {
+        $('#loading').remove();
+        $('body').append('<div id="chart" style="height:300px; width:400px;"></div>');
+        $('#chart').text($.t('Error parsing data'));
       }
     })
     .fail(function() {
+      $('#loading').remove();
+      $('body').append('<div id="chart" style="height:300px; width:400px;"></div>');
       $('#chart').text($.t('Error getting monitor'));
     });
   });

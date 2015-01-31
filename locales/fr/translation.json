@@ -173,5 +173,6 @@
     "Year": "Année",
     "Current song": "Chanson en cours",
     "Show": "Montrer",
-    "Hide": "Cacher"
+    "Hide": "Cacher",
+    "Error parsing data": "Erreur dans l'évaluation des données"
 }

@@ -381,17 +381,6 @@ function overviewDevice(deviceId) {
 
 		initMusic(deviceId);
 
-		$('#camera-list-'+deviceId).change(function () {
-			if (!$('#camera-switch-'+deviceId+'-stream').prop('checked')) {
-				var url = 'camera/camera.php?device=' + deviceId + '&file=' + $(this).val() + '&alert=' + ($('#camera-switch-'+deviceId+'-trigg').prop('checked')?'true':'false') + '&no-cache=' + Math.floor((Math.random() * 100) + 1);
-				$('#camera-photo-'+deviceId).attr('src', url);
-				$('#camera-photo-large-'+deviceId).attr('href', url+'&large');
-			} else {
-				$('#camera-photo-'+deviceId).attr('src', 'camera/stream.php?device=' + deviceId).width('640').height('480');
-				$('#camera-photo-large-'+deviceId).attr('href', 'camera/stream.php?device=' + deviceId);
-			}
-		});
-
 	})
 	.fail(function() {
 		$('#message-'+deviceId).text($.t('Error getting device values'));
@@ -736,12 +725,9 @@ function refresh(force) {
 	
 	// Refresh camera files
 	for (camera in globalCameras) {
-		var selected = $('#camera-list-'+camera).val();
+		globalCameras[camera]['selected'] = $('#camera-list-'+camera).val();
 		getCameraFiles(camera, false);
-		triggerImagesListChange(camera, false, false);
 		getCameraFiles(camera, true);
-		triggerImagesListChange(camera, true, true);
-		$('#camera-list-'+camera+' option[value="'+selected+'"]').prop('selected', true);
 	}
 	
 	var date = new Date();
@@ -895,7 +881,7 @@ function monitorElement($button) {
 	
 	var curDate = new Date();
 	var $dialog = $('#dialog-monitor');
-	$dialog.find('#dialog-monitor-since').find('option[value="1"]').prop('selected', true);
+	$dialog.find('#dialog-monitor-since').find('option[value="4"]').prop('selected', true);
 	
 	var iframe = '<iframe border="0" src="graph.html?device='+device+'&pin='+pin+'&sensor='+sensor+'&startDate='+startDate+'&unit='+unit+'" width="430px" height="350px"></iframe>';
 	$dialog.find('#dialog-chart').html(iframe);
@@ -918,22 +904,34 @@ function monitorElement($button) {
 							startDate = parseInt((new Date(curDate.getTime() - (1000*60*60))).getTime()/1000);
 							break;
 						case '1':
+							// Last 2 hours
+							startDate = parseInt((new Date(curDate.getTime() - (2*1000*60*60))).getTime()/1000);
+							break;
+						case '2':
+							// Last 6 hours
+							startDate = parseInt((new Date(curDate.getTime() - (6*1000*60*60))).getTime()/1000);
+							break;
+						case '3':
+							// Last 12 hours
+							startDate = parseInt((new Date(curDate.getTime() - (12*1000*60*60))).getTime()/1000);
+							break;
+						case '4':
 							// Last day
 							startDate = parseInt((new Date(curDate.getTime() - (24*1000*60*60))).getTime()/1000);
 							break;
-						case '2':
+						case '5':
 							// Last 2 days
 							startDate = parseInt((new Date(curDate.getTime() - (48*1000*60*60))).getTime()/1000);
 							break;
-						case '3':
+						case '6':
 							// Last 3 days
 							startDate = parseInt((new Date(curDate.getTime() - (72*1000*60*60))).getTime()/1000);
 							break;
-						case '4':
+						case '7':
 							// Last week
 							startDate = parseInt((new Date(curDate.getTime() - (168*1000*60*60))).getTime()/1000);
 							break;
-						case '5':
+						case '8':
 							// Last month
 							startDate = parseInt((new Date(curDate.getTime() - (720*1000*60*60))).getTime()/1000);
 							break;
@@ -2259,15 +2257,28 @@ function initCameras() {
 		var cameras = $.parseJSON(data);
 		for (i in cameras.cameras) {
 			var camera = cameras.cameras[i];
+			globalCameras[camera.name] = [];
+			globalCameras[camera.name]['selected'] = 'lastsnap.jpg';
 			getCameraFiles(camera.name, false);
 			getCameraFiles(camera.name, true);
 			var divCamera = $('#div-camera').html().replace(/CAMERA/g, camera.name).replace(/DESCRIPTION/g, camera.description);
 			$('#list-cameras').append(divCamera);
-			$('input[name=camera-switch-'+camera.name+']').unbind().change(function() {
-				triggerImagesListChange($(this).attr('name').split('-').slice(-1).pop(), ($(this).attr('id').split('-').slice(-1).pop() == 'trigg'), ($(this).attr('id').split('-').slice(-1).pop() == 'stream'));
+			$('input[name=camera-switch-'+camera.name+']').change(function() {
+				triggerImagesListChange($(this).attr('name').split('-').slice(-1).pop());
 				$('#camera-list-'+camera.name).trigger('change');
 			});
 			
+			$('#camera-list-'+camera.name).change(function() {
+				var cameraName = $(this).attr('name').split('-').slice(-1).pop();
+				if (!$('#camera-switch-'+cameraName+'-stream').prop('checked')) {
+					var url = 'camera/camera.php?camera='+cameraName+'&file='+$(this).val()+'&random='+Math.floor((Math.random()*100)+1);
+					if ($('#camera-switch-'+cameraName+'-trigg').prop('checked')) {
+						url += '&alert';
+					}
+					$('#camera-photo-'+cameraName).attr('src', url);
+					$('#camera-photo-large-'+cameraName).attr('href', url+'&large');
+				}
+			});
 		}
 	})
 	.fail(function() {
@@ -2276,7 +2287,6 @@ function initCameras() {
 }
 
 function getCameraFiles(camera, alert) {
-	globalCameras[camera] = [];
 	var url = 'camera/listfiles.php?camera='+camera;
 	var type = (alert?'alert':'sched');
 	url += (alert?'&alert':'');
@@ -2285,7 +2295,7 @@ function getCameraFiles(camera, alert) {
 		var listFiles = $.parseJSON(data);
 		if (listFiles.result == 'ok') {
 			globalCameras[camera][type] = listFiles.list;
-			triggerImagesListChange(camera, alert, false);
+			triggerImagesListChange(camera);
 		} else {
 			$('#footer-message-global').text($.t('Error getting camera '+camera)+', '+$.t('server error'));
 		}
@@ -2295,38 +2305,37 @@ function getCameraFiles(camera, alert) {
 	});
 }
 
-function triggerImagesListChange(camera, alert, stream) {
+function triggerImagesListChange(camera) {
 	var $selectList = $('#camera-list-'+camera);
-	if (!alert && $('#camera-switch-'+camera+'-sched').prop('checked')) {
+	var selected = '';
+	if ($('#camera-switch-'+camera+'-sched').prop('checked')) {
 		$selectList.empty();
 		$selectList.append('<option value="lastsnap.jpg">'+$.t('Last snapshot')+'</option>\n');
 		for (index in globalCameras[camera]['sched']) {
-			$selectList.append('<option>'+globalCameras[camera]['sched'][index]+'</option>\n');
+			if (globalCameras[camera]['sched'][index] == globalCameras[camera]['selected']) {
+				selected = ' selected="true"';
+			} else {
+				selected = '';
+			}
+			$selectList.append('<option value="'+globalCameras[camera]['sched'][index]+'"'+selected+'>'+globalCameras[camera]['sched'][index]+'</option>\n');
 		}
-	} else if (alert && $('#camera-switch-'+camera+'-trigg').prop('checked')) {
+	} else if ($('#camera-switch-'+camera+'-trigg').prop('checked')) {
 		$selectList.empty();
 		for (index in globalCameras[camera]['alert']) {
-			$selectList.append('<option>'+globalCameras[camera]['alert'][index]+'</option>\n');
+			if (globalCameras[camera]['alert'][index] == globalCameras[camera]['selected']) {
+				selected = ' selected="true"';
+			} else {
+				selected = '';
+			}
+			$selectList.append('<option value="'+globalCameras[camera]['alert'][index]+'"'+selected+'>'+globalCameras[camera]['alert'][index]+'</option>\n');
 		}
-	} else if (stream && $('#camera-switch-'+camera+'-stream').prop('checked')) {
+	} else if ($('#camera-switch-'+camera+'-stream').prop('checked')) {
 		$selectList.empty();
-		$selectList.append('<option data-i18n>Real-time stream</option>\n');
+		$selectList.append('<option data-i18n>'+$.t('Real-time stream')+'</option>\n');
 		var url = 'camera/stream.php?camera='+camera;
 		$('#camera-photo-'+camera).attr('src', url);
 		$('#camera-photo-large-'+camera).attr('href', url+'&large');
-		console.log(url, $('#camera-photo-'+camera).attr('src'));
 	}
-	$selectList.unbind().change(function() {
-		if (!$('#camera-switch-'+camera+'-stream').prop('checked')) {
-			var cameraName = $(this).attr('name').split('-').slice(-1).pop();
-			var url = 'camera/camera.php?camera='+cameraName+'&file='+$(this).val();
-			if ($('#camera-switch-'+cameraName+'-trigg').prop('checked')) {
-				url += '&alert';
-			}
-			$('#camera-photo-'+cameraName).attr('src', url);
-			$('#camera-photo-large-'+cameraName).attr('href', url+'&large');
-		}
-	});
 	$selectList.trigger('change');
 }
 

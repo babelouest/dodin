@@ -1801,9 +1801,13 @@ function okScript($dialog) {
 		globalScripts[script.id] = script;
 		if (isAdd) {
 			var enabled = script.enabled?'enabled="true"':'enabled="false"';
-			var htmlScript = '<p><input type="button" id="admin-global-script-'+script.id+'" name="admin-global-script-'+script.id+'" data-an-script-id="'+script.id+'" class="admin-button admin-modify-delete" value="+"><input type="button" script-id="'+script.id+'" data-an-device="" name="script-'+script.id+'" id="script-'+script.id+'" value="'+script.name+'" '+enabled+'><label id="message-script-'+script.id+'"></label></p>\n';
+			var htmlScript = '<p><input type="button" id="admin-global-script-'+script.id+'" name="admin-global-script-'+script.id+'" data-an-script-id="'+script.id+'" class="admin-button admin-modify-delete" value="+"><input type="button" data-an-script-id="'+script.id+'" data-an-device="" name="script-'+script.id+'" id="script-'+script.id+'" value="'+script.name+'" '+enabled+'><label id="message-script-'+script.id+'"></label></p>\n';
 			$('#script-global .inside').append(htmlScript);
-			$('#admin-global-script-'+script.id).slideDown();
+			if (adminGlobal) {
+				$('#admin-global-script-'+script.id).slideDown();
+			} else {
+				$('#admin-global-script-'+script.id).slideUp();
+			}
 			$('#script-'+script.id).click(function() {
 				runScript(this);
 			});
@@ -1811,7 +1815,12 @@ function okScript($dialog) {
 			if (script.device != "") {
 				htmlScript = '<p><input type="button" id="admin-script-'+script.id+'" name="admin-script-'+script.id+'" data-an-script-id="'+script.id+'" class="admin-button admin-modify-delete" value="+"><input type="button" data-an-script-id="'+script.id+'" data-an-device="'+script.device+'" name="script-'+script.device+'-'+script.id+'" id="script-'+script.device+'-'+script.id+'" value="'+script.name+'" '+enabled+'/><label id="message-script-'+script.device+'-'+script.id+'"></label></p>\n';
 				$('#script-'+script.device+' .inside').append(htmlScript);
-				$('#admin-script-'+script.id).slideDown();
+				if (devicesTab[script.device].admin) {
+					$('#admin-script-'+script.id).slideDown();
+				} else {
+					$('#admin-script-'+script.id).slideUp();
+				}
+
 				$('#script-'+script.device+'-'+script.id).click(function() {
 					runScript(this);
 				});

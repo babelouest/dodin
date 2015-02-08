@@ -11,7 +11,7 @@ header("Content-type: image/png");
 header("Cache-Control: no-cache, must-revalidate");
 if (isset($configCameras[$name])) {
   $camera = $configCameras[$name];
-  $photoDir = $camera['source-path'];
+  $photoDir = $camera['scheduled-path'];
   $curFile = "lastsnap.jpg";
   if (isset($_GET['file'])) {
     $curFile = $_GET['file'];

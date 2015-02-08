@@ -294,7 +294,7 @@ function overviewDevice(deviceId) {
 			var $sensor = $('#sensor-'+deviceId+' .inside');
 			for (var i=0; i<json.sensors.length; i++) {
 				var sensor = json.sensors[i];
-				var htmlSensor = '<p id="p-sensor-'+deviceId+'-'+sensor.name+'" class="'+(!sensor.enabled?'p-hidden':'')+'"><input type="button" class="admin-button admin-modify-graph" value="+" name="admin-sensor-'+deviceId+'-'+sensor.name+'" id="admin-sensor-'+deviceId+'-'+sensor.name+'" data-an-device="'+deviceId+'" data-an-sensor="'+sensor.name+'" data-an-unit="'+sensor.unit+'"/><label id="label-'+deviceId+'-'+sensor.name+'" for="'+deviceId+'-'+sensor.name+'">'+sensor.display+': </label>';
+				var htmlSensor = '<p id="p-sensor-'+deviceId+'-'+sensor.name+'" class="sensor '+(!sensor.enabled?'p-hidden':'')+'"><input type="button" class="admin-button admin-modify-graph" value="+" name="admin-sensor-'+deviceId+'-'+sensor.name+'" id="admin-sensor-'+deviceId+'-'+sensor.name+'" data-an-device="'+deviceId+'" data-an-sensor="'+sensor.name+'" data-an-unit="'+sensor.unit+'"/><label id="label-'+deviceId+'-'+sensor.name+'" for="'+deviceId+'-'+sensor.name+'">'+sensor.display+': </label>';
 				htmlSensor += '<label id="value-'+deviceId+'-'+sensor.name+'" value="'+sensor.value+'" data-sensor-unit="'+sensor.unit+'">'+sensor.value+' '+sensor.unit+'</label></p>\n';
 				$sensor.append($(htmlSensor));
 				if (!sensor.enabled) {
@@ -485,14 +485,14 @@ function initScripts() {
 			var script = jsonScripts.scripts[i];
 			globalScripts[script.id] = script;
 			var enabled = script.enabled?'enabled="true"':'enabled="false"';
-			var htmlScript = '<p><input type="button" id="admin-global-script-'+script.id+'" name="admin-global-script-'+script.id+'" data-an-script-id="'+script.id+'" class="admin-button admin-modify-delete" value="+"><input type="button" data-an-script-id="'+script.id+'" data-an-device="" name="script-'+script.id+'" id="script-'+script.id+'" value="'+script.name+'" '+enabled+'><label id="message-script-'+script.id+'"></label></p>\n';
+			var htmlScript = '<p><input type="button" id="admin-global-script-'+script.id+'" name="admin-global-script-'+script.id+'" data-an-script-id="'+script.id+'" class="admin-button admin-modify-delete" value="+"><input type="button" data-an-script-id="'+script.id+'" data-an-device="" name="script-'+script.id+'" id="script-'+script.id+'" value="'+script.name+'" '+enabled+' class="styled-button"><label id="message-script-'+script.id+'"></label></p>\n';
 			$('#script-global .inside').append(htmlScript);
 			$('#script-'+script.id).click(function() {
 				runScript(this);
 			});
 			
 			if (script.device != "") {
-				htmlScript = '<p><input type="button" id="admin-script-'+script.id+'" name="admin-script-'+script.id+'" data-an-script-id="'+script.id+'" class="admin-button admin-modify-delete" value="+"><input type="button" data-an-script-id="'+script.id+'" data-an-device="'+script.device+'" name="script-'+script.device+'-'+script.id+'" id="script-'+script.device+'-'+script.id+'" value="'+script.name+'" '+enabled+'/><label id="message-script-'+script.device+'-'+script.id+'"></label></p>\n';
+				htmlScript = '<p><input type="button" id="admin-script-'+script.id+'" name="admin-script-'+script.id+'" data-an-script-id="'+script.id+'" class="admin-button admin-modify-delete" value="+"><input type="button" data-an-script-id="'+script.id+'" data-an-device="'+script.device+'" name="script-'+script.device+'-'+script.id+'" id="script-'+script.device+'-'+script.id+'" value="'+script.name+'" '+enabled+' class="styled-button"/><label id="message-script-'+script.device+'-'+script.id+'"></label></p>\n';
 				$('#script-'+script.device+' .inside').append(htmlScript);
 				$('#script-'+script.device+'-'+script.id).click(function() {
 					runScript(this);
@@ -546,7 +546,7 @@ function initSchedules() {
 			globalSchedules[schedule.id] = schedule;
 			var nextTime = new Date(schedule.next_time * 1000);
 			var enabled = schedule.enabled;
-			var htmlSchedule = '<p id="p-schedule-'+schedule.id+'" class="class-schedule-'+schedule.id+'"><input type="button" data-an-schedule-id="'+schedule.id+'" class="admin-button admin-modify-delete" value="+" name="admin-schedule-'+schedule.id+'" id="admin-schedule-'+schedule.id+'"/><input type="checkbox" value="schedule-'+schedule.id+'" data-an-schedule="'+schedule.id+'" data-an-device="" name="schedule-'+schedule.id+'" id="schedule-'+schedule.id+'" /><label for="schedule-'+schedule.id+'" id="message-schedule-'+schedule.id+'"></label></p>\n';
+			var htmlSchedule = '<p id="p-schedule-'+schedule.id+'" class="class-schedule class-schedule-'+schedule.id+'"><input type="button" data-an-schedule-id="'+schedule.id+'" class="admin-button admin-modify-delete" value="+" name="admin-schedule-'+schedule.id+'" id="admin-schedule-'+schedule.id+'"/><input type="checkbox" value="schedule-'+schedule.id+'" data-an-schedule="'+schedule.id+'" data-an-device="" name="schedule-'+schedule.id+'" id="schedule-'+schedule.id+'" /><label for="schedule-'+schedule.id+'" id="message-schedule-'+schedule.id+'"></label></p>\n';
 			$('#schedule-global .inside').append(htmlSchedule);
 			if (!enabled) {
 				$('#message-schedule-'+schedule.id).text(schedule.name+' (Désactivé)');
@@ -560,7 +560,7 @@ function initSchedules() {
 				enableSchedule($(this), value);
 			});
 			if (schedule.device != "") {
-				var htmlSchedule = '<p id="p-schedule-'+schedule.device+'-'+schedule.id+'" class="class-schedule-'+schedule.id+'"><input type="button" data-an-schedule-id="'+schedule.id+'" class="admin-button admin-modify-delete" value="+" name="admin-schedule-'+schedule.device+'-'+schedule.id+'" id="admin-schedule-'+schedule.device+'-'+schedule.id+'"/><input type="checkbox" value="schedule-'+schedule.device+'-'+schedule.id+'" data-an-schedule="'+schedule.id+'" data-an-device="'+schedule.device+'" name="schedule-'+schedule.device+'-'+schedule.id+'" id="schedule-'+schedule.device+'-'+schedule.id+'" /><label for="schedule-'+schedule.device+'-'+schedule.id+'" id="message-schedule-'+schedule.device+'-'+schedule.id+'"></label></p>\n';
+				var htmlSchedule = '<p id="p-schedule-'+schedule.device+'-'+schedule.id+'" class="class-schedule class-schedule-'+schedule.id+'"><input type="button" data-an-schedule-id="'+schedule.id+'" class="admin-button admin-modify-delete" value="+" name="admin-schedule-'+schedule.device+'-'+schedule.id+'" id="admin-schedule-'+schedule.device+'-'+schedule.id+'"/><input type="checkbox" value="schedule-'+schedule.device+'-'+schedule.id+'" data-an-schedule="'+schedule.id+'" data-an-device="'+schedule.device+'" name="schedule-'+schedule.device+'-'+schedule.id+'" id="schedule-'+schedule.device+'-'+schedule.id+'" /><label for="schedule-'+schedule.device+'-'+schedule.id+'" id="message-schedule-'+schedule.device+'-'+schedule.id+'"></label></p>\n';
 				$('#schedule-'+schedule.device+' .inside').append(htmlSchedule);
 				if (!enabled) {
 					$('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+' (Désactivé)');
@@ -1761,6 +1761,8 @@ function okScript($dialog) {
 	var url = prefix;
 	var postParams = {};
 	var isAdd = true;
+	var scriptName = '';
+	var scriptId = '';
 	
 	if ($dialog.find('#dialog-script-id').val() != '') {
 		url += '/SETSCRIPT';
@@ -1799,9 +1801,11 @@ function okScript($dialog) {
 			i++;
 		});
 		globalScripts[script.id] = script;
+		scriptId = script.id;
+		scriptName = script.name;
 		if (isAdd) {
 			var enabled = script.enabled?'enabled="true"':'enabled="false"';
-			var htmlScript = '<p><input type="button" id="admin-global-script-'+script.id+'" name="admin-global-script-'+script.id+'" data-an-script-id="'+script.id+'" class="admin-button admin-modify-delete" value="+"><input type="button" data-an-script-id="'+script.id+'" data-an-device="" name="script-'+script.id+'" id="script-'+script.id+'" value="'+script.name+'" '+enabled+'><label id="message-script-'+script.id+'"></label></p>\n';
+			var htmlScript = '<p><input type="button" id="admin-global-script-'+script.id+'" name="admin-global-script-'+script.id+'" data-an-script-id="'+script.id+'" class="admin-button admin-modify-delete" value="+"><input type="button" data-an-script-id="'+script.id+'" data-an-device="" name="script-'+script.id+'" id="script-'+script.id+'" value="'+script.name+'" '+enabled+' class="styled-button"><label id="message-script-'+script.id+'"></label></p>\n';
 			$('#script-global .inside').append(htmlScript);
 			if (adminGlobal) {
 				$('#admin-global-script-'+script.id).slideDown();
@@ -1813,7 +1817,7 @@ function okScript($dialog) {
 			});
 			
 			if (script.device != "") {
-				htmlScript = '<p><input type="button" id="admin-script-'+script.id+'" name="admin-script-'+script.id+'" data-an-script-id="'+script.id+'" class="admin-button admin-modify-delete" value="+"><input type="button" data-an-script-id="'+script.id+'" data-an-device="'+script.device+'" name="script-'+script.device+'-'+script.id+'" id="script-'+script.device+'-'+script.id+'" value="'+script.name+'" '+enabled+'/><label id="message-script-'+script.device+'-'+script.id+'"></label></p>\n';
+				htmlScript = '<p><input type="button" id="admin-script-'+script.id+'" name="admin-script-'+script.id+'" data-an-script-id="'+script.id+'" class="admin-button admin-modify-delete" value="+"><input type="button" data-an-script-id="'+script.id+'" data-an-device="'+script.device+'" name="script-'+script.device+'-'+script.id+'" id="script-'+script.device+'-'+script.id+'" value="'+script.name+'" '+enabled+' class="styled-button"/><label id="message-script-'+script.device+'-'+script.id+'"></label></p>\n';
 				$('#script-'+script.device+' .inside').append(htmlScript);
 				if (devicesTab[script.device].admin) {
 					$('#admin-script-'+script.id).slideDown();
@@ -1825,7 +1829,32 @@ function okScript($dialog) {
 					runScript(this);
 				});
 			}
-		} else {
+            var urlAction = prefix + '/ADDACTION/';
+            var params = {};
+            params.name = 'script - '+scriptName;
+            params.type = 77;
+            params.device = '';
+            params.sensor = '';
+            params.pin = '';
+            params.heater = '';
+            params.params = scriptId;
+            
+            var $postingAction = $.post(urlAction, params);
+            $postingAction.done(function(dataAction) {
+            	var jsonAction = $.parseJSON(dataAction)
+            	console.log(jsonAction);
+            	var newAction = jsonAction.action;
+            	globalActions[newAction.id] = newAction;
+            	var htmlAction = '<p id="p-admin-global-action-'+newAction.id+'"><input type="button" id="admin-global-action-'+newAction.id+'" name="admin-global-action-'+newAction.id+'" data-an-action-id="'+newAction.id+'" class="admin-button admin-modify-delete" value="+"><label id="global-action-name-'+newAction.id+'">'+newAction.name+'</label></p>\n';
+            	$('#action-global .inside').append(htmlAction);
+            	if (adminGlobal) {
+            		$('#admin-global-action-'+newAction.id).slideDown();
+            	} else {
+            		$('#admin-global-action-'+newAction.id).slideUp();
+            	}
+            });
+			
+        } else {
 			$('#script-'+script.id).val(script.name);
 			for (var key in devicesTab) {
 				if ($('#script-'+devicesTab[key].name+'-'+script.id).length > 0) {
@@ -1834,6 +1863,7 @@ function okScript($dialog) {
 			}
 		}
 	});
+	
 	
 	$dialog.dialog( 'close' ); 
 }
@@ -2049,7 +2079,7 @@ function okSchedule($dialog) {
 		if (isAdd) {
 			var nextTime = new Date(schedule.next_time * 1000);
 			var enabled = schedule.enabled;
-			var htmlSchedule = '<p id="p-schedule-'+schedule.id+'" class="class-schedule-'+schedule.id+'"><input type="button" data-an-schedule-id="'+schedule.id+'" class="admin-button admin-modify-delete" value="+" name="admin-schedule-'+schedule.id+'" id="admin-schedule-'+schedule.id+'"/><input type="checkbox" value="schedule-'+schedule.id+'" data-an-schedule="'+schedule.id+'" data-an-device="" name="schedule-'+schedule.id+'" id="schedule-'+schedule.id+'" /><label for="schedule-'+schedule.id+'" id="message-schedule-'+schedule.id+'"></label></p>\n';
+			var htmlSchedule = '<p id="p-schedule-'+schedule.id+'" class="class-schedule class-schedule-'+schedule.id+'"><input type="button" data-an-schedule-id="'+schedule.id+'" class="admin-button admin-modify-delete" value="+" name="admin-schedule-'+schedule.id+'" id="admin-schedule-'+schedule.id+'"/><input type="checkbox" value="schedule-'+schedule.id+'" data-an-schedule="'+schedule.id+'" data-an-device="" name="schedule-'+schedule.id+'" id="schedule-'+schedule.id+'" /><label for="schedule-'+schedule.id+'" id="message-schedule-'+schedule.id+'"></label></p>\n';
 			$('#schedule-global .inside').append(htmlSchedule);
 			if (!enabled) {
 				$('#message-schedule-'+schedule.id).text(schedule.name+' (Désactivé)');
@@ -2066,7 +2096,7 @@ function okSchedule($dialog) {
 				enableSchedule($(this), value);
 			});
 			if (schedule.device != "") {
-				var htmlSchedule = '<p id="p-schedule-'+schedule.device+'-'+schedule.id+'" class="class-schedule-'+schedule.id+'"><input type="button" data-an-schedule-id="'+schedule.id+'" class="admin-button admin-modify-delete" value="+" name="admin-schedule-'+schedule.device+'-'+schedule.id+'" id="admin-schedule-'+schedule.device+'-'+schedule.id+'"/><input type="checkbox" value="schedule-'+schedule.device+'-'+schedule.id+'" data-an-schedule="'+schedule.id+'" data-an-device="'+schedule.device+'" name="schedule-'+schedule.device+'-'+schedule.id+'" id="schedule-'+schedule.device+'-'+schedule.id+'" /><label for="schedule-'+schedule.device+'-'+schedule.id+'" id="message-schedule-'+schedule.device+'-'+schedule.id+'"></label></p>\n';
+				var htmlSchedule = '<p id="p-schedule-'+schedule.device+'-'+schedule.id+'" class="class-schedule class-schedule-'+schedule.id+'"><input type="button" data-an-schedule-id="'+schedule.id+'" class="admin-button admin-modify-delete" value="+" name="admin-schedule-'+schedule.device+'-'+schedule.id+'" id="admin-schedule-'+schedule.device+'-'+schedule.id+'"/><input type="checkbox" value="schedule-'+schedule.device+'-'+schedule.id+'" data-an-schedule="'+schedule.id+'" data-an-device="'+schedule.device+'" name="schedule-'+schedule.device+'-'+schedule.id+'" id="schedule-'+schedule.device+'-'+schedule.id+'" /><label for="schedule-'+schedule.device+'-'+schedule.id+'" id="message-schedule-'+schedule.device+'-'+schedule.id+'"></label></p>\n';
 				$('#schedule-'+schedule.device+' .inside').append(htmlSchedule);
 				if (!enabled) {
 					$('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+' (Désactivé)');
@@ -2145,7 +2175,7 @@ function buildMusic(deviceId, mpdName, mpdDisplay) {
 	var jqxhr = $.get( urlStatus, function(data) {
 		var music = $.parseJSON(data);
 		var $mpc = $('#mpc-'+deviceId+' .inside');
-		var htmlMpc = '<p><input type="button" name="toggle-mpc-'+deviceId+'-'+mpdName+'" id="toggle-mpc-'+deviceId+'-'+mpdName+'" value="' + $.t('Show') + '" data-i18n data-container="p-container-mpc-'+deviceId+'-'+mpdName+'" data-status="hidden">&nbsp;'+mpdDisplay+'</p><div id="p-container-mpc-'+deviceId+'-'+mpdName+'"><p id="p-mpc-'+deviceId+'-'+mpdName+'" >\n';
+		var htmlMpc = '<p><input type="button" name="toggle-mpc-'+deviceId+'-'+mpdName+'" id="toggle-mpc-'+deviceId+'-'+mpdName+'" value="' + $.t('Show') + '" data-i18n data-container="p-container-mpc-'+deviceId+'-'+mpdName+'" data-status="hidden" class="styled-button">&nbsp;'+mpdDisplay+'</p><div id="p-container-mpc-'+deviceId+'-'+mpdName+'"><p id="p-mpc-'+deviceId+'-'+mpdName+'" >\n';
 		htmlMpc += '</p><p>';
 		htmlMpc += '<div id="div-mpc-'+deviceId+'-'+mpdName+'-stop"><a href="#" id="mpc-'+deviceId+'-'+mpdName+'-stop" ><img src="images/media-playback-stop-big.png" /></a></div><div id="div-mpc-'+deviceId+'-'+mpdName+'-play"><a href="#" id="mpc-'+deviceId+'-'+mpdName+'-play"><img src="images/media-playback-start-big.png" /></a></div>\n';
 		if (music.state == 'stopped') {
@@ -2160,7 +2190,7 @@ function buildMusic(deviceId, mpdName, mpdDisplay) {
 		$('#toggle-mpc-'+deviceId+'-'+mpdName).click(function() {
 			var $container = $('#'+$(this).attr('data-container'));
 			if ($(this).attr('data-status') == 'hidden') {
-				$container.show();
+				$container.slideDown();
 				$(this).attr('value', $.t('Hide'));
 				$(this).attr('data-status', 'shown');
 				if (globalMpdIntervalHandle[deviceId] == undefined) {
@@ -2171,7 +2201,7 @@ function buildMusic(deviceId, mpdName, mpdDisplay) {
 					updateMusic(deviceId, mpdName);
 				}, 1000 * 10);
 		} else {
-				$container.hide();
+				$container.slideUp();
 				$(this).attr('value', $.t('Show'));
 				$(this).attr('data-status', 'hidden');
 				if (globalMpdIntervalHandle[deviceId][mpdName] != undefined) {
@@ -2441,11 +2471,11 @@ function toggleRadio(state) {
 		$('#radio-stream').trigger('pause');
 		$('#radio-stream').empty();
 		$('#radio-toggle').attr('value', $.t('Show'));
-		$('#p-radio-list').hide();
-		$('#p-radio-stream').hide();
-		$('#p-radio-commands').hide();
-		$('#p-radio-list-songs').hide();
-		$('#p-radio-metadata-song').hide();
+		$('#p-radio-list').slideUp();
+		$('#p-radio-stream').slideUp();
+		$('#p-radio-commands').slideUp();
+		$('#p-radio-list-songs').slideUp();
+		$('#p-radio-metadata-song').slideUp();
 		globalRadioToggle = false;
 		if (globalRadioIntervalHandle !== '') {
 			window.clearInterval(globalRadioIntervalHandle);
@@ -2453,11 +2483,11 @@ function toggleRadio(state) {
 		}
 	} else {
 		$('#radio-toggle').attr('value', $.t('Hide'));
-		$('#p-radio-list').show();
-		$('#p-radio-stream').show();
-		$('#p-radio-commands').show();
-		$('#p-radio-list-songs').show();
-		$('#p-radio-metadata-song').show();
+		$('#p-radio-list').slideDown();
+		$('#p-radio-stream').slideDown();
+		$('#p-radio-commands').slideDown();
+		$('#p-radio-list-songs').slideDown();
+		$('#p-radio-metadata-song').slideDown();
 		globalRadioToggle = true;
 		
 		var url = 'liquidsoap/?action=streams';

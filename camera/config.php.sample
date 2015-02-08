@@ -3,7 +3,7 @@
 $configCameras = array(
 	"camera1" =>	array(	"name" => "camera1",
 		"description" => "first camera",
-		"source-path" => "/path/to/camera1",
+		"scheduled-path" => "/path/to/camera1",
 		"triggered-path" => "/path/to/camera1/alert",
 		"scheduled-files-filter" => "*-snapshot.jpg",
 		"triggered-files-filter" => "*.jpg",
@@ -11,7 +11,7 @@ $configCameras = array(
 	),
 	"camera2" =>	array(	"name" => "camera2",
 		"description" => "second camera",
-		"source-path" => "/path/to/camera2",
+		"scheduled-path" => "/path/to/camera2",
 		"triggered-path" => "/path/to/camera2/alert",
 		"scheduled-files-filter" => "*-snapshot.jpg",
 		"triggered-files-filter" => "*.jpg",

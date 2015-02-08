@@ -29,14 +29,14 @@
   float: left;
 }
 #tabs ul li.active {
-  border-top:2px #FFFF66 solid;
-  background: #008080;
+  border-top:2px #58585A solid;
+  background: #DCDCE0;
 }
 #tabs ul li.active a {
   color: #333333;
 }
 #tabs .tab {
-  background: #008080;
+  background: #DCDCE0;
   clear: both;
   padding: 15px;
   min-height: 200px;
@@ -74,7 +74,7 @@
   margin: 5px;
   border-style: solid;
   border-width: 3px;
-  border-color: #004545;
+  border-color: #292929;
   border-radius:10px;
 }
 
@@ -98,13 +98,34 @@ input[type=checkbox] {
 
 input[type=checkbox] + label {
   background: url('../images/switch-off.jpg') no-repeat;
-  height: 30px;
   padding-left: 55px;
+  height: 23px;
+  vertical-align:middle;
+  display:inline-block;
 }
 
 input[type=checkbox]:checked + label {
   background: url('../images/switch-on.jpg') no-repeat;
-  height: 26px;
+}
+
+.sensor {
+  margin: 2px;
+}
+
+.sw-type-tw {
+  margin: 4px;
+}
+
+.sw-type-nc {
+  margin: 4px;
+}
+
+.class-schedule {
+  margin: 4px;
+}
+
+.camera-control {
+  margin: 4px;
 }
 
 .sw-type-nc input[type=checkbox] + label {
@@ -137,6 +158,7 @@ input[type=checkbox]:checked + label {
   display:none;
   font-style: italic;
   text-decoration-style: dotted;
+  margin: 4px;
 }
 
 .dialog {
@@ -173,7 +195,43 @@ input[type=checkbox]:checked + label {
   font-style: italic;
 }
 
+.radio {
+  margin: 5px;
+}
+
 .radio-metatada-song {
   font-size: 100%;
   font-weight: bold;
 }
+
+
+.styled-button {
+   border-top: 1px solid #929292;
+   background: #00c8c8;
+   background: -webkit-gradient(linear, left top, left bottom, from(#C8C8C8), to(#909090));
+   background: -webkit-linear-gradient(top, #C8C8C8, #909090);
+   background: -moz-linear-gradient(top, #C8C8C8, #909090);
+   background: -ms-linear-gradient(top, #C8C8C8, #909090);
+   background: -o-linear-gradient(top, #C8C8C8, #909090);
+   padding: 3px 3px;
+   -webkit-border-radius: 25px;
+   -moz-border-radius: 25px;
+   border-radius: 25px;
+   -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   box-shadow: rgba(0,0,0,1) 0 1px 0;
+   text-shadow: rgba(0,0,0,.4) 0 1px 0;
+   color: #000000;
+   text-decoration: none;
+   vertical-align: middle;
+   margin: 4px;
+   }
+.styled-button:hover {
+   border-top-color: #929292;
+   background: #929292;
+   color: #FFFFFF;
+   }
+.styled-button:active {
+   border-top-color: #929292;
+   background: #929292;
+   }

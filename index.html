@@ -109,45 +109,10 @@
         </p>
         <p>
           <label for="refresh" data-i18n>Refresh data</label>
-          <input type="button" name="refresh" id="refresh" value="Refresh" data-i18n />
+          <input type="button" name="refresh" id="refresh" value="Refresh" class="styled-button" data-i18n />
         </p>
         <p>
           <label id="header-message-global"></label>
-        </p>
-      </div>
-      <div id="radio-global" class="radio">
-        <h3 data-i18n>Webradio</h3>
-        <p>
-          <input type="button" id="radio-toggle" name="radio-toggle" value="Show" data-i18n />
-        </p>
-        <p id="p-radio-list">
-		  <select id="radio-list" name="radio-list"></select>
-        </p>
-        <p id="p-radio-stream">
-          <audio controls preload="auto" id="radio-stream">
-            <em>Sorry, no source defined.</em>
-          </audio>
-        </p>
-        <p id="p-radio-commands">
-          <a href="#" id="a-radio-command-stop"><img src="images/media-playback-stop-big.png" /></a>
-          <a href="#" id="a-radio-command-start"><img src="images/media-playback-start-big.png" /></a>
-          <a href="#" id="a-radio-command-next"><img src="images/media-playback-next-big.png" /></a>
-        </p>
-        <p id="p-radio-list-songs">
-          <label for="radio-list-song" data-i18n>Song list</label>
-          <select id="radio-list-song" name="radio-list-song"></select>
-        </p>
-        <p id="p-radio-metadata-song">
-          <label data-i18n>Title</label>
-          <label id="radio-metadata-song-title" class="radio-metatada-song"></label><br/>
-          <label data-i18n>Artist</label>
-          <label id="radio-metadata-song-artist" class="radio-metatada-song"></label><br/>
-          <label data-i18n id="label-radio-metadata-song-albumartist">Album artist</label>
-          <label id="radio-metadata-song-albumartist" class="radio-metatada-song"></label><br/>
-          <label data-i18n>Album</label>
-          <label id="radio-metadata-song-album" class="radio-metatada-song"></label><br/>
-          <label data-i18n>Year</label>
-          <label id="radio-metadata-song-year" class="radio-metatada-song"></label><br/>
         </p>
       </div>
       <div id="archive-global" class="archive">
@@ -164,21 +129,58 @@
             </select>
           </p>
           <p>
-            <input type="button" name="archive" id="archive" value="Run archive" data-i18n />
+            <input type="button" name="archive" id="archive" value="Run archive" class="styled-button" data-i18n />
           </p>
         </div>
       </div>
-      <div id="script-global" class="scripts">
+      <div id="radio-global" class="radio block">
+        <div id="inner-radio" class="inside">
+          <h3 data-i18n>Webradio</h3>
+          <p>
+            <input type="button" id="radio-toggle" name="radio-toggle" value="Show" class="styled-button" data-i18n />
+          </p>
+          <p id="p-radio-list" class="radio">
+            <select id="radio-list" name="radio-list"></select>
+          </p>
+          <p id="p-radio-stream" class="radio">
+            <audio controls preload="auto" id="radio-stream">
+              <em>Sorry, no source defined.</em>
+            </audio>
+          </p>
+          <p id="p-radio-commands" class="radio">
+            <a href="#" id="a-radio-command-stop"><img src="images/media-playback-stop-big.png" /></a>
+            <a href="#" id="a-radio-command-start"><img src="images/media-playback-start-big.png" /></a>
+            <a href="#" id="a-radio-command-next"><img src="images/media-playback-next-big.png" /></a>
+          </p>
+          <p id="p-radio-list-songs" class="radio">
+            <label for="radio-list-song" data-i18n>Song list</label>
+            <select id="radio-list-song" name="radio-list-song"></select>
+          </p>
+          <p id="p-radio-metadata-song" class="radio">
+            <label data-i18n>Title</label>
+            <label id="radio-metadata-song-title" class="radio-metatada-song"></label><br/>
+            <label data-i18n>Artist</label>
+            <label id="radio-metadata-song-artist" class="radio-metatada-song"></label><br/>
+            <label data-i18n id="label-radio-metadata-song-albumartist">Album artist</label>
+            <label id="radio-metadata-song-albumartist" class="radio-metatada-song"></label><br/>
+            <label data-i18n>Album</label>
+            <label id="radio-metadata-song-album" class="radio-metatada-song"></label><br/>
+            <label data-i18n>Year</label>
+            <label id="radio-metadata-song-year" class="radio-metatada-song"></label><br/>
+          </p>
+        </div>
+      </div>
+      <div id="script-global" class="scripts block">
         <div class="inside">
           <h3 data-i18n>Tasks</h3><input type="button" class="admin-button admin-script-add" id="admin-script-global-add" name="admin-script-global-add" value="Add">
         </div>
       </div>
-      <div id="schedule-global" class="schedules">
+      <div id="schedule-global" class="schedules block">
         <div class="inside">
           <h3 data-i18n>Scheduled tasks</h3><input type="button" class="admin-button admin-add" id="admin-schedule-global-add" name="admin-schedule-global-add" value="Add">
         </div>
       </div>
-      <div id="action-global" class="actions p-hidden">
+      <div id="action-global" class="actions p-hidden block">
         <div class="inside">
           <h3 data-i18n>Actions</h3><input type="button" class="admin-button admin-add" id="admin-action-global-add" name="admin-action-global-add" value="Add">
         </div>
@@ -418,23 +420,6 @@
       <select id="dialog-script-action-list" name="dialog-script-action-list"></select>
     </p>
     <p>
-      <label for="dialog-script-action-result" data-i18n>Results validation</label>
-      <select id="dialog-script-action-result" name="dialog-script-action-result">
-        <option value="0" data-i18n>None</option>
-        <option value="1" data-i18n>Equal to</option>
-        <option value="2" data-i18n>Lower to</option>
-        <option value="3" data-i18n>Lower or equal to</option>
-        <option value="4" data-i18n>Higher or equal to</option>
-        <option value="5" data-i18n>Higher to</option>
-        <option value="6" data-i18n>Different from</option>
-        <option value="7" data-i18n>Contains</option>
-      </select>
-    </p>
-    <p>
-      <label for="dialog-script-action-result-value" data-i18n>Value compared</label>
-      <input type="text" name="dialog-script-action-result-value" id="dialog-script-action-result-value" value="">
-    </p>
-    <p>
       <input type="button" value="Add" name="dialog-script-action-add" id="dialog-script-action-add">
     </p>
   </p>
@@ -621,7 +606,7 @@
     <div id="elements-container-cameras" class="elements">
       <div id="header-cameras" class="header">
         <p>
-          <label for="global-lang-select" id="global-lang-label" data-i18n>Cameras</label>
+          <h2 data-i18n>Cameras</h2>
         </p>
       </div>
       <div id="list-cameras" class="cameras">
@@ -631,23 +616,25 @@
 </div>
 
 <div id="div-camera" class="template">
-  <div id="camera-CAMERA" class="inside">
-    <h3>DESCRIPTION</h3>
-    <p>
-      <label for="camera-list-CAMERA" data-i18n>Pictures list</label>
-      <select name="camera-list-CAMERA" id="camera-list-CAMERA"></select>
-      <label data-i18n>Pictures type</label>
-      <input type="radio" name="camera-switch-CAMERA" id="camera-switch-CAMERA-sched" checked="checked" />
-      <label for="camera-switch-CAMERA-sched" data-i18n>Scheduled</label>
-      <input type="radio" name="camera-switch-CAMERA" id="camera-switch-CAMERA-trigg" />
-      <label for="camera-switch-CAMERA-trigg" data-i18n>Triggered</label>
-      <input type="radio" name="camera-switch-CAMERA" id="camera-switch-CAMERA-stream" />
-      <label for="camera-switch-CAMERA-stream" data-i18n>Real-time stream</label>
-    </p>
-    <p>
-      <a data-lightbox="camera-CAMERA" id="camera-photo-large-CAMERA" href="camera/camera.php?name=CAMERA&large">
-        <img src="camera/camera.php?name=CAMERA" id="camera-photo-CAMERA" width="640" height="480">
-      </a>
-    </p>
+  <div id="container" class="block">
+    <div id="camera-CAMERA" class="inside">
+      <h3>DESCRIPTION</h3>
+      <p class="camera-control">
+        <label for="camera-list-CAMERA" data-i18n>Pictures list</label>
+        <select name="camera-list-CAMERA" id="camera-list-CAMERA"></select>
+        <label data-i18n>Pictures type</label>
+        <input type="radio" name="camera-switch-CAMERA" id="camera-switch-CAMERA-sched" checked="checked" />
+        <label for="camera-switch-CAMERA-sched" data-i18n>Scheduled</label>
+        <input type="radio" name="camera-switch-CAMERA" id="camera-switch-CAMERA-trigg" />
+        <label for="camera-switch-CAMERA-trigg" data-i18n>Triggered</label>
+        <input type="radio" name="camera-switch-CAMERA" id="camera-switch-CAMERA-stream" />
+        <label for="camera-switch-CAMERA-stream" data-i18n>Real-time stream</label>
+      </p>
+      <p>
+        <a data-lightbox="camera-CAMERA" id="camera-photo-large-CAMERA" href="camera/camera.php?name=CAMERA&large">
+          <img src="camera/camera.php?name=CAMERA" id="camera-photo-CAMERA" width="640" height="480">
+        </a>
+      </p>
+    </div>
   </div>
 </div>

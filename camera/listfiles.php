@@ -3,7 +3,7 @@ require_once 'config.php';
 
 if (isset($_GET['camera']) && isset($configCameras[$_GET['camera']])) {
   $camera = $configCameras[$_GET['camera']];
-  $photoDir = $camera['source-path'].'/';
+  $photoDir = $camera['scheduled-path'].'/';
   if (isset($_GET['alert'])) {
     $photoDir = $camera['triggered-path'].'/';
     $filesFilter = $camera['triggered-files-filter'];

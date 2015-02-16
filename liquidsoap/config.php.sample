@@ -1,0 +1,11 @@
+<?php
+
+$fields = array("title", "artist", "albumartist", "year", "album");
+$commands = array("skip", "stop", "start", "status", "remaining");
+
+$streams = array(
+		"radioparadise" => array("name" => "Radio Paradise MP3 128 Kb", "url" => "http://stream-dc1.radioparadise.com/mp3-128", "type" => "audio/mpeg"), 
+		"localradio" => array("name" => "Local Hosted Liquidsoap Radio OGG (64 kb, mono)", "url" => "/radio/stream.ogg", "type" => "audio/ogg", "host" => "localhost", "port" => "1201", "requestName" => "streamOGG"),
+	);
+
+?>

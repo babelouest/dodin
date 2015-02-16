@@ -104,6 +104,12 @@ input[type=checkbox] + label {
   display:inline-block;
 }
 
+hr {
+  height: 3px;
+  color: #292929;
+  background-color: #292929;
+}
+
 input[type=checkbox]:checked + label {
   background: url('../images/switch-on.jpg') no-repeat;
 }

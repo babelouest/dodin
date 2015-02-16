@@ -15,6 +15,7 @@ var globalCurrentSong = [];
 var globalRadioSongsList = [];
 var globalRadioIntervalHandle = '';
 var globalRadioToggle = false;
+var globalRadioDataToggle = false;
 var globalRadioSources = [];
 var globalCurrentRadioStream = '';
 var globalCameras = [];
@@ -218,9 +219,14 @@ function initDevices() {
 			initSchedules();
 
 			toggleRadio(globalRadioToggle);
+			toggleRadioData(globalRadioDataToggle);
 
 			$('#radio-toggle').click(function() {
 				toggleRadio(!globalRadioToggle);
+			});
+			
+			$('#radio-data-toggle').click(function() {
+				toggleRadioData(!globalRadioDataToggle);
 			});
 			
 			$('#radio-list').change(function() {
@@ -2390,7 +2396,7 @@ function updateRadioSongList() {
 			globalRadioSongsList = list;
 			var selectedSong = $select.find('option:selected').text();
 			$select.empty();
-			$select.append('<option value="current" data-i18n>Current song</option>');
+			$select.append('<option value="current">'+$.t('Current song')+'</option>');
 			if (list.length >0) {
 				for (i=0; i<list.length; i++) {
 					$select.append('<option value="'+i+'">'+list[i].artist + ' - ' + list[i].title+'</option>');
@@ -2468,26 +2474,21 @@ function updateRadioSongMetadata(song) {
 
 function toggleRadio(state) {
 	if (state === false) {
+		toggleRadioData(false);
 		$('#radio-stream').trigger('pause');
 		$('#radio-stream').empty();
 		$('#radio-toggle').attr('value', $.t('Show'));
 		$('#p-radio-list').slideUp();
 		$('#p-radio-stream').slideUp();
 		$('#p-radio-commands').slideUp();
-		$('#p-radio-list-songs').slideUp();
-		$('#p-radio-metadata-song').slideUp();
+		$('#inner-radio-data').slideUp();
 		globalRadioToggle = false;
-		if (globalRadioIntervalHandle !== '') {
-			window.clearInterval(globalRadioIntervalHandle);
-			globalRadioIntervalHandle = '';
-		}
 	} else {
 		$('#radio-toggle').attr('value', $.t('Hide'));
 		$('#p-radio-list').slideDown();
 		$('#p-radio-stream').slideDown();
 		$('#p-radio-commands').slideDown();
-		$('#p-radio-list-songs').slideDown();
-		$('#p-radio-metadata-song').slideDown();
+		$('#inner-radio-data').slideDown();
 		globalRadioToggle = true;
 		
 		var url = 'liquidsoap/?action=streams';
@@ -2500,12 +2501,31 @@ function toggleRadio(state) {
 				var option = '<option value="' + streamId + '">' + globalRadioSources[streamId].name + '</option>\n';
 				$radioList.append(option);
 			}
-			
-			$radioList.trigger('change');
-			globalRadioIntervalHandle = setInterval(function() {
-				updateRadioSongList();
-			}, 1000*10); 
+			globalCurrentRadioStream = $radioList.val();
 		});
+	}
+}
+
+function toggleRadioData(state) {
+	if (state === false) {
+		$('#radio-data-toggle').attr('value', $.t('Show'));
+		$('#p-radio-list-songs').slideUp();
+		$('#p-radio-metadata-song').slideUp();
+		globalRadioDataToggle = false;
+		if (globalRadioIntervalHandle !== '') {
+			window.clearInterval(globalRadioIntervalHandle);
+			globalRadioIntervalHandle = '';
+		}
+	} else {
+		$('#radio-data-toggle').attr('value', $.t('Hide'));
+		$('#p-radio-list-songs').slideDown();
+		$('#p-radio-metadata-song').slideDown();
+		globalRadioDataToggle = true;
+		
+		updateRadioSongList();
+		globalRadioIntervalHandle = setInterval(function() {
+			updateRadioSongList();
+		}, 1000*10); 
 
 	}
 }

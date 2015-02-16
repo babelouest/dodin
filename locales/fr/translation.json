@@ -177,5 +177,8 @@
     "Current song": "Chanson en cours",
     "Show": "Montrer",
     "Hide": "Cacher",
-    "Error parsing data": "Erreur dans l'évaluation des données"
+    "Error parsing data": "Erreur dans l'évaluation des données",
+    "Player": "Lecteur",
+    "Last played songs": "Dernières chansons jouées",
+    "Web Radio": "Radio Web"
 }

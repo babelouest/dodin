@@ -10,6 +10,11 @@
     <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="js/i18next-1.7.4.min.js"></script>
     <script type="text/javascript" src="js/jquery-ui-1.10.4.min.js"></script>
+
+    <!-- tagging -->
+    <script type="text/javascript" src="js/bootstrap-tagsinput.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-tagsinput.css" />
+    <!--<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />-->
     
     <!-- Charts and graphs -->
     <script type="text/javascript" src="js/jquery.jqplot.min.js"></script>
@@ -79,7 +84,7 @@
       </div>
       <div id="schedule-TEMPLATE" class="schedules block">
         <div class="inside">
-          <h3 data-i18n>Scheduled tasks</h3><input type="button" class="admin-button admin-add" id="admin-schedule-add-TEMPLATE" name="admin-schedule-add-TEMPLATE" value="Add">
+          <h3 data-i18n>Scheduled tasks</h3><input type="button" class="admin-button admin-schedule-add" id="admin-schedule-add-TEMPLATE" name="admin-schedule-add-TEMPLATE" value="Add">
         </div>
       </div>
       <div id="mpc-TEMPLATE" class="mpc block">
@@ -217,6 +222,10 @@
     <label for="dialog-device-enabled" data-i18n>Enabled</label>
     <input type="checkbox" name="dialog-device-enabled" id="dialog-device-enabled"><label for="dialog-device-enabled"></label>
   </p>
+  <p>
+    <label for="dialog-device-tags" data-i18n>Tags</label>
+    <input type="text" name="dialog-device-tags" id="dialog-device-tags" value="" data-role="tagsinput" class="bootstrap-tagsinput">
+  </p>
 </div>
 
 <div id="dialog-light" title="Edit a light" class="template dialog">
@@ -231,6 +240,10 @@
   <p>
     <label for="dialog-light-enabled" data-i18n>Enabled</label>
     <input type="checkbox" name="dialog-light-enabled" id="dialog-light-enabled"><label for="dialog-light-enabled"></label>
+  </p>
+  <p>
+    <label for="dialog-light-tags" data-i18n>Tags</label>
+    <input type="text" name="dialog-light-tags" id="dialog-light-tags" value="" data-role="tagsinput" class="bootstrap-tagsinput">
   </p>
 </div>
 
@@ -251,6 +264,10 @@
     <label for="dialog-heater-enabled" data-i18n>Enabled</label>
     <input type="checkbox" name="dialog-heater-enabled" id="dialog-heater-enabled"><label for="dialog-heater-enabled"></label>
   </p>
+  <p>
+    <label for="dialog-heater-tags" data-i18n>Tags</label>
+    <input type="text" name="dialog-heater-tags" id="dialog-heater-tags" value="" data-role="tagsinput" class="bootstrap-tagsinput">
+  </p>
 </div>
 
 <div id="dialog-sensor" title="Edit a sensor" class="template dialog">
@@ -269,6 +286,10 @@
   <p>
     <label for="dialog-sensor-enabled" data-i18n>Enabled</label>
     <input type="checkbox" name="dialog-sensor-enabled" id="dialog-sensor-enabled"><label for="dialog-sensor-enabled"></label>
+  </p>
+  <p>
+    <label for="dialog-sensor-tags" data-i18n>Tags</label>
+    <input type="text" name="dialog-sensor-tags" id="dialog-sensor-tags" value="" data-role="tagsinput" class="bootstrap-tagsinput">
   </p>
   <p>
     <label for="dialog-sensor-monitored" data-i18n>Monitored</label>
@@ -320,6 +341,10 @@
     <input type="checkbox" name="dialog-switch-enabled" id="dialog-switch-enabled"><label for="dialog-switch-enabled"></label>
   </p>
   <p>
+    <label for="dialog-switch-tags" data-i18n>Tags</label>
+    <input type="text" name="dialog-switch-tags" id="dialog-switch-tags" value="" data-role="tagsinput" class="bootstrap-tagsinput">
+  </p>
+  <p>
     <label for="dialog-switch-monitored" data-i18n>Monitored</label>
     <input type="checkbox" name="dialog-switch-monitored" id="dialog-switch-monitored"><label for="dialog-switch-monitored"></label>
   </p>
@@ -354,6 +379,10 @@
     <input type="text" name="dialog-action-name" id="dialog-action-name" value="">
   </p>
   <p>
+    <label for="dialog-action-tags" data-i18n>Tags</label>
+    <input type="text" name="dialog-action-tags" id="dialog-action-tags" data-role="tagsinput" class="bootstrap-tagsinput">
+  </p>
+  <p>
     <label for="dialog-action-type" data-i18n>Type</label>
     <select id="dialog-action-type" name="dialog-action-type">
       <option value="0" data-i18n>Device list</option>
@@ -364,6 +393,7 @@
       <option value="7" data-i18n>Toggle switch</option>
       <option value="5" data-i18n>Get sensor status</option>
       <option value="6" data-i18n>Set heater status</option>
+      <option value="77" data-i18n>Run script</option>
       <option value="88" data-i18n>Sleep (milliseconds)</option>
       <option value="99" data-i18n>Internal server command</option>
     </select>
@@ -383,6 +413,10 @@
   <p>
     <label for="dialog-action-heater" data-i18n>Heater</label>
     <select id="dialog-action-heater" name="dialog-action-heater"></select>
+  </p>
+  <p>
+    <label for="dialog-action-script" data-i18n>Script</label>
+    <select id="dialog-action-script" name="dialog-action-script"></select>
   </p>
   <p id="p-dialog-action-params" class="hidden">
     <label id="dialog-action-params" data-i18n>Additional parameters</label>
@@ -405,6 +439,10 @@
   <p>
     <label for="dialog-script-name" data-i18n>Name</label>
     <input type="text" name="dialog-script-name" id="dialog-script-name" value="">
+  </p>
+  <p>
+    <label for="dialog-script-tags" data-i18n>Tags</label>
+    <input type="text" name="dialog-script-tags" id="dialog-script-tags" value="" data-role="tagsinput" class="bootstrap-tagsinput">
   </p>
   <p>
     <label for="dialog-script-enabled" data-i18n>Enabled</label>
@@ -441,6 +479,10 @@
   <p>
     <label for="dialog-schedule-enabled" data-i18n>Enabled</label>
     <input type="checkbox" name="dialog-schedule-enabled" id="dialog-schedule-enabled"><label for="dialog-schedule-enabled"></label>
+  </p>
+  <p>
+    <label for="dialog-schedule-tags" data-i18n>Tags</label>
+    <input type="text" name="dialog-schedule-tags" id="dialog-schedule-tags" value="" data-role="tagsinput" class="bootstrap-tagsinput">
   </p>
   <p>
     <label for="dialog-schedule-script" data-i18n>Task to run</label>

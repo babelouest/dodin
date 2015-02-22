@@ -210,6 +210,15 @@ input[type=checkbox]:checked + label {
   font-weight: bold;
 }
 
+.an-enabled {
+  background: #00FF00;
+  font-weight: bold;
+}
+
+.an-disabled {
+  background: #FF0000;
+  font-style: italic;
+}
 
 .styled-button {
    border-top: 1px solid #929292;

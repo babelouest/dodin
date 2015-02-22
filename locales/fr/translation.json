@@ -180,5 +180,10 @@
     "Error parsing data": "Erreur dans l'évaluation des données",
     "Player": "Lecteur",
     "Last played songs": "Dernières chansons jouées",
-    "Web Radio": "Radio Web"
+    "Web Radio": "Radio Web",
+    "Tags": "Étiquettes",
+    "Run script": "Lancer une tâche",
+    "Script": "Tâche",
+    "You must enter a script name": "Vous devez saisir un nom pour la tâche",
+    "You must enter at least one action": "Vous devez ajouter au moins une action"
 }

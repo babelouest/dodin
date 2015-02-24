@@ -1,0 +1,11 @@
+<?php
+
+$servers = array();
+
+$servers[] = array(
+                "device" => "DEV1",
+                "name" => "localhost",
+                "display" => "Local",
+                "host" => "localhost",
+                "port" => 6600,
+                "password" => "");

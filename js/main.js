@@ -1,11 +1,10 @@
+/**
+ * Angrarad Web client
+ * Copyright 2014-2015 Nicolas Mora mail@babelouest.org
+ * Licenced under AGPL
+ */
 var prefix = '';
 
-var jqxhr = $.get( 'config/config.json', function(data) {
-	prefix = data.prefix;
-})
-.fail(function() {
-	$('#message-'+deviceId).text($.t('Error getting config'));
-});
 var devicesTab = [];
 var globalOverview = [];
 var globalActions = [];
@@ -26,7 +25,20 @@ var globalRadioSources = [];
 var globalCurrentRadioStream = '';
 var globalCameras = [];
 
-$.i18n.init({fallbackLng:'en'});
+function initConfig() {
+    $.ajax({
+        async: false,
+        type: 'GET',
+        url: 'config/config.json',
+        success: function(data) {
+            prefix = data.prefix;
+        },
+        fail: function() {
+            $('#message-'+deviceId).text($.t('Error getting config'));
+        }
+    });
+    
+}
 
 function htmlI18n() {
 	$('html head').find('title').text($.t('Angharad Web Client'));
@@ -48,91 +60,88 @@ function htmlI18n() {
 
 $(document).ready(function() {
 
-	htmlI18n();
+    $.i18n.init({fallbackLng:'en'}).done(function() {
+        htmlI18n();
+    	$.contextMenu({
+    		selector: '.admin-modify-delete',
+    		trigger: 'left',
+    		callback: function (key, options) {
+    			if (key == 'edit') {
+    				if ($(this).attr('name').indexOf('admin-global-action') == 0) {
+    					editAction($(this));
+    				} else if ($(this).attr('name').indexOf('admin-global-script') == 0 || $(this).attr('name').indexOf('admin-script') == 0) {
+    					editScript($(this));
+    				} else if ($(this).attr('name').indexOf('admin-global-schedule') == 0 || $(this).attr('name').indexOf('admin-schedule') == 0) {
+    					editSchedule($(this));
+    				}
+    			} else {
+    				if ($(this).attr('name').indexOf('admin-global-action') == 0) {
+    					deleteAction($(this));
+    				} else if ($(this).attr('name').indexOf('admin-global-script') == 0 || $(this).attr('name').indexOf('admin-script') == 0) {
+    					deleteScript($(this));
+    				} else if ($(this).attr('name').indexOf('admin-global-schedule') == 0 || $(this).attr('name').indexOf('admin-schedule') == 0) {
+    					deleteSchedule($(this));
+    				}
+    			}
+    		},
+    		items: {
+    			'edit': {name: $.t('Edit'), icon: 'edit'},
+    			'delete': {name: $.t('Delete'), icon: 'delete'},
+    		}
+    	});
+    		
+    	$.contextMenu({
+    		selector: '.admin-modify-graph',
+    		trigger: 'left',
+    		callback: function (key, options) {
+    			if (key == 'graph') {
+    				if ($(this).attr('name').indexOf('admin-sensor-') == 0) {
+    					monitorElement($(this));
+    				} else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
+    					monitorElement($(this));
+    				}
+    			} else {
+    				if ($(this).attr('name').indexOf('admin-sensor-') == 0) {
+    					editSensor($(this));
+    				} else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
+    					editSwitch($(this));
+    				} else if ($(this).attr('name').indexOf('admin-light-') == 0) {
+    					editLight($(this));
+    				} else if ($(this).attr('name').indexOf('admin-heater-') == 0) {
+    					editHeater($(this));
+    				}
+    			}
+    		},
+    		items: {
+    			'edit': {name: $.t('Edit'), icon: 'edit'},
+    			'graph': {name: $.t('Graph'), icon: 'graph'},
+    		}
+    	});
+    
+    	$.contextMenu({
+    		selector: '.admin-modify',
+    		trigger: 'left',
+    		callback: function (key, options) {
+    			if ($(this).attr('name').indexOf('admin-sensor-') == 0) {
+    				editSensor($(this));
+    			} else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
+    				editSwitch($(this));
+    			} else if ($(this).attr('name').indexOf('admin-light-') == 0) {
+    				editLight($(this));
+    			} else if ($(this).attr('name').indexOf('admin-heater-') == 0) {
+    				editHeater($(this));
+    			}
+    		},
+    		items: {
+    			'edit': {name: $.t('Edit'), icon: 'edit'},
+    		}
+    	});
+    });
+
+	initConfig();
 	
 	initDevices();
 	
-	$(function() {
-		$.contextMenu({
-			selector: '.admin-modify-delete',
-			trigger: 'left',
-			callback: function (key, options) {
-				if (key == 'edit') {
-					if ($(this).attr('name').indexOf('admin-global-action') == 0) {
-						editAction($(this));
-					} else if ($(this).attr('name').indexOf('admin-global-script') == 0 || $(this).attr('name').indexOf('admin-script') == 0) {
-						editScript($(this));
-					} else if ($(this).attr('name').indexOf('admin-global-schedule') == 0 || $(this).attr('name').indexOf('admin-schedule') == 0) {
-						editSchedule($(this));
-					}
-				} else {
-					if ($(this).attr('name').indexOf('admin-global-action') == 0) {
-						deleteAction($(this));
-					} else if ($(this).attr('name').indexOf('admin-global-script') == 0 || $(this).attr('name').indexOf('admin-script') == 0) {
-						deleteScript($(this));
-					} else if ($(this).attr('name').indexOf('admin-global-schedule') == 0 || $(this).attr('name').indexOf('admin-schedule') == 0) {
-						deleteSchedule($(this));
-					}
-				}
-			},
-			items: {
-				'edit': {name: $.t('Edit'), icon: 'edit'},
-				'delete': {name: $.t('Delete'), icon: 'delete'},
-			}
-		});
-	});
-
-	$(function() {
-		$.contextMenu({
-			selector: '.admin-modify-graph',
-			trigger: 'left',
-			callback: function (key, options) {
-				if (key == 'graph') {
-					if ($(this).attr('name').indexOf('admin-sensor-') == 0) {
-						monitorElement($(this));
-					} else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
-						monitorElement($(this));
-					}
-				} else {
-					if ($(this).attr('name').indexOf('admin-sensor-') == 0) {
-						editSensor($(this));
-					} else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
-						editSwitch($(this));
-					} else if ($(this).attr('name').indexOf('admin-light-') == 0) {
-						editLight($(this));
-					} else if ($(this).attr('name').indexOf('admin-heater-') == 0) {
-						editHeater($(this));
-					}
-				}
-			},
-			items: {
-				'edit': {name: $.t('Edit'), icon: 'edit'},
-				'graph': {name: $.t('Graph'), icon: 'graph'},
-			}
-		});
-	});
-
-	$(function() {
-		$.contextMenu({
-			selector: '.admin-modify',
-			trigger: 'left',
-			callback: function (key, options) {
-				if ($(this).attr('name').indexOf('admin-sensor-') == 0) {
-					editSensor($(this));
-				} else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
-					editSwitch($(this));
-				} else if ($(this).attr('name').indexOf('admin-light-') == 0) {
-					editLight($(this));
-				} else if ($(this).attr('name').indexOf('admin-heater-') == 0) {
-					editHeater($(this));
-				}
-			},
-			items: {
-				'edit': {name: $.t('Edit'), icon: 'edit'},
-			}
-		});
-	});
-
 });
 
 function initDevices() {

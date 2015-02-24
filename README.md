@@ -3,7 +3,7 @@ angharadweb
 
 Angharad web client, JQuery application
 
-Handles angharad server, cameras, mpc devices
+Handles angharad server, cameras, mpc devices and webradios
 
 ![Main screen](https://github.com/babelouest/angharadweb/blob/master/screenshots/main.png "Main screen")
 

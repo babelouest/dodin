@@ -185,5 +185,6 @@
     "Run script": "Lancer une tâche",
     "Script": "Tâche",
     "You must enter a script name": "Vous devez saisir un nom pour la tâche",
-    "You must enter at least one action": "Vous devez ajouter au moins une action"
+    "You must enter at least one action": "Vous devez ajouter au moins une action",
+    "Graph": "Graphique"
 }

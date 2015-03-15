@@ -105,8 +105,8 @@ $(document).ready(function() {
     					editSensor($(this));
     				} else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
     					editSwitch($(this));
-    				} else if ($(this).attr('name').indexOf('admin-light-') == 0) {
-    					editLight($(this));
+    				} else if ($(this).attr('name').indexOf('admin-dimmer-') == 0) {
+    					editDimmer($(this));
     				} else if ($(this).attr('name').indexOf('admin-heater-') == 0) {
     					editHeater($(this));
     				}
@@ -126,8 +126,8 @@ $(document).ready(function() {
     				editSensor($(this));
     			} else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
     				editSwitch($(this));
-    			} else if ($(this).attr('name').indexOf('admin-light-') == 0) {
-    				editLight($(this));
+    			} else if ($(this).attr('name').indexOf('admin-dimmer-') == 0) {
+    				editDimmer($(this));
     			} else if ($(this).attr('name').indexOf('admin-heater-') == 0) {
     				editHeater($(this));
     			}
@@ -273,45 +273,35 @@ function overviewDevice(deviceId) {
 		if (!json.syntax_error) {
 			globalOverview[deviceId] = json;
 			var $switches = $('#switch-'+deviceId+' .inside');
-			for (var i=0; i<json.pins.length; i++) {
-				var pin = json.pins[i];
-				var isChecked = pin.status==1?'checked="checked"':'';
-				var pinClass = '';
-				if (pin.type == 1) {
+      if (json.switches.length == 0) {
+        $('#switch-'+deviceId).hide();
+      }
+			for (var i=0; i<json.switches.length; i++) {
+				var switcher = json.switches[i];
+				var isChecked = switcher.status==1?'checked="checked"':'';
+				var switcherClass = '';
+				if (switcher.type == 1) {
 					// Normally on
-					pinClass = 'sw-type-nc';
-				} else if (pin.type == 2) {
+					switcherClass = 'sw-type-nc';
+				} else if (switcher.type == 2) {
 					// Three-way
-					pinClass = 'sw-type-tw';
+					switcherClass = 'sw-type-tw';
 				}
-				var htmlPin = '<p id="p-switch-'+deviceId+'-'+pin.name+'" class="'+(!pin.enabled?'p-hidden':'')+' '+pinClass+'"><input type="button" class="admin-button admin-modify-graph" value="+" name="admin-switch-'+deviceId+'-'+pin.name+'" id="admin-switch-'+deviceId+'-'+pin.name+'" data-an-device="'+deviceId+'" data-an-switch="'+pin.name+'" data-an-unit=""/><input type="checkbox" value="sw-'+deviceId+'-'+pin.name+'" data-an-device="'+deviceId+'" data-an-pin="'+pin.name+'" name="sw-'+deviceId+'-'+pin.name+'" id="sw-'+deviceId+'-'+pin.name+'" '+isChecked+' data-an-display="'+pin.enabled+'"/>';
-				htmlPin += '<label for="sw-'+deviceId+'-'+pin.name+'" id="label-sw-'+deviceId+'-'+pin.name+'" >'+pin.display+'</label>';
-				htmlPin += '<label id="message-'+deviceId+'-'+pin.name+'"></label></p>\n';
-				$switches.append(htmlPin);
-				var $checkbox = $('#sw-'+deviceId+'-'+pin.name);
+				var htmlSwitcher = '<p id="p-switch-'+deviceId+'-'+switcher.name+'" class="'+(!switcher.enabled?'p-hidden':'')+' '+switcherClass+'"><input type="button" class="admin-button admin-modify-graph" value="+" name="admin-switch-'+deviceId+'-'+switcher.name+'" id="admin-switch-'+deviceId+'-'+switcher.name+'" data-an-device="'+deviceId+'" data-an-switch="'+switcher.name+'" data-an-unit=""/><input type="checkbox" value="sw-'+deviceId+'-'+switcher.name+'" data-an-device="'+deviceId+'" data-an-switcher="'+switcher.name+'" name="sw-'+deviceId+'-'+switcher.name+'" id="sw-'+deviceId+'-'+switcher.name+'" '+isChecked+' data-an-display="'+switcher.enabled+'"/>';
+				htmlSwitcher += '<label for="sw-'+deviceId+'-'+switcher.name+'" id="label-sw-'+deviceId+'-'+switcher.name+'" >'+switcher.display+'</label>';
+				htmlSwitcher += '<label id="message-'+deviceId+'-'+switcher.name+'"></label></p>\n';
+				$switches.append(htmlSwitcher);
+				var $checkbox = $('#sw-'+deviceId+'-'+switcher.name);
 				$checkbox.change(function() {
 					var value = $(this).prop('checked')?'1':'0';
-					setSwitchValue($(this).attr('data-an-device'), $(this).attr('data-an-pin').substring(3), value);
-				});
-			}
-			
-			var $light = $('#light-'+deviceId+' .inside');
-			for (var i=0; i<json.lights.length; i++) {
-				var light = json.lights[i];
-				var isOn = light.on?'checked="checked"':'';
-				var htmlLight = '<p id="p-light-'+deviceId+'-'+light.name+'" class="'+(!light.enabled?'p-hidden':'')+'"><input type="button" class="admin-button admin-modify" value="+" name="admin-light-'+deviceId+'-'+light.name+'" id="admin-light-'+deviceId+'-'+light.name+'" data-an-device="'+deviceId+'" data-an-light="'+light.name+'"/><input type="checkbox" value="li-'+deviceId+'-'+light.name+'" data-an-device="'+deviceId+'" data-an-light="'+light.name+'" name="li-'+deviceId+'-'+light.name+'" id="li-'+deviceId+'-'+light.name+'" '+isOn+' /><label id="label-light-'+deviceId+'-'+light.name+'" for="li-'+deviceId+'-'+light.name+'">'+light.display+'</label></p>\n';
-				$light.append(htmlLight);
-				if (!light.enabled) {
-					$('#p-light'+deviceId+'-'+light.name).hide();
-				}
-				var $checkbox = $('#li-'+deviceId+'-'+light.name);
-				$checkbox.change(function() {
-					var value = $(this).prop('checked')?'1':'0';
-					setLightValue($(this).attr('data-an-device'), $(this).attr('data-an-light'), value);
+					setSwitchValue($(this).attr('data-an-device'), $(this).attr('data-an-switcher'), value);
 				});
 			}
 			
 			var $sensor = $('#sensor-'+deviceId+' .inside');
+      if (json.sensors.length == 0) {
+        $('#sensor-'+deviceId).hide();
+      }
 			for (var i=0; i<json.sensors.length; i++) {
 				var sensor = json.sensors[i];
 				var htmlSensor = '<p id="p-sensor-'+deviceId+'-'+sensor.name+'" class="sensor '+(!sensor.enabled?'p-hidden':'')+'"><input type="button" class="admin-button admin-modify-graph" value="+" name="admin-sensor-'+deviceId+'-'+sensor.name+'" id="admin-sensor-'+deviceId+'-'+sensor.name+'" data-an-device="'+deviceId+'" data-an-sensor="'+sensor.name+'" data-an-unit="'+sensor.unit+'"/><label id="label-'+deviceId+'-'+sensor.name+'" for="'+deviceId+'-'+sensor.name+'">'+sensor.display+': </label>';
@@ -328,6 +318,9 @@ function overviewDevice(deviceId) {
 			}
 			
 			var $heater = $('#heater-'+deviceId+' .inside');
+      if (json.heaters.length == 0) {
+        $('#heater-'+deviceId).hide();
+      }
 			for (var i=0; i<json.heaters.length; i++) {
 				var heater = json.heaters[i];
 				var isSet = heater.set?'checked="checked"':'';
@@ -397,7 +390,51 @@ function overviewDevice(deviceId) {
 					$('#he-slide-'+deviceId+'-'+heater.name).hide();
 				}
 			}
-		}
+
+			
+			var $dimmer = $('#dimmer-'+deviceId+' .inside');
+      if (json.dimmers.length == 0) {
+        $('#dimmer-'+deviceId).hide();
+      }
+			for (var i=0; i<json.dimmers.length; i++) {
+				var dimmer = json.dimmers[i];
+				var htmlDimmer = '<p id="p-dimmer-'+deviceId+'-'+dimmer.name+'" class="'+(!dimmer.enabled?'p-hidden':'')+'"><input type="button" class="admin-button admin-modify" value="+" name="admin-dimmer-'+deviceId+'-'+dimmer.name+'" id="admin-dimmer-'+deviceId+'-'+dimmer.name+'" data-an-device="'+deviceId+'" data-an-dimmer="'+dimmer.name+'"/>\n'
+        htmlDimmer += '<label id="label-dimmer-'+deviceId+'-'+dimmer.name+'" for="di-'+deviceId+'-'+dimmer.name+'" data-an-label="'+dimmer.display+'">'+dimmer.display+'</label>';
+				htmlDimmer += '<div id="label-di-slide-'+deviceId+'-'+dimmer.name+'"></div><div class="dimmer" data-an-device="'+deviceId+'" data-an-dimmer="'+dimmer.name+'" id="di-slide-'+deviceId+'-'+dimmer.name+'" ></div>\n';
+				htmlDimmer += '</p>\n';
+				$dimmer.append(htmlDimmer);
+				$('#label-di-slide-'+deviceId+'-'+dimmer.name).html(dimmer.value+' %');
+				$(function() {
+					$('#di-slide-'+deviceId+'-'+dimmer.name).slider({
+						min:0,
+						max:99,
+						step:1,
+						value:dimmer.value,
+						slide:function( event, ui ) {
+							$('#label-di-slide-'+$(this).attr('data-an-device')+'-'+$(this).attr('data-an-dimmer')).html(ui.value+' %');
+						},
+						change:function( event, ui ) {
+							if (event.originalEvent) {
+								var dimmerId = $(this).attr('data-an-dimmer');
+								var deviceId = $(this).attr('data-an-device');
+								var url = prefix+'/SETDIMMER/'+deviceId+'/'+dimmerId+'/'+$(this).slider( 'value' );
+								var jqxhr = $.get( url, function(data) {
+									//var json = $.parseJSON(data);
+								})
+								.fail(function() {
+									var $label = $('#label-dimmer-'+deviceId+'-'+dimmerId);
+									$label.text($label.attr('data-an-label') + ' - ' + $.t('Error setting dimmer'));
+									setTimeout(function() {
+										$label.text($label.attr('data-an-label'));
+									}, 10000);
+								});
+							}
+						}
+					});
+				});
+			}
+      
+    }
 
 		initMusic(deviceId);
 
@@ -449,11 +486,11 @@ function resetDevice(device) {
 	})
 }
 
-function setSwitchValue(device, pin, value) {
-	var $message = $('#message-'+device+'-PIN'+pin);
-	var $switch = $('#sw-'+device+'-PIN'+pin);
+function setSwitchValue(device, switcher, value) {
+	var $message = $('#message-'+device+'-SWITCH'+switcher);
+	var $switch = $('#sw-'+device+'-SWITCH'+switcher);
 	$message.text('...');
-	var url = prefix+'/SETPIN/'+device+'/'+pin+'/'+value;
+	var url = prefix+'/SETSWITCH/'+device+'/'+switcher+'/'+value;
 	var jqxhr = $.get( url, function(data) {
 		var json = $.parseJSON(data);
 		if (json.result.response == 1 || json.result.response == 0) {
@@ -476,24 +513,6 @@ function setSwitchValue(device, pin, value) {
 			$message.text('');
 			$switch.prop('disabled', false);
 		}, 10000);
-	})
-}
-
-function setLightValue(device, light, value) {
-	var $message = $('#message-'+device+'-'+light);
-	$message.text('...');
-	var url = prefix+'/SETLIGHT/'+device+'/'+light+'/'+value;
-	var jqxhr = $.get( url, function(data) {
-		var json = $.parseJSON(data);
-		if (json.result.response == 1 || json.result.response == 0) {
-			$message.text('');
-			refresh(false);
-		} else {
-			$message.text($.t('Error setting switch'));
-		}
-	})
-	.fail(function() {
-		$message.text($.t('Error setting switch')+', '+$.t('network error'));
 	})
 }
 
@@ -692,18 +711,18 @@ function refresh(force) {
 				globalOverview[deviceId] = json;
 				var device = json.name;
 				
-				for (var j=0; j<json.pins.length; j++) {
-					var pin = json.pins[j];
-					var $switch = $('#sw-'+device+'-'+pin.name);
+				for (var j=0; j<json.switches.length; j++) {
+					var switcher = json.switches[j];
+					var $switch = $('#sw-'+device+'-'+switcher.name);
 					$switch.prop('enabled', false);
-					$switch.prop('checked', pin.status==1);
-					if ($('#label-sw-'+device+'-'+pin.name).text() != pin.display) {
-						$('#label-sw-'+device+'-'+pin.name).text(pin.display+': ');
+					$switch.prop('checked', switcher.status==1);
+					if ($('#label-sw-'+device+'-'+switcher.name).text() != switcher.display) {
+						$('#label-sw-'+device+'-'+switcher.name).text(switcher.display+': ');
 					}
-					if (!pin.enabled) {
-						$('#p-switch-'+device+'-'+pin.name).addClass('p-hidden');
+					if (!switcher.enabled) {
+						$('#p-switch-'+device+'-'+switcher.name).addClass('p-hidden');
 					} else {
-						$('#p-switch-'+device+'-'+pin.name).removeClass('p-hidden');
+						$('#p-switch-'+device+'-'+switcher.name).removeClass('p-hidden');
 					}
 				}
 				
@@ -720,10 +739,6 @@ function refresh(force) {
 					}
 				}
 				
-				for (var j=0; j<json.lights.length; j++) {
-					var light = json.lights[j];
-				}
-				
 				for (var j=0; j<json.heaters.length; j++) {
 					var heater = json.heaters[j];
 					$('#he-'+device+'-'+heater.name).prop('disabled', true);
@@ -734,6 +749,13 @@ function refresh(force) {
 					$('#he-slide-'+device+'-'+heater.name).slider('option', 'disabled', !heater.set);
 					$('#he-'+device+'-'+heater.name).prop('disabled', false);
 				}
+
+				for (var j=0; j<json.dimmers.length; j++) {
+					var dimmer = json.dimmers[j];
+					$('#di-slide-'+device+'-'+dimmer.name).slider('value', dimmer.value);
+					$('#label-di-slide-'+device+'-'+dimmer.name).html(dimmer.value+' %');
+				}
+
 				$('#header-message-global').text('');
 			})
 			.fail(function() {
@@ -881,22 +903,22 @@ function okDialogDevice(curName, curDisplay, curEnabled, curTags) {
 function monitorElement($button) {
 	var device = $button.attr('data-an-device');
 	var sensor = $button.attr('data-an-sensor');
-	var pin = $button.attr('data-an-switch');
+	var switcher = $button.attr('data-an-switch');
 	var unit = encodeURIComponent($button.attr('data-an-unit'));
 	var startDate = '';
 	var title = '';
 
 	if (sensor === undefined) {
 		sensor = '0';
-		pins = globalOverview[device].pins;
-		for (var i=0; i<pins.length; i++) {
-			if (pin == pins[i].name) {
-				title = pins[i].display;
+		switches = globalOverview[device].switches;
+		for (var i=0; i<switches.length; i++) {
+			if (switcher == switches[i].name) {
+				title = switches[i].display;
 			}
 		}
 	}
-	if (pin === undefined) {
-		pin = '0';
+	if (switcher === undefined) {
+		switcher = '0';
 		sensors = globalOverview[device].sensors;
 		for (var i=0; i<sensors.length; i++) {
 			if (sensor == sensors[i].name) {
@@ -909,7 +931,7 @@ function monitorElement($button) {
 	var $dialog = $('#dialog-monitor');
 	$dialog.find('#dialog-monitor-since').find('option[value="4"]').prop('selected', true);
 	
-	var iframe = '<iframe border="0" src="graph.html?device='+device+'&pin='+pin+'&sensor='+sensor+'&startDate='+startDate+'&unit='+unit+'" width="430px" height="350px"></iframe>';
+	var iframe = '<iframe border="0" src="graph.html?device='+device+'&switcher='+switcher+'&sensor='+sensor+'&startDate='+startDate+'&unit='+unit+'" width="430px" height="350px"></iframe>';
 	$dialog.find('#dialog-chart').html(iframe);
 	
 	$dialog.dialog({
@@ -965,7 +987,7 @@ function monitorElement($button) {
 							break;
 					}
 					
-					var iframe = '<iframe border="0" src="graph.html?device='+device+'&pin='+pin+'&sensor='+sensor+'&startDate='+startDate+'&unit='+unit+'" width="430px" height="350px"></iframe>';
+					var iframe = '<iframe border="0" src="graph.html?device='+device+'&switcher='+switcher+'&sensor='+sensor+'&startDate='+startDate+'&unit='+unit+'" width="430px" height="350px"></iframe>';
 					$('#dialog-chart').html(iframe);
 					
 				});
@@ -1169,28 +1191,28 @@ function okDialogHeater(curDevice, curName, curDisplay, curUnit, curEnabled, cur
 	});
 }
 
-function editLight($lightAdminButton) {
-	for (var i=0; i<globalOverview[$lightAdminButton.attr('data-an-device')].lights.length; i++) {
-		if ($lightAdminButton.attr('data-an-light') == globalOverview[$lightAdminButton.attr('data-an-device')].lights[i].name) {
-			var curLight = globalOverview[$lightAdminButton.attr('data-an-device')].lights[i];
-			var $dialog = $('#dialog-light');
-			$dialog.find('#dialog-light-name').text(curLight.name);
-			$dialog.find('#dialog-light-display').val(curLight.display);
-			$dialog.find('#dialog-light-enabled').prop('checked', curLight.enabled);
-      $dialog.find('#dialog-light-tags').tagsinput('removeAll');
-      for (var key in curLight.tags) {
-        $dialog.find('#dialog-light-tags').tagsinput('add', curLight.tags[key]);
+function editDimmer($dimmerAdminButton) {
+	for (var i=0; i<globalOverview[$dimmerAdminButton.attr('data-an-device')].dimmers.length; i++) {
+		if ($dimmerAdminButton.attr('data-an-dimmer') == globalOverview[$dimmerAdminButton.attr('data-an-device')].dimmers[i].name) {
+			var curDimmer = globalOverview[$dimmerAdminButton.attr('data-an-device')].dimmers[i];
+			var $dialog = $('#dialog-dimmer');
+			$dialog.find('#dialog-dimmer-name').text(curDimmer.name);
+			$dialog.find('#dialog-dimmer-display').val(curDimmer.display);
+			$dialog.find('#dialog-dimmer-enabled').prop('checked', curDimmer.enabled);
+      $dialog.find('#dialog-dimmer-tags').tagsinput('removeAll');
+      for (var key in curDimmer.tags) {
+        $dialog.find('#dialog-dimmer-tags').tagsinput('add', curDimmer.tags[key]);
       }
 			
 			$dialog.on('keypress', function(e) {
 				var code = (e.keyCode ? e.keyCode : e.which);
 				if(code == 13) {
-					var curName=curLight.name;
-					var curDisplay=$(this).find('#dialog-light-display').val();
-					var curEnabled=$(this).find('#dialog-light-enabled').prop('checked')?'true':'false';
-          var curTags=$(this).find('#dialog-light-tags').tagsinput('items').join();
+					var curName=curDimmer.name;
+					var curDisplay=$(this).find('#dialog-dimmer-display').val();
+					var curEnabled=$(this).find('#dialog-dimmer-enabled').prop('checked')?'true':'false';
+          var curTags=$(this).find('#dialog-dimmer-tags').tagsinput('items').join();
 					
-					okDialogLight($lightAdminButton.attr('data-an-device'), curName, curDisplay, curEnabled, curTags);
+					okDialogDimmer($dimmerAdminButton.attr('data-an-device'), curName, curDisplay, curEnabled, curTags);
 					
 					$( this ).dialog( 'close' );
 				}
@@ -1200,16 +1222,16 @@ function editLight($lightAdminButton) {
 				autoOpen: false,
 				width: 400,
 				modal: true,
-				title: $.t('Edit a light'),
+				title: $.t('Edit a dimmer'),
 				buttons: [{
 					text:$.t('Ok'),
 					click:function() {
-						var curName=curLight.name;
-						var curDisplay=$(this).find('#dialog-light-display').val();
-						var curEnabled=$(this).find('#dialog-light-enabled').prop('checked')?'true':'false';
-            var curTags=$(this).find('#dialog-light-tags').tagsinput('items').join();
+						var curName=curDimmer.name;
+						var curDisplay=$(this).find('#dialog-dimmer-display').val();
+						var curEnabled=$(this).find('#dialog-dimmer-enabled').prop('checked')?'true':'false';
+            var curTags=$(this).find('#dialog-dimmer-tags').tagsinput('items').join();
 						
-						okDialogLight($lightAdminButton.attr('data-an-device'), curName, curDisplay, curEnabled, curTags);
+						okDialogDimmer($dimmerAdminButton.attr('data-an-device'), curName, curDisplay, curEnabled, curTags);
 						
 						$( this ).dialog( 'close' );
 					}
@@ -1221,39 +1243,39 @@ function editLight($lightAdminButton) {
 	}
 }
 
-function okDialogLight(curDevice, curName, curDisplay, curEnabled, curTags) {
-	var url = prefix+'/SETLIGHTDATA/';
+function okDialogDimmer(curDevice, curName, curDisplay, curEnabled, curTags) {
+	var url = prefix+'/SETDIMMERDATA/';
 	var $posting = $.post(url,
 		{name: curName, device: curDevice, display: curDisplay, enabled: curEnabled, tags: curTags}
 	);
 	
 	$posting.done(function(data) {
 		var json = $.parseJSON(data);
-		if (json.light.enabled) {
-			$('#p-light-'+curDevice+'-'+curName).removeClass('p-hidden');
+		if (json.dimmer.enabled) {
+			$('#p-dimmer-'+curDevice+'-'+curName).removeClass('p-hidden');
 		} else {
-			$('#p-light-'+curDevice+'-'+curName).addClass('p-hidden');
-			$('#p-light-'+curDevice+'-'+curName).show();
+			$('#p-dimmer-'+curDevice+'-'+curName).addClass('p-hidden');
+			$('#p-dimmer-'+curDevice+'-'+curName).show();
 		}
-		var $label = $('#label-light-'+curDevice+'-'+curName);
-		var $value = $('#value-light-'+curDevice+'-'+curName);
-		$label.text(json.light.display);
+		var $label = $('#label-dimmer-'+curDevice+'-'+curName);
+		var $value = $('#value-dimmer-'+curDevice+'-'+curName);
+		$label.text(json.dimmer.display);
 		$value.text($value.attr('value'));
 		
-		for (var i=0; i<globalOverview[curDevice].lights.length; i++) {
-			if (globalOverview[curDevice].lights[i].name == curName) {
-				globalOverview[curDevice].lights[i].display = curDisplay;
-				globalOverview[curDevice].lights[i].enabled = curEnabled;
-				globalOverview[curDevice].lights[i].tags = curTags.split(',');
+		for (var i=0; i<globalOverview[curDevice].dimmers.length; i++) {
+			if (globalOverview[curDevice].dimmers[i].name == curName) {
+				globalOverview[curDevice].dimmers[i].display = curDisplay;
+				globalOverview[curDevice].dimmers[i].enabled = curEnabled;
+				globalOverview[curDevice].dimmers[i].tags = curTags.split(',');
 			}
 		}
 	});
 }
 
 function editSwitch($switchAdminButton) {
-	for (var i=0; i<globalOverview[$switchAdminButton.attr('data-an-device')].pins.length; i++) {
-		if ($switchAdminButton.attr('data-an-switch') == globalOverview[$switchAdminButton.attr('data-an-device')].pins[i].name) {
-			var curSwitch = globalOverview[$switchAdminButton.attr('data-an-device')].pins[i];
+	for (var i=0; i<globalOverview[$switchAdminButton.attr('data-an-device')].switches.length; i++) {
+		if ($switchAdminButton.attr('data-an-switch') == globalOverview[$switchAdminButton.attr('data-an-device')].switches[i].name) {
+			var curSwitch = globalOverview[$switchAdminButton.attr('data-an-device')].switches[i];
 			var $dialog = $('#dialog-switch');
 			$dialog.find('#dialog-switch-name').text(curSwitch.name);
 			$dialog.find('#dialog-switch-display').val(curSwitch.display);
@@ -1322,8 +1344,7 @@ function editSwitch($switchAdminButton) {
 }
 
 function okDialogSwitch(curDevice, curName, curDisplay, curType, curEnabled, curMonitored, curMonitoredEvery, curTags) {
-	var url = prefix+'/SETPINDATA/';
-  console.log(curTags);
+	var url = prefix+'/SETSWITCHDATA/';
 	var $posting = $.post(url,
 		{name: curName, device: curDevice, display: curDisplay, type: curType, enabled: curEnabled, monitored: curMonitored, monitored_every: curMonitoredEvery, tags: curTags}
 	);
@@ -1331,32 +1352,32 @@ function okDialogSwitch(curDevice, curName, curDisplay, curType, curEnabled, cur
 	$posting.done(function(data) {
 		var json = $.parseJSON(data);
 		var $p = $('#p-switch-'+curDevice+'-'+curName);
-		if (json.pin.enabled) {
+		if (json.switcher.enabled) {
 			$p.removeClass('p-hidden');
 		} else {
 			$p.addClass('p-hidden');
 			$p.show();
 		}
-		if (json.pin.type == 0) {
+		if (json.switcher.type == 0) {
 			$p.removeClass('sw-type-nc');
 			$p.removeClass('sw-type-tw');
-		} else if (json.pin.type == 1) {
+		} else if (json.switcher.type == 1) {
 			$p.addClass('sw-type-nc');
 			$p.removeClass('sw-type-tw');
-		} else if (json.pin.type == 2) {
+		} else if (json.switcher.type == 2) {
 			$p.removeClass('sw-type-nc');
 			$p.addClass('sw-type-tw');
 		}
 		var $label = $('#label-sw-'+curDevice+'-'+curName);
-		$label.text(json.pin.display);
+		$label.text(json.switcher.display);
 		
-		for (var i=0; i<globalOverview[curDevice].pins.length; i++) {
-			if (globalOverview[curDevice].pins[i].name == curName) {
-				globalOverview[curDevice].pins[i].display = curDisplay;
-				globalOverview[curDevice].pins[i].enabled = curEnabled;
-				globalOverview[curDevice].pins[i].monitored = curMonitored;
-				globalOverview[curDevice].pins[i].monitoredEvery = curMonitoredEvery;
-        globalOverview[curDevice].pins[i].tags = curTags.split(',');
+		for (var i=0; i<globalOverview[curDevice].switches.length; i++) {
+			if (globalOverview[curDevice].switches[i].name == curName) {
+				globalOverview[curDevice].switches[i].display = curDisplay;
+				globalOverview[curDevice].switches[i].enabled = curEnabled;
+				globalOverview[curDevice].switches[i].monitored = curMonitored;
+				globalOverview[curDevice].switches[i].monitoredEvery = curMonitoredEvery;
+        globalOverview[curDevice].switches[i].tags = curTags.split(',');
 			}
 		}
 	});
@@ -1417,15 +1438,16 @@ function editAction($action) {
 function initActionDialog($dialog, $action) {
 	var $tags = $dialog.find('#dialog-action-tags');
 	var $devicesList = $dialog.find('#dialog-action-device');
-	var $pinsList = $dialog.find('#dialog-action-pin');
-	var $sensorsList = $dialog.find('#dialog-action-sensor');
+	var $switchesList = $dialog.find('#dialog-action-switcher');
+	var $dimmersList = $dialog.find('#dialog-action-dimmer');
 	var $heatersList = $dialog.find('#dialog-action-heater');
 	var $scriptsList = $dialog.find('#dialog-action-script');
 	var $typeList = $dialog.find('#dialog-action-type');
 	var $pParams = $dialog.find('#p-dialog-action-params');
-	var $pParamsSetpin = $dialog.find('#p-dialog-action-params-setpin');
+	var $pparamsSetSwitch = $dialog.find('#p-dialog-action-params-setswitcher');
+	var $pparamsSetDimmer = $dialog.find('#p-dialog-action-params-setdimmer');
 	var $pParamsValue = $dialog.find('#p-dialog-action-params-value');
-	var $paramsSetpin = $dialog.find('#dialog-action-params-setpin');
+	var $paramsSetSwitch = $dialog.find('#dialog-action-params-setswitcher');
 	var $paramsValue = $dialog.find('#dialog-action-params-value');
 	
 	$devicesList.empty();
@@ -1445,102 +1467,65 @@ function initActionDialog($dialog, $action) {
 	$typeList.change(function () {
 		switch ($(this).val().toString()) {
 			case "0":
-				// DEVICES
-				$devicesList.prop('disabled', true);
-				$pinsList.prop('disabled', true);
-				$sensorsList.prop('disabled', true);
-				$heatersList.prop('disabled', true);
-        $scriptsList.prop('disabled', true);
-				$pParams.slideUp();
-				$pParamsSetpin.slideUp();
-				$pParamsValue.slideUp();
-				break;
-			case "1":
-				// OVERVIEW
+				// SET_SWITCH
 				$devicesList.prop('disabled', false);
-				$pinsList.prop('disabled', true);
-				$sensorsList.prop('disabled', true);
-				$heatersList.prop('disabled', true);
-        $scriptsList.prop('disabled', true);
-				$pParams.slideUp();
-				$pParamsSetpin.slideUp();
-				$pParamsValue.slideUp();
-				break;
-			case "2":
-				// REFRESH
-				$devicesList.prop('disabled', false);
-				$pinsList.prop('disabled', true);
-				$sensorsList.prop('disabled', true);
-				$heatersList.prop('disabled', true);
-        $scriptsList.prop('disabled', true);
-				$pParams.slideUp();
-				$pParamsSetpin.slideUp();
-				$pParamsValue.slideUp();
-				break;
-			case "3":
-				// GET
-				$devicesList.prop('disabled', false);
-				$pinsList.prop('disabled', false);
-				$sensorsList.prop('disabled', true);
-				$heatersList.prop('disabled', true);
-        $scriptsList.prop('disabled', true);
-				$pParams.slideUp();
-				$pParamsSetpin.slideUp();
-				$pParamsValue.slideUp();
-				break;
-			case "4":
-				// SET
-				$devicesList.prop('disabled', false);
-				$pinsList.prop('disabled', false);
-				$sensorsList.prop('disabled', true);
+				$switchesList.prop('disabled', false);
+				$dimmersList.prop('disabled', true);
 				$heatersList.prop('disabled', true);
         $scriptsList.prop('disabled', true);
 				$pParams.slideDown();
-				$pParamsSetpin.slideDown();
+				$pparamsSetSwitch.slideDown();
+				$pparamsSetDimmer.slideUp();
 				$pParamsValue.slideUp();
 				break;
-			case "5":
-				// SENSOR
+			case "1":
+				// TOGGLE_SWITCH
 				$devicesList.prop('disabled', false);
-				$pinsList.prop('disabled', true);
-				$sensorsList.prop('disabled', false);
+				$switchesList.prop('disabled', false);
+				$dimmersList.prop('disabled', true);
 				$heatersList.prop('disabled', true);
         $scriptsList.prop('disabled', true);
 				$pParams.slideUp();
-				$pParamsSetpin.slideUp();
+				$pparamsSetSwitch.slideDown();
+				$pparamsSetDimmer.slideUp();
 				$pParamsValue.slideUp();
 				break;
-			case "6":
+			case "2":
+				// DIMMER
+				$devicesList.prop('disabled', false);
+				$switchesList.prop('disabled', true);
+				$dimmersList.prop('disabled', false);
+				$heatersList.prop('disabled', true);
+        $scriptsList.prop('disabled', true);
+				$pParams.slideUp();
+				$pparamsSetSwitch.slideUp();
+				$pparamsSetDimmer.slideDown();
+				$pParamsValue.slideDown();
+				break;
+			case "3":
 				// HEATER
 				$devicesList.prop('disabled', false);
-				$pinsList.prop('disabled', true);
-				$sensorsList.prop('disabled', true);
+				$switchesList.prop('disabled', true);
+				$dimmersList.prop('disabled', true);
 				$heatersList.prop('disabled', false);
         $scriptsList.prop('disabled', true);
 				$pParams.slideUp();
-				$pParamsSetpin.slideDown();
+        $paramsSetSwitch.find('option[value="0"]').text($.t('Off'));
+        $paramsSetSwitch.find('option[value="1"]').text($.t('On'));
+				$pparamsSetSwitch.slideDown();
+				$pparamsSetDimmer.slideUp();
 				$pParamsValue.slideDown();
-				break;
-			case "7":
-				// TOGGLE
-				$devicesList.prop('disabled', false);
-				$pinsList.prop('disabled', false);
-				$sensorsList.prop('disabled', true);
-				$heatersList.prop('disabled', true);
-        $scriptsList.prop('disabled', true);
-				$pParams.slideUp();
-				$pParamsSetpin.slideUp();
-				$pParamsValue.slideUp();
 				break;
 			case "77":
 				// SCRIPT
 				$devicesList.prop('disabled', true);
-				$pinsList.prop('disabled', true);
-				$sensorsList.prop('disabled', true);
+				$switchesList.prop('disabled', true);
+				$dimmersList.prop('disabled', true);
 				$heatersList.prop('disabled', true);
         $scriptsList.prop('disabled', false);
 				$pParams.slideUp();
-				$pParamsSetpin.slideUp();
+				$pparamsSetSwitch.slideUp();
+				$pparamsSetDimmer.slideUp();
 				$pParamsValue.slideUp();
 				break;
 			case "88":
@@ -1549,12 +1534,13 @@ function initActionDialog($dialog, $action) {
 			case "99":
 				// SYSTEM
 				$devicesList.prop('disabled', true);
-				$pinsList.prop('disabled', true);
-				$sensorsList.prop('disabled', true);
+				$switchesList.prop('disabled', true);
+				$dimmersList.prop('disabled', true);
 				$heatersList.prop('disabled', true);
         $scriptsList.prop('disabled', true);
 				$pParams.slideUp();
-				$pParamsSetpin.slideUp();
+				$pparamsSetSwitch.slideUp();
+				$pparamsSetDimmer.slideUp();
 				$pParamsValue.slideDown();
 				break;
 			default:
@@ -1564,47 +1550,47 @@ function initActionDialog($dialog, $action) {
 	
 	$devicesList.change(function() {
 		
-		$pinsList.empty();
-		var pins = globalOverview[$(this).val()].pins;
-		for (var i=0; i<pins.length; i++) {
-			if (pins[i].enabled) {
-				var htmlOption = '<option value="'+pins[i].name+'">'+pins[i].display+'</option>';
-				$pinsList.append(htmlOption);
+		$switchesList.empty();
+		var switches = globalOverview[$(this).val()].switches;
+		for (var i=0; i<switches.length; i++) {
+			if (switches[i].enabled) {
+				var htmlOption = '<option value="'+switches[i].name+'">'+switches[i].display+'</option>\n';
+				$switchesList.append(htmlOption);
 			}
 		}
 		
-		$sensorsList.empty();
-		var sensors = globalOverview[$(this).val()].sensors;
-		for (var i=0; i<sensors.length; i++) {
-			var htmlOption = '<option value="'+sensors[i].name+'">'+sensors[i].display+'</option>';
-			$sensorsList.append(htmlOption);
+		$dimmersList.empty();
+		var dimmers = globalOverview[$(this).val()].dimmers;
+		for (var i=0; i<dimmers.length; i++) {
+			var htmlOption = '<option value="'+dimmers[i].name+'">'+dimmers[i].display+'</option>\n';
+			$dimmersList.append(htmlOption);
 		}
 		
 		$heatersList.empty();
 		var heaters = globalOverview[$(this).val()].heaters;
 		for (var i=0; i<heaters.length; i++) {
-			var htmlOption = '<option value="'+heaters[i].name+'">'+heaters[i].display+'</option>';
+			var htmlOption = '<option value="'+heaters[i].name+'">'+heaters[i].display+'</option>\n';
 			$heatersList.append(htmlOption);
 		}
 	});
 	
-	$pinsList.change(function() {
-		var pinName = $(this).val();
-		var pin = null;
-		for (var i=0; i<globalOverview[$devicesList.val()].pins.length; i++) {
-			if (globalOverview[$devicesList.val()].pins[i].name == pinName) {
-				pin = globalOverview[$devicesList.val()].pins[i];
+	$switchesList.change(function() {
+		var switcherName = $(this).val();
+		var switcher = null;
+		for (var i=0; i<globalOverview[$devicesList.val()].switches.length; i++) {
+			if (globalOverview[$devicesList.val()].switches[i].name == switcherName) {
+				switcher = globalOverview[$devicesList.val()].switches[i];
 			}
 		}
-		if (pin.type == 0) {
-			$paramsSetpin.find('option[value="0"]').text($.t('Off'));
-			$paramsSetpin.find('option[value="1"]').text($.t('On'));
-		} else if (pin.type == 1) {
-			$paramsSetpin.find('option[value="0"]').text($.t('On'));
-			$paramsSetpin.find('option[value="1"]').text($.t('Off'));
-		} else if (pin.type == 2) {
-			$paramsSetpin.find('option[value="0"]').text($.t('Left'));
-			$paramsSetpin.find('option[value="1"]').text($.t('Right'));
+		if (switcher.type == 0) {
+			$paramsSetSwitch.find('option[value="0"]').text($.t('Off'));
+			$paramsSetSwitch.find('option[value="1"]').text($.t('On'));
+		} else if (switcher.type == 1) {
+			$paramsSetSwitch.find('option[value="0"]').text($.t('On'));
+			$paramsSetSwitch.find('option[value="1"]').text($.t('Off'));
+		} else if (switcher.type == 2) {
+			$paramsSetSwitch.find('option[value="0"]').text($.t('Left'));
+			$paramsSetSwitch.find('option[value="1"]').text($.t('Right'));
 		}
 	});
 	
@@ -1623,27 +1609,27 @@ function initActionDialog($dialog, $action) {
 		$devicesList.find('option[value="'+action.device+'"]').prop('selected', true);
 		$typeList.trigger('change');
 		$devicesList.trigger('change');
-		$pinsList.find('option[value="'+action.pin+'"]').prop('selected', true);
-		$pinsList.trigger('change');
-		$sensorsList.find('option[value="'+action.sensor+'"]').prop('selected', true);
-		if (action.type == 4) {
+		$switchesList.find('option[value="'+action.switcher+'"]').prop('selected', true);
+		$switchesList.trigger('change');
+		$dimmersList.find('option[value="'+action.dimmer+'"]').prop('selected', true);
+		if (action.type == 0 || action.type == 1) { // SETSWITCH || TOGGLESWITCH
 			if (action.params == "1") {
-				$paramsSetpin.find('option[value="1"]').prop('selected', true);
+				$paramsSetSwitch.find('option[value="1"]').prop('selected', true);
 			} else {
-				$paramsSetpin.find('option[value="0"]').prop('selected', true);
+				$paramsSetSwitch.find('option[value="0"]').prop('selected', true);
 			}
 			$paramsValue.val('');
-		} else if (action.type == 6) {
+		} else if (action.type == 3) {
 			var values = action.params.split(',');
-			$paramsSetpin.find('option[value="'+values[0]+'"]').prop('selected', true);
+			$paramsSetSwitch.find('option[value="'+values[0]+'"]').prop('selected', true);
 			$paramsValue.val(values[1]);
 		} else if (action.type == 77) {
 			$scriptsList.find('option[value="'+action.params+'"]').prop('selected', true);
 		} else if (action.type == 99 || action.type == 88) {
-			$paramsSetpin.find('option[value="0"]').prop('selected', true);
+			$paramsSetSwitch.find('option[value="0"]').prop('selected', true);
 			$paramsValue.val(action.params);
 		} else {
-			$paramsSetpin.find('option[value="0"]').prop('selected', true);
+			$paramsSetSwitch.find('option[value="0"]').prop('selected', true);
 			$paramsValue.val('');
 		}
 	} else {
@@ -1652,9 +1638,9 @@ function initActionDialog($dialog, $action) {
 		$tags.tagsinput('removeAll');
 		$typeList.find('option[value="0"]').prop('selected', true);
 		$devicesList.find('option[0]').prop('selected', true);
-		$pinsList.find('option[0]').prop('selected', true);
-		$sensorsList.find('option[0]').prop('selected', true);
-		$paramsSetpin.find('option[value="0"]').prop('selected', true);
+		$switchesList.find('option[0]').prop('selected', true);
+		$dimmersList.find('option[0]').prop('selected', true);
+		$paramsSetSwitch.find('option[value="0"]').prop('selected', true);
 		$paramsValue.val('');
 	}
 }
@@ -1663,7 +1649,7 @@ function okAction($dialog) {
 	var url = prefix;
 	var isAdd = true;
 	var params = {};
-	var $paramsSetpin = $dialog.find('#dialog-action-params-setpin');
+	var $paramsSetSwitch = $dialog.find('#dialog-action-params-setswitcher');
 	var $paramsValue = $dialog.find('#dialog-action-params-value');
 	
 	if ($dialog.find('#dialog-action-id').val() == '') {
@@ -1680,24 +1666,28 @@ function okAction($dialog) {
 	params.tags = $dialog.find('#dialog-action-tags').tagsinput('items').join();
 	params.type = $dialog.find('#dialog-action-type').val();
 	params.device = $dialog.find('#dialog-action-device').val();
-	params.pin = $dialog.find('#dialog-action-pin').val();
-	params.sensor = $dialog.find('#dialog-action-sensor').val();
+	params.switcher = $dialog.find('#dialog-action-switcher').val();
+	params.dimmer = $dialog.find('#dialog-action-dimmer').val();
 	params.heater = $dialog.find('#dialog-action-heater').val();
 	
 	if (params.name == '') {
 		alert($.t('Enter action name'));
 		return false;
 	}
-	if (params.type == 4) {
-		params.params = $paramsSetpin.val();
-	} else if (params.type == 5) {
-		params.params = '1';
-	} else if (params.type == 6) {
+	if (params.type == 0) { // SETSWITCH
+		params.params = $paramsSetSwitch.val();
+	} else if (params.type == 2) { // DIMMER
+		if ($paramsValue.val() == '' || isNaN($paramsValue.val()) || $paramsValue.val() < 0 || $paramsValue.val() > 99) {
+			alert($.t('Dimmer value must be numeric between 0 and 99'));
+			return false;
+		}
+		params.params = $paramsValue.val();
+	} else if (params.type == 3) { // HEATER
 		if ($paramsValue.val() == '' || isNaN($paramsValue.val())) {
 			alert($.t('Heat value must be numeric'));
 			return false;
 		}
-		params.params = $paramsSetpin.val()+','+$paramsValue.val();
+		params.params = $paramsSetSwitch.val()+','+$paramsValue.val();
 	} else if (params.type == 88) {
 		if ($paramsValue.val() == '') {
 			alert($.t('Duration must be in milliseconds'));
@@ -1948,8 +1938,8 @@ function okScript($dialog) {
       params.name = 'script - '+scriptName;
       params.type = 77;
       params.device = '';
-      params.sensor = '';
-      params.pin = '';
+      params.dimmers = '';
+      params.switcher = '';
       params.heater = '';
       params.params = scriptId;
       

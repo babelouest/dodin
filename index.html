@@ -67,11 +67,11 @@ Licenced under AGPL
         <div class="inside">
         </div>
       </div>
-      <!--<div id="light-TEMPLATE" class="lights block">
+      <div id="dimmer-TEMPLATE" class="dimmers block">
         <div class="inside">
-          <h3 data-i18n>Lights</h3>
+          <h3 data-i18n>Dimmers</h3>
         </div>
-      </div>-->
+      </div>
       <div id="heater-TEMPLATE" class="heater block">
         <div class="inside">
           <h3 data-i18n>Heater</h3>
@@ -233,22 +233,22 @@ Licenced under AGPL
   </p>
 </div>
 
-<div id="dialog-light" title="Edit a light" class="template dialog">
+<div id="dialog-dimmer" title="Edit a dimmer" class="template dialog">
   <p>
-    <label for="dialog-light-name" data-i18n>Internal name</label>
-    <label id="dialog-light-name"></label>
+    <label for="dialog-dimmer-name" data-i18n>Internal name</label>
+    <label id="dialog-dimmer-name"></label>
   </p>
   <p>
-    <label for="dialog-light-display" data-i18n>Displayed name</label>
-    <input type="text" name="dialog-light-display" id="dialog-light-display" value="">
+    <label for="dialog-dimmer-display" data-i18n>Displayed name</label>
+    <input type="text" name="dialog-dimmer-display" id="dialog-dimmer-display" value="">
   </p>
   <p>
-    <label for="dialog-light-enabled" data-i18n>Enabled</label>
-    <input type="checkbox" name="dialog-light-enabled" id="dialog-light-enabled"><label for="dialog-light-enabled"></label>
+    <label for="dialog-dimmer-enabled" data-i18n>Enabled</label>
+    <input type="checkbox" name="dialog-dimmer-enabled" id="dialog-dimmer-enabled"><label for="dialog-dimmer-enabled"></label>
   </p>
   <p>
-    <label for="dialog-light-tags" data-i18n>Tags</label>
-    <input type="text" name="dialog-light-tags" id="dialog-light-tags" value="" data-role="tagsinput" class="bootstrap-tagsinput">
+    <label for="dialog-dimmer-tags" data-i18n>Tags</label>
+    <input type="text" name="dialog-dimmer-tags" id="dialog-dimmer-tags" value="" data-role="tagsinput" class="bootstrap-tagsinput">
   </p>
 </div>
 
@@ -390,14 +390,10 @@ Licenced under AGPL
   <p>
     <label for="dialog-action-type" data-i18n>Type</label>
     <select id="dialog-action-type" name="dialog-action-type">
-      <option value="0" data-i18n>Device list</option>
-      <option value="1" data-i18n>Overview device</option>
-      <option value="2" data-i18n>Refresh device</option>
-      <option value="3" data-i18n>Get switch status</option>
-      <option value="4" data-i18n>Set switch status</option>
-      <option value="7" data-i18n>Toggle switch</option>
-      <option value="5" data-i18n>Get sensor status</option>
-      <option value="6" data-i18n>Set heater status</option>
+      <option value="0" data-i18n>Set switch status</option>
+      <option value="1" data-i18n>Toggle switch</option>
+      <option value="2" data-i18n>Set dimmer status</option>
+      <option value="3" data-i18n>Set heater status</option>
       <option value="77" data-i18n>Run script</option>
       <option value="88" data-i18n>Sleep (milliseconds)</option>
       <option value="99" data-i18n>Internal server command</option>
@@ -408,12 +404,12 @@ Licenced under AGPL
     <select id="dialog-action-device" name="dialog-action-device"></select>
   </p>
   <p>
-    <label for="dialog-action-pin" data-i18n>Switch</label>
-    <select id="dialog-action-pin" name="dialog-action-pin"></select>
+    <label for="dialog-action-switcher" data-i18n>Switch</label>
+    <select id="dialog-action-switcher" name="dialog-action-switcher"></select>
   </p>
   <p>
-    <label for="dialog-action-sensor" data-i18n>Sensor</label>
-    <select id="dialog-action-sensor" name="dialog-action-sensor"></select>
+    <label for="dialog-action-dimmer" data-i18n>Dimmer</label>
+    <select id="dialog-action-dimmer" name="dialog-action-dimmer"></select>
   </p>
   <p>
     <label for="dialog-action-heater" data-i18n>Heater</label>
@@ -426,9 +422,9 @@ Licenced under AGPL
   <p id="p-dialog-action-params" class="hidden">
     <label id="dialog-action-params" data-i18n>Additional parameters</label>
   </p>
-  <p id="p-dialog-action-params-setpin" class="hidden">
-    <label for="dialog-action-params-setpin" data-i18n>Status</label>
-    <select id="dialog-action-params-setpin" name="dialog-action-params-setpin">
+  <p id="p-dialog-action-params-setswitcher" class="hidden">
+    <label for="dialog-action-params-setswitcher" data-i18n>Status</label>
+    <select id="dialog-action-params-setswitcher" name="dialog-action-params-setswitcher">
       <option value="0" data-i18n>Off</option>
       <option value="1" data-i18n>On</option>
     </select>

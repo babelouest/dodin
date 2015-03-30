@@ -79,13 +79,14 @@ $(document).ready(function(){
             var jsonData = $.parseJSON(data);
             var heatPoints = [];
             
+            var monitor = jsonData.monitor;
             $('#loading').remove();
             $('body').append('<div id="chart" style="height:300px; width:400px;"></div>');
-            if (jsonData.values.length > 0) {
-                for (var i=0; i<jsonData.values.length; i++){
+            if (monitor.values.length > 0) {
+                for (var i=0; i<monitor.values.length; i++){
                     var d = new Date(0);
-                    d.setUTCSeconds(jsonData.values[i].date_time);
-                    heatPoints.push([d, parseFloat(jsonData.values[i].value)]); 
+                    d.setUTCSeconds(monitor.values[i].date_time);
+                    heatPoints.push([d, parseFloat(monitor.values[i].value)]); 
                 }
                 var plot3 = $.jqplot('chart', [heatPoints], {
                     axes:{

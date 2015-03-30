@@ -97,8 +97,8 @@ input[type=checkbox] {
 
 input[type=checkbox] + label {
   background: url('../images/switch-off.jpg') no-repeat;
+  height: 26px;
   padding-left: 55px;
-  height: 23px;
   vertical-align:middle;
   display:inline-block;
 }
@@ -111,6 +111,7 @@ hr {
 
 input[type=checkbox]:checked + label {
   background: url('../images/switch-on.jpg') no-repeat;
+  height: 26px;
 }
 
 .sensor {
@@ -118,6 +119,10 @@ input[type=checkbox]:checked + label {
 }
 
 .sw-type-tw {
+  margin: 4px;
+}
+
+.sw-type-no {
   margin: 4px;
 }
 
@@ -249,3 +254,11 @@ input[type=checkbox]:checked + label {
    border-top-color: #929292;
    background: #929292;
    }
+
+.dimmer-row div {
+  width: 20%;
+  float: left;
+}
+
+.dimmer-row div input {
+}

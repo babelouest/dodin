@@ -55,6 +55,7 @@ function htmlI18n() {
 	$('#dialog-script-action-up').attr('value', $.t('Up'));
 	$('#dialog-script-action-down').attr('value', $.t('Down'));
 	$('#dialog-script-action-remove').attr('value', $.t('Remove'));
+  $('#global-archive-last-title').text($.t('Last archive completed')+':');
 	$('.template').i18n();
 }
 
@@ -232,6 +233,8 @@ function initDevices() {
 			
 			initSchedules();
 
+      updateArchiveDisplay();
+
 			toggleRadio(globalRadioToggle);
 			toggleRadioData(globalRadioDataToggle);
 
@@ -251,7 +254,7 @@ function initDevices() {
 			
 			var date = new Date();
 			$('#footer-message').text($.t('Last sync')+': '+date.toLocaleString());
-		
+
 		} else {
 			$('#message').text($.t('Error loading devices'));
 		}
@@ -271,16 +274,20 @@ function overviewDevice(deviceId) {
 	var jqxhr = $.get( url, function(data) {
 		var json = $.parseJSON(data);
 		if (!json.syntax_error) {
-			globalOverview[deviceId] = json;
+			globalOverview[deviceId] = json.device;
+      var switches_list = json.device.switches;
 			var $switches = $('#switch-'+deviceId+' .inside');
-      if (json.switches.length == 0) {
+      if (switches_list.length == 0) {
         $('#switch-'+deviceId).hide();
       }
-			for (var i=0; i<json.switches.length; i++) {
-				var switcher = json.switches[i];
+			for (var i=0; i<switches_list.length; i++) {
+				var switcher = switches_list[i];
 				var isChecked = switcher.status==1?'checked="checked"':'';
 				var switcherClass = '';
-				if (switcher.type == 1) {
+				if (switcher.type == 0) {
+					// Normally on
+					switcherClass = 'sw-type-no';
+				} else if (switcher.type == 1) {
 					// Normally on
 					switcherClass = 'sw-type-nc';
 				} else if (switcher.type == 2) {
@@ -299,11 +306,12 @@ function overviewDevice(deviceId) {
 			}
 			
 			var $sensor = $('#sensor-'+deviceId+' .inside');
-      if (json.sensors.length == 0) {
+      var sensors_list = json.device.sensors;
+      if (sensors_list.length == 0) {
         $('#sensor-'+deviceId).hide();
       }
-			for (var i=0; i<json.sensors.length; i++) {
-				var sensor = json.sensors[i];
+			for (var i=0; i<sensors_list.length; i++) {
+				var sensor = sensors_list[i];
 				var htmlSensor = '<p id="p-sensor-'+deviceId+'-'+sensor.name+'" class="sensor '+(!sensor.enabled?'p-hidden':'')+'"><input type="button" class="admin-button admin-modify-graph" value="+" name="admin-sensor-'+deviceId+'-'+sensor.name+'" id="admin-sensor-'+deviceId+'-'+sensor.name+'" data-an-device="'+deviceId+'" data-an-sensor="'+sensor.name+'" data-an-unit="'+sensor.unit+'"/><label id="label-'+deviceId+'-'+sensor.name+'" for="'+deviceId+'-'+sensor.name+'">'+sensor.display+': </label>';
 				htmlSensor += '<label id="value-'+deviceId+'-'+sensor.name+'" value="'+sensor.value+'" data-sensor-unit="'+sensor.unit+'">'+sensor.value+' '+sensor.unit+'</label></p>\n';
 				$sensor.append($(htmlSensor));
@@ -318,11 +326,12 @@ function overviewDevice(deviceId) {
 			}
 			
 			var $heater = $('#heater-'+deviceId+' .inside');
-      if (json.heaters.length == 0) {
+      var heaters_list = json.device.heaters;
+      if (heaters_list.length == 0) {
         $('#heater-'+deviceId).hide();
       }
-			for (var i=0; i<json.heaters.length; i++) {
-				var heater = json.heaters[i];
+			for (var i=0; i<heaters_list.length; i++) {
+				var heater = heaters_list[i];
 				var isSet = heater.set?'checked="checked"':'';
 				var htmlHeater = '<p id="p-heater-'+deviceId+'-'+heater.name+'" class="'+(!heater.enabled?'p-hidden':'')+'"><input type="button" class="admin-button admin-modify" value="+" name="admin-heater-'+deviceId+'-'+heater.name+'" id="admin-heater-'+deviceId+'-'+heater.name+'" data-an-device="'+deviceId+'" data-an-heater="'+heater.name+'"/>\n'
 				htmlHeater += '<input type="checkbox" value="he-'+deviceId+'-'+heater.name+'" data-an-device="'+deviceId+'" data-an-heater="'+heater.name+'" name="he-'+deviceId+'-'+heater.name+'" id="he-'+deviceId+'-'+heater.name+'" '+isSet+' /><label id="label-heater-'+deviceId+'-'+heater.name+'" for="he-'+deviceId+'-'+heater.name+'" data-an-label="'+heater.display+'">'+heater.display+'</label>';
@@ -392,14 +401,22 @@ function overviewDevice(deviceId) {
 			}
 
 			
+      var dimmers_list = json.device.dimmers;
 			var $dimmer = $('#dimmer-'+deviceId+' .inside');
-      if (json.dimmers.length == 0) {
-        $('#dimmer-'+deviceId).hide();
-      }
-			for (var i=0; i<json.dimmers.length; i++) {
-				var dimmer = json.dimmers[i];
+			if (dimmers_list.length == 0) {
+				$('#dimmer-'+deviceId).hide();
+			}
+			for (var i=0; i<dimmers_list.length; i++) {
+				var dimmer = dimmers_list[i];
 				var htmlDimmer = '<p id="p-dimmer-'+deviceId+'-'+dimmer.name+'" class="'+(!dimmer.enabled?'p-hidden':'')+'"><input type="button" class="admin-button admin-modify" value="+" name="admin-dimmer-'+deviceId+'-'+dimmer.name+'" id="admin-dimmer-'+deviceId+'-'+dimmer.name+'" data-an-device="'+deviceId+'" data-an-dimmer="'+dimmer.name+'"/>\n'
-        htmlDimmer += '<label id="label-dimmer-'+deviceId+'-'+dimmer.name+'" for="di-'+deviceId+'-'+dimmer.name+'" data-an-label="'+dimmer.display+'">'+dimmer.display+'</label>';
+			  htmlDimmer += '<label id="label-dimmer-'+deviceId+'-'+dimmer.name+'" for="di-'+deviceId+'-'+dimmer.name+'" data-an-label="'+dimmer.display+'">'+dimmer.display+'</label>\n';
+				htmlDimmer += '<div class="dimmer-row">\n';
+				htmlDimmer += '<div class="dimmer-0"><input type="button" name="di-set-0-'+deviceId+'-'+dimmer.name+'" id="di-set-0-'+deviceId+'-'+dimmer.name+'" value="0%" data-an-dimmer-value="0" class="styled-button" data-an-dimmer="di-slide-'+deviceId+'-'+dimmer.name+'" data-an-dimmer-id="'+dimmer.name+'"></div>\n';
+				htmlDimmer += '<div class="dimmer-25"><input type="button" name="di-set-25-'+deviceId+'-'+dimmer.name+'" id="di-set-25-'+deviceId+'-'+dimmer.name+'" value="25%" data-an-dimmer-value="25" class="styled-button" data-an-dimmer="di-slide-'+deviceId+'-'+dimmer.name+'" data-an-dimmer-id="'+dimmer.name+'"></div>\n';
+				htmlDimmer += '<div class="dimmer-50"><input type="button" name="di-set-50-'+deviceId+'-'+dimmer.name+'" id="di-set-50-'+deviceId+'-'+dimmer.name+'" value="50%" data-an-dimmer-value="50" class="styled-button" data-an-dimmer="di-slide-'+deviceId+'-'+dimmer.name+'" data-an-dimmer-id="'+dimmer.name+'"></div>\n';
+				htmlDimmer += '<div class="dimmer-75"><input type="button" name="di-set-75-'+deviceId+'-'+dimmer.name+'" id="di-set-75-'+deviceId+'-'+dimmer.name+'" value="75%" data-an-dimmer-value="75" class="styled-button" data-an-dimmer="di-slide-'+deviceId+'-'+dimmer.name+'" data-an-dimmer-id="'+dimmer.name+'"></div>\n';
+				htmlDimmer += '<div class="dimmer-100"><input type="button" name="di-set-100-'+deviceId+'-'+dimmer.name+'" id="di-set-100-'+deviceId+'-'+dimmer.name+'" value="100%" data-an-dimmer-value="100" class="styled-button" data-an-dimmer="di-slide-'+deviceId+'-'+dimmer.name+'" data-an-dimmer-id="'+dimmer.name+'"></div>\n';
+				htmlDimmer += '</div>\n';
 				htmlDimmer += '<div id="label-di-slide-'+deviceId+'-'+dimmer.name+'"></div><div class="dimmer" data-an-device="'+deviceId+'" data-an-dimmer="'+dimmer.name+'" id="di-slide-'+deviceId+'-'+dimmer.name+'" ></div>\n';
 				htmlDimmer += '</p>\n';
 				$dimmer.append(htmlDimmer);
@@ -414,7 +431,7 @@ function overviewDevice(deviceId) {
 							$('#label-di-slide-'+$(this).attr('data-an-device')+'-'+$(this).attr('data-an-dimmer')).html(ui.value+' %');
 						},
 						change:function( event, ui ) {
-							if (event.originalEvent) {
+							if (event == null || event.originalEvent) {
 								var dimmerId = $(this).attr('data-an-dimmer');
 								var deviceId = $(this).attr('data-an-device');
 								var url = prefix+'/SETDIMMER/'+deviceId+'/'+dimmerId+'/'+$(this).slider( 'value' );
@@ -433,9 +450,27 @@ function overviewDevice(deviceId) {
 					});
 				});
 			}
+			$('#dimmer-'+deviceId).find('.dimmer-row input').click(function() {
+				var dimmerId = $(this).attr('data-an-dimmer')
+				var $dimmer = $('#'+dimmerId);
+				var value = $(this).attr('data-an-dimmer-value');
+				var dimmerName = $(this).attr('data-an-dimmer-id');
+				var url = prefix+'/SETDIMMER/'+deviceId+'/'+dimmerName+'/'+value;
+				var jqxhr = $.get( url, function(data) {
+					$dimmer.slider('value', value);
+					$('#label-'+dimmerId).html(value+' %');
+				})
+				.fail(function() {
+					var $label = $('#label-'+dimmerId);
+					$label.text($label.attr('data-an-label') + ' - ' + $.t('Error setting dimmer'));
+					setTimeout(function() {
+						$label.text($label.attr('data-an-label'));
+					}, 10000);
+				});
+			});
       
-    }
-
+	  }
+    
 		initMusic(deviceId);
 
 	})
@@ -580,18 +615,18 @@ function initSchedules() {
 	var urlSchedules = prefix+'/SCHEDULES/';
 	var jqxhr = $.get( urlSchedules, function(dataSchedule) {
 		var jsonSchedule = $.parseJSON(dataSchedule);
-		for (var i=0; i<jsonSchedule.result.length; i++) {
-			var schedule = jsonSchedule.result[i];
+		for (var i=0; i<jsonSchedule.schedules.length; i++) {
+			var schedule = jsonSchedule.schedules[i];
 			globalSchedules[schedule.id] = schedule;
 			var nextTime = new Date(schedule.next_time * 1000);
 			var enabled = schedule.enabled;
 			var htmlSchedule = '<p id="p-schedule-'+schedule.id+'" class="class-schedule class-schedule-'+schedule.id+'"><input type="button" data-an-schedule-id="'+schedule.id+'" class="admin-button admin-modify-delete" value="+" name="admin-schedule-'+schedule.id+'" id="admin-schedule-'+schedule.id+'"/><input type="checkbox" value="schedule-'+schedule.id+'" data-an-schedule="'+schedule.id+'" data-an-device="" name="schedule-'+schedule.id+'" id="schedule-'+schedule.id+'" /><label for="schedule-'+schedule.id+'" id="message-schedule-'+schedule.id+'"></label></p>\n';
 			$('#schedule-global .inside').append(htmlSchedule);
 			if (!enabled) {
-				$('#message-schedule-'+schedule.id).text(schedule.name+' (Désactivé)');
+				$('#message-schedule-'+schedule.id).text(schedule.name+' ('+$.t('Disabled')+')');
 				$('#schedule-'+schedule.id).prop('checked', false);
 			} else {
-				$('#message-schedule-'+schedule.id).text(schedule.name+', Prochain lancement: '+nextTime.toLocaleString())
+				$('#message-schedule-'+schedule.id).text(schedule.name+', '+$.t('Next launch')+': '+nextTime.toLocaleString())
 				$('#schedule-'+schedule.id).prop('checked', true);
 			}
 			$('#schedule-'+schedule.id).change(function() {
@@ -602,10 +637,10 @@ function initSchedules() {
 				var htmlSchedule = '<p id="p-schedule-'+schedule.device+'-'+schedule.id+'" class="class-schedule class-schedule-'+schedule.id+'"><input type="button" data-an-schedule-id="'+schedule.id+'" class="admin-button admin-modify-delete" value="+" name="admin-schedule-'+schedule.device+'-'+schedule.id+'" id="admin-schedule-'+schedule.device+'-'+schedule.id+'"/><input type="checkbox" value="schedule-'+schedule.device+'-'+schedule.id+'" data-an-schedule="'+schedule.id+'" data-an-device="'+schedule.device+'" name="schedule-'+schedule.device+'-'+schedule.id+'" id="schedule-'+schedule.device+'-'+schedule.id+'" /><label for="schedule-'+schedule.device+'-'+schedule.id+'" id="message-schedule-'+schedule.device+'-'+schedule.id+'"></label></p>\n';
 				$('#schedule-'+schedule.device+' .inside').append(htmlSchedule);
 				if (!enabled) {
-					$('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+' (Désactivé)');
+					$('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+' ('+$.t('Disabled')+')');
 					$('#schedule-'+schedule.device+'-'+schedule.id).prop('checked', false);
 				} else {
-					$('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+', Prochain lancement: '+nextTime.toLocaleString())
+					$('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+', '+$.t('Next launch')+': '+nextTime.toLocaleString())
 					$('#schedule-'+schedule.device+'-'+schedule.id).prop('checked', true);
 				}
 				$('#schedule-'+schedule.device+'-'+schedule.id).change(function() {
@@ -638,12 +673,12 @@ function enableSchedule($schedule, value) {
 	var jqxhr = $.get( url, function(data) {
 		var json = $.parseJSON(data);
 		if (json.result != 'error') {
-			if (!json.result.enabled) {
-				$message.text(json.result.name+' (Désactivé)');
+			if (!json.schedule.enabled) {
+				$message.text(json.schedule.name+' ('+$.t('Disabled')+')');
 				$schedule.prop('checked', false);
 			} else {
-				var nextTime = new Date(json.result.next_time * 1000);
-				$message.text(json.result.name+', Prochain lancement: '+nextTime.toLocaleString());
+				var nextTime = new Date(json.schedule.next_time * 1000);
+				$message.text(json.schedule.name+', '+$.t('Next launch')+': '+nextTime.toLocaleString());
 				$schedule.prop('checked', true);
 			}
 		} else {
@@ -674,13 +709,13 @@ function refresh(force) {
 	var footerMessage="";
 	var jqxhr = $.get( urlSchedules, function(dataSchedule) {
 		var jsonSchedule = $.parseJSON(dataSchedule);
-		for (var i=0; i<jsonSchedule.result.length; i++) {
-			var schedule = jsonSchedule.result[i];
+		for (var i=0; i<jsonSchedule.schedules.length; i++) {
+			var schedule = jsonSchedule.schedules[i];
 			var nextTime = new Date(schedule.next_time * 1000);
 			if (!schedule.enabled) {
-				$('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+' '+$.t('(Disabled)'));
+				$('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+' '+$.t('Disabled'));
 				$('#schedule-'+schedule.device+'-'+schedule.id).prop('checked', false);
-				$('#message-schedule-'+schedule.id).text(schedule.name+' '+$.t('(Disabled)'));
+				$('#message-schedule-'+schedule.id).text(schedule.name+' '+$.t('Disabled'));
 				$('#schedule-'+schedule.id).prop('checked', false);
 			} else {
 				$('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+', '+$.t('Next launch')+': '+nextTime.toLocaleString())
@@ -708,11 +743,12 @@ function refresh(force) {
 			
 			var jqxhr = $.get( url+deviceId, function(data) {
 				var json = $.parseJSON(data);
-				globalOverview[deviceId] = json;
-				var device = json.name;
+				globalOverview[deviceId] = json.device;
+				var device = json.device.name;
 				
-				for (var j=0; j<json.switches.length; j++) {
-					var switcher = json.switches[j];
+        var switches_list = json.device.switches;
+				for (var j=0; j<switches_list.length; j++) {
+					var switcher = switches_list[j];
 					var $switch = $('#sw-'+device+'-'+switcher.name);
 					$switch.prop('enabled', false);
 					$switch.prop('checked', switcher.status==1);
@@ -726,8 +762,9 @@ function refresh(force) {
 					}
 				}
 				
-				for (var j=0; j<json.sensors.length; j++) {
-					var sensor = json.sensors[j];
+        var sensors_list = json.device.sensors;
+				for (var j=0; j<sensors_list.length; j++) {
+					var sensor = sensors_list[j];
 					$('#value-'+device+'-'+sensor.name).text(sensor.value+' '+sensor.unit);
 					if ($('#label-'+device+'-'+sensor.name).text() != sensor.display) {
 						$('#label-'+device+'-'+sensor.name).text(sensor.display+': ');
@@ -739,8 +776,9 @@ function refresh(force) {
 					}
 				}
 				
-				for (var j=0; j<json.heaters.length; j++) {
-					var heater = json.heaters[j];
+        var heaters_list = json.device.heaters;
+				for (var j=0; j<heaters_list.length; j++) {
+					var heater = heaters_list[j];
 					$('#he-'+device+'-'+heater.name).prop('disabled', true);
 					$('#he-'+device+'-'+heater.name).prop('checked', heater.set);
 					$('#he-slide-'+device+'-'+heater.name).slider('value', heater.max_value);
@@ -750,8 +788,9 @@ function refresh(force) {
 					$('#he-'+device+'-'+heater.name).prop('disabled', false);
 				}
 
-				for (var j=0; j<json.dimmers.length; j++) {
-					var dimmer = json.dimmers[j];
+        var dimmers_list = json.device.dimmers;
+				for (var j=0; j<dimmers_list.length; j++) {
+					var dimmer = dimmers_list[j];
 					$('#di-slide-'+device+'-'+dimmer.name).slider('value', dimmer.value);
 					$('#label-di-slide-'+device+'-'+dimmer.name).html(dimmer.value+' %');
 				}
@@ -772,6 +811,9 @@ function refresh(force) {
 		getCameraFiles(camera, true);
 	}
 	
+  // Refresh last archive date
+  updateArchiveDisplay();
+  
 	var date = new Date();
 	if (footerMessage != "") {
 		$('#footer-message').text($.t('Last sync')+': '+date.toLocaleString()+'<br/>'+footerMessage);
@@ -783,7 +825,6 @@ function refresh(force) {
 function archive() {
 	var url = prefix+'/ARCHIVE/';
 	var $message = $('#header-message-global');
-	$message.text($.t('Archiving')+'...');
 	var archiveUpTo = $('#global-archive-up-to').val();
 	var curDate = new Date();
 	curDate.setHours(0);
@@ -810,20 +851,44 @@ function archive() {
 	var jqxhr = $.get( url, function(data) {
 		var json = $.parseJSON(data);
 		if (json.result != 'error') {
-			$message.text($.t('Archve complete'));
+			$message.text($.t('Archive launched'));
 		} else {
-			$message.text($.t('Error archiving'));
+			$message.text($.t('Error running archive'));
 		}
 		setTimeout(function() {
 			$message.text('');
 		}, 10000);
 	})
 	.fail(function() {
-		$message.text($.t('Error archiving')+', '+$.t('network error'));
+		$message.text($.t('Error running archive')+', '+$.t('network error'));
 		setTimeout(function() {
 			$message.text('');
 		}, 10000);
 	});
+}
+
+function updateArchiveDisplay() {
+	var url = prefix + '/LASTARCHIVE';
+	
+  var jqxhr = $.get( url, function(data) {
+    var json = $.parseJSON(data);
+    if (json.result == 'ok') {
+      if (json.last_archive > 0) {
+        var lastArchive = new Date(json.last_archive * 1000);
+        $('#global-archive-last').text(lastArchive.toLocaleString());
+      } else {
+        $('#global-archive-last').text($.t('Never'));
+      }
+      $('#global-archive-ongoing').text(json.archive_running?$.t('Currently archiving...'):'');
+    } else {
+      $('#global-archive-last').text($.t('Error getting last archive date'));
+      $('#global-archive-ongoing').text('');
+    }
+  })
+  .fail(function() {
+    $('#global-archive-last').text($.t('Error getting last archive date'));
+    $('#global-archive-ongoing').text('');
+  });
 }
 
 function updateMpds() {
@@ -1352,24 +1417,24 @@ function okDialogSwitch(curDevice, curName, curDisplay, curType, curEnabled, cur
 	$posting.done(function(data) {
 		var json = $.parseJSON(data);
 		var $p = $('#p-switch-'+curDevice+'-'+curName);
-		if (json.switcher.enabled) {
+		if (json.switch.enabled) {
 			$p.removeClass('p-hidden');
 		} else {
 			$p.addClass('p-hidden');
 			$p.show();
 		}
-		if (json.switcher.type == 0) {
+		if (json.switch.type == 0) {
 			$p.removeClass('sw-type-nc');
 			$p.removeClass('sw-type-tw');
-		} else if (json.switcher.type == 1) {
+		} else if (json.switch.type == 1) {
 			$p.addClass('sw-type-nc');
 			$p.removeClass('sw-type-tw');
-		} else if (json.switcher.type == 2) {
+		} else if (json.switch.type == 2) {
 			$p.removeClass('sw-type-nc');
 			$p.addClass('sw-type-tw');
 		}
 		var $label = $('#label-sw-'+curDevice+'-'+curName);
-		$label.text(json.switcher.display);
+		$label.text(json.switch.display);
 		
 		for (var i=0; i<globalOverview[curDevice].switches.length; i++) {
 			if (globalOverview[curDevice].switches[i].name == curName) {
@@ -1443,12 +1508,12 @@ function initActionDialog($dialog, $action) {
 	var $heatersList = $dialog.find('#dialog-action-heater');
 	var $scriptsList = $dialog.find('#dialog-action-script');
 	var $typeList = $dialog.find('#dialog-action-type');
-	var $pParams = $dialog.find('#p-dialog-action-params');
-	var $pparamsSetSwitch = $dialog.find('#p-dialog-action-params-setswitcher');
-	var $pparamsSetDimmer = $dialog.find('#p-dialog-action-params-setdimmer');
-	var $pParamsValue = $dialog.find('#p-dialog-action-params-value');
 	var $paramsSetSwitch = $dialog.find('#dialog-action-params-setswitcher');
 	var $paramsValue = $dialog.find('#dialog-action-params-value');
+	var $pParams = $dialog.find('#p-dialog-action-params');
+	var $pParamsSetSwitch = $dialog.find('#p-dialog-action-params-setswitcher');
+	var $pParamsSetDimmer = $dialog.find('#p-dialog-action-params-setdimmer');
+	var $pParamsValue = $dialog.find('#p-dialog-action-params-value');
 	
 	$devicesList.empty();
 	for (var key in devicesTab) {
@@ -1473,9 +1538,9 @@ function initActionDialog($dialog, $action) {
 				$dimmersList.prop('disabled', true);
 				$heatersList.prop('disabled', true);
         $scriptsList.prop('disabled', true);
-				$pParams.slideDown();
-				$pparamsSetSwitch.slideDown();
-				$pparamsSetDimmer.slideUp();
+				$pParams.slideUp();
+				$pParamsSetSwitch.slideDown();
+				$pParamsSetDimmer.slideUp();
 				$pParamsValue.slideUp();
 				break;
 			case "1":
@@ -1486,8 +1551,8 @@ function initActionDialog($dialog, $action) {
 				$heatersList.prop('disabled', true);
         $scriptsList.prop('disabled', true);
 				$pParams.slideUp();
-				$pparamsSetSwitch.slideDown();
-				$pparamsSetDimmer.slideUp();
+				$pParamsSetSwitch.slideUp();
+				$pParamsSetDimmer.slideUp();
 				$pParamsValue.slideUp();
 				break;
 			case "2":
@@ -1498,8 +1563,8 @@ function initActionDialog($dialog, $action) {
 				$heatersList.prop('disabled', true);
         $scriptsList.prop('disabled', true);
 				$pParams.slideUp();
-				$pparamsSetSwitch.slideUp();
-				$pparamsSetDimmer.slideDown();
+				$pParamsSetSwitch.slideUp();
+				$pParamsSetDimmer.slideDown();
 				$pParamsValue.slideDown();
 				break;
 			case "3":
@@ -1512,8 +1577,8 @@ function initActionDialog($dialog, $action) {
 				$pParams.slideUp();
         $paramsSetSwitch.find('option[value="0"]').text($.t('Off'));
         $paramsSetSwitch.find('option[value="1"]').text($.t('On'));
-				$pparamsSetSwitch.slideDown();
-				$pparamsSetDimmer.slideUp();
+				$pParamsSetSwitch.slideDown();
+				$pParamsSetDimmer.slideUp();
 				$pParamsValue.slideDown();
 				break;
 			case "77":
@@ -1524,13 +1589,12 @@ function initActionDialog($dialog, $action) {
 				$heatersList.prop('disabled', true);
         $scriptsList.prop('disabled', false);
 				$pParams.slideUp();
-				$pparamsSetSwitch.slideUp();
-				$pparamsSetDimmer.slideUp();
+				$pParamsSetSwitch.slideUp();
+				$pParamsSetDimmer.slideUp();
 				$pParamsValue.slideUp();
 				break;
 			case "88":
 				// SLEEP
-				break;
 			case "99":
 				// SYSTEM
 				$devicesList.prop('disabled', true);
@@ -1539,8 +1603,8 @@ function initActionDialog($dialog, $action) {
 				$heatersList.prop('disabled', true);
         $scriptsList.prop('disabled', true);
 				$pParams.slideUp();
-				$pparamsSetSwitch.slideUp();
-				$pparamsSetDimmer.slideUp();
+				$pParamsSetSwitch.slideUp();
+				$pParamsSetDimmer.slideUp();
 				$pParamsValue.slideDown();
 				break;
 			default:
@@ -1595,6 +1659,7 @@ function initActionDialog($dialog, $action) {
 	});
 	
 	$typeList.trigger('change');
+  
 	$devicesList.trigger('change');
 
 	if ($action != null) {
@@ -1619,7 +1684,9 @@ function initActionDialog($dialog, $action) {
 				$paramsSetSwitch.find('option[value="0"]').prop('selected', true);
 			}
 			$paramsValue.val('');
-		} else if (action.type == 3) {
+		} else if (action.type == 2) { // DIMMER
+      $paramsValue.val(action.params);
+		} else if (action.type == 3) { // HEATER
 			var values = action.params.split(',');
 			$paramsSetSwitch.find('option[value="'+values[0]+'"]').prop('selected', true);
 			$paramsValue.val(values[1]);
@@ -1651,6 +1718,7 @@ function okAction($dialog) {
 	var params = {};
 	var $paramsSetSwitch = $dialog.find('#dialog-action-params-setswitcher');
 	var $paramsValue = $dialog.find('#dialog-action-params-value');
+  var $paramsScript = $dialog.find('#dialog-action-script');
 	
 	if ($dialog.find('#dialog-action-id').val() == '') {
 		// Add action
@@ -1688,13 +1756,15 @@ function okAction($dialog) {
 			return false;
 		}
 		params.params = $paramsSetSwitch.val()+','+$paramsValue.val();
-	} else if (params.type == 88) {
+	} else if (params.type == 77) { // SCRIPT
+    params.params = $paramsScript.val();
+	} else if (params.type == 88) { // SLEEP
 		if ($paramsValue.val() == '') {
 			alert($.t('Duration must be in milliseconds'));
 			return false;
 		}
 		params.params = $paramsValue.val();
-	} else if (params.type == 99) {
+	} else if (params.type == 99) { // SYSTEM
 		if ($paramsValue.val() == '') {
 			alert($.t('You must enter a server command'));
 			return false;
@@ -2085,6 +2155,13 @@ function initDialogSchedule($dialog, $schedule) {
 		$('.p-dialog-schedule-repeat-every').hide();
 		$('.p-dialog-schedule-repeat-value-dow').hide();
     $('#dialog-schedule-tags').tagsinput('removeAll');
+    $('#dialog-schedule-repeat-value-dow-1').prop('checked', false);
+    $('#dialog-schedule-repeat-value-dow-2').prop('checked', false);
+    $('#dialog-schedule-repeat-value-dow-4').prop('checked', false);
+    $('#dialog-schedule-repeat-value-dow-8').prop('checked', false);
+    $('#dialog-schedule-repeat-value-dow-16').prop('checked', false);
+    $('#dialog-schedule-repeat-value-dow-32').prop('checked', false);
+    $('#dialog-schedule-repeat-value-dow-64').prop('checked', false);
 	} else {
 		var curDate = new Date(0);
 		var curSchedule = globalSchedules[$schedule.attr('data-an-schedule-id')];
@@ -2096,24 +2173,23 @@ function initDialogSchedule($dialog, $schedule) {
 		$('#dialog-schedule-device option[value="'+curSchedule.device+'"]').prop('selected', true);
 		curDate.setUTCSeconds(curSchedule.next_time);
 		setDateDisplay(curDate);
-		$('#dialog-schedule-repeat').prop('checked', curSchedule.repeat!=-1);
-		$('#dialog-schedule-repeat-every option[value="'+curSchedule.repeat+'"]').prop('selected', true);
+		$('#dialog-schedule-repeat').prop('checked', curSchedule.repeat_schedule!=-1);
+		$('#dialog-schedule-repeat-every option[value="'+curSchedule.repeat_schedule+'"]').prop('selected', true);
     $('#dialog-schedule-tags').tagsinput('removeAll');
     for (var key in curSchedule.tags) {
       $('#dialog-schedule-tags').tagsinput('add', curSchedule.tags[key]);
     }
-		if (curSchedule.repeat == 3) {
+		if (curSchedule.repeat_schedule == 3) {
 			// Day of week
-			$('#dialog-schedule-repeat-value-dow-1').prop('checked', (curSchedule.repeat_value & 1));
-			$('#dialog-schedule-repeat-value-dow-2').prop('checked', (curSchedule.repeat_value & 2));
-			$('#dialog-schedule-repeat-value-dow-4').prop('checked', (curSchedule.repeat_value & 4));
-			$('#dialog-schedule-repeat-value-dow-8').prop('checked', (curSchedule.repeat_value & 8));
-			$('#dialog-schedule-repeat-value-dow-16').prop('checked', (curSchedule.repeat_value & 16));
-			$('#dialog-schedule-repeat-value-dow-32').prop('checked', (curSchedule.repeat_value & 32));
-			$('#dialog-schedule-repeat-value-dow-64').prop('checked', (curSchedule.repeat_value & 64));
-
+			$('#dialog-schedule-repeat-value-dow-1').prop('checked', (curSchedule.repeat_schedule_value & 1));
+			$('#dialog-schedule-repeat-value-dow-2').prop('checked', (curSchedule.repeat_schedule_value & 2));
+			$('#dialog-schedule-repeat-value-dow-4').prop('checked', (curSchedule.repeat_schedule_value & 4));
+			$('#dialog-schedule-repeat-value-dow-8').prop('checked', (curSchedule.repeat_schedule_value & 8));
+			$('#dialog-schedule-repeat-value-dow-16').prop('checked', (curSchedule.repeat_schedule_value & 16));
+			$('#dialog-schedule-repeat-value-dow-32').prop('checked', (curSchedule.repeat_schedule_value & 32));
+			$('#dialog-schedule-repeat-value-dow-64').prop('checked', (curSchedule.repeat_schedule_value & 64));
 		} else {
-			$('#dialog-schedule-repeat-value').val(curSchedule.repeat_value);
+			$('#dialog-schedule-repeat-value').val(curSchedule.repeat_schedule_value);
 		}
 		$('#dialog-schedule-repeat').trigger('change');
 		$('#dialog-schedule-repeat-every').trigger('change');
@@ -2122,11 +2198,11 @@ function initDialogSchedule($dialog, $schedule) {
 
 function setDateDisplay(curDate) {
 	var hh = curDate.getHours();
-	var min = curDate.getMinutes();
+	var mm = curDate.getMinutes();
 	
 	$('#dialog-schedule-date').val($.datepicker.formatDate('dd/mm/yy', curDate));
 	$('#dialog-schedule-hh option[value='+hh+']').prop('selected', true);
-	$('#dialog-schedule-mm option[value='+min+']').prop('selected', true);
+	$('#dialog-schedule-mm option[value='+mm+']').prop('selected', true);
 }
 
 function okSchedule($dialog) {
@@ -2160,6 +2236,17 @@ function okSchedule($dialog) {
 		alert($.t('The next run must be in the future'));
 		return false;
 	}
+  
+  if ($dialog.find('#dialog-schedule-repeat').prop('checked')) {
+    var repeatEvery = $dialog.find('#dialog-schedule-repeat-every').val();
+    var repeatValue = $dialog.find('#dialog-schedule-repeat-value').val();
+    if ((repeatEvery == 0 || repeatEvery == 1 || repeatEvery == 2 || repeatEvery == 4 || repeatEvery == 5) &&
+    (repeatValue =='' || isNaN(repeatValue) || repeatValue <= 0)
+    ) {
+      alert($.t('You must enter a positive numeric value for the repeat frequency'));
+      return false;
+    }
+  }
 	postParams.next_time = nextTime.getTime() / 1000;
 	postParams.remove_after_done = $dialog.find('#dialog-schedule-remove-after-done').prop('checked')?1:0;
 	
@@ -2189,10 +2276,10 @@ function okSchedule($dialog) {
 			var htmlSchedule = '<p id="p-schedule-'+schedule.id+'" class="class-schedule class-schedule-'+schedule.id+'"><input type="button" data-an-schedule-id="'+schedule.id+'" class="admin-button admin-modify-delete" value="+" name="admin-schedule-'+schedule.id+'" id="admin-schedule-'+schedule.id+'"/><input type="checkbox" value="schedule-'+schedule.id+'" data-an-schedule="'+schedule.id+'" data-an-device="" name="schedule-'+schedule.id+'" id="schedule-'+schedule.id+'" /><label for="schedule-'+schedule.id+'" id="message-schedule-'+schedule.id+'"></label></p>\n';
 			$('#schedule-global .inside').append(htmlSchedule);
 			if (!enabled) {
-				$('#message-schedule-'+schedule.id).text(schedule.name+' (Désactivé)');
+				$('#message-schedule-'+schedule.id).text(schedule.name+' ('+$.t('Disabled')+')');
 				$('#schedule-'+schedule.id).prop('checked', false);
 			} else {
-				$('#message-schedule-'+schedule.id).text(schedule.name+', Prochain lancement: '+nextTime.toLocaleString())
+				$('#message-schedule-'+schedule.id).text(schedule.name+', '+$.t('Next launch')+': '+nextTime.toLocaleString())
 				$('#schedule-'+schedule.id).prop('checked', true);
 			}
 			if (adminGlobal) {
@@ -2206,10 +2293,10 @@ function okSchedule($dialog) {
 				var htmlSchedule = '<p id="p-schedule-'+schedule.device+'-'+schedule.id+'" class="class-schedule class-schedule-'+schedule.id+'"><input type="button" data-an-schedule-id="'+schedule.id+'" class="admin-button admin-modify-delete" value="+" name="admin-schedule-'+schedule.device+'-'+schedule.id+'" id="admin-schedule-'+schedule.device+'-'+schedule.id+'"/><input type="checkbox" value="schedule-'+schedule.device+'-'+schedule.id+'" data-an-schedule="'+schedule.id+'" data-an-device="'+schedule.device+'" name="schedule-'+schedule.device+'-'+schedule.id+'" id="schedule-'+schedule.device+'-'+schedule.id+'" /><label for="schedule-'+schedule.device+'-'+schedule.id+'" id="message-schedule-'+schedule.device+'-'+schedule.id+'"></label></p>\n';
 				$('#schedule-'+schedule.device+' .inside').append(htmlSchedule);
 				if (!enabled) {
-					$('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+' (Désactivé)');
+					$('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+' ('+$.t('Disabled')+')');
 					$('#schedule-'+schedule.device+'-'+schedule.id).prop('checked', false);
 				} else {
-					$('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+', Prochain lancement: '+nextTime.toLocaleString())
+					$('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+', '+$.t('Next launch')+': '+nextTime.toLocaleString())
 					$('#schedule-'+schedule.device+'-'+schedule.id).prop('checked', true);
 				}
 				$('#schedule-'+schedule.device+'-'+schedule.id).change(function() {
@@ -2227,11 +2314,11 @@ function okSchedule($dialog) {
 			$('.class-schedule-'+schedule.id).each(function() {
 				$(this).find('#schedule-'+schedule.device+'-'+schedule.id).prop('checked', schedule.enabled);
 				if (!schedule.enabled) {
-					$('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+' (Désactivé)');
+					$('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+' ('+$.t('Disabled')+')');
 					$('#schedule-'+schedule.device+'-'+schedule.id).prop('checked', false);
 				} else {
 					var nextTime = new Date(schedule.next_time * 1000);
-					$('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+', Prochain lancement: '+nextTime.toLocaleString())
+					$('#message-schedule-'+schedule.device+'-'+schedule.id).text(schedule.name+', '+$.t('Next launch')+': '+nextTime.toLocaleString())
 					$('#schedule-'+schedule.device+'-'+schedule.id).prop('checked', true);
 				}
 			});

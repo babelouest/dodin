@@ -100,6 +100,10 @@ $(document).ready(function() {
     					monitorElement($(this));
     				} else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
     					monitorElement($(this));
+    				} else if ($(this).attr('name').indexOf('admin-dimmer-') == 0) {
+    					monitorElement($(this));
+    				} else if ($(this).attr('name').indexOf('admin-heater-') == 0) {
+    					monitorElement($(this));
     				}
     			} else {
     				if ($(this).attr('name').indexOf('admin-sensor-') == 0) {
@@ -333,7 +337,7 @@ function overviewDevice(deviceId) {
 			for (var i=0; i<heaters_list.length; i++) {
 				var heater = heaters_list[i];
 				var isSet = heater.set?'checked="checked"':'';
-				var htmlHeater = '<p id="p-heater-'+deviceId+'-'+heater.name+'" class="'+(!heater.enabled?'p-hidden':'')+'"><input type="button" class="admin-button admin-modify" value="+" name="admin-heater-'+deviceId+'-'+heater.name+'" id="admin-heater-'+deviceId+'-'+heater.name+'" data-an-device="'+deviceId+'" data-an-heater="'+heater.name+'"/>\n'
+				var htmlHeater = '<p id="p-heater-'+deviceId+'-'+heater.name+'" class="'+(!heater.enabled?'p-hidden':'')+'"><input type="button" class="admin-button admin-modify-graph" value="+" name="admin-heater-'+deviceId+'-'+heater.name+'" id="admin-heater-'+deviceId+'-'+heater.name+'" data-an-device="'+deviceId+'" data-an-heater="'+heater.name+'" data-an-unit="'+heater.unit+'"/>\n'
 				htmlHeater += '<input type="checkbox" value="he-'+deviceId+'-'+heater.name+'" data-an-device="'+deviceId+'" data-an-heater="'+heater.name+'" name="he-'+deviceId+'-'+heater.name+'" id="he-'+deviceId+'-'+heater.name+'" '+isSet+' /><label id="label-heater-'+deviceId+'-'+heater.name+'" for="he-'+deviceId+'-'+heater.name+'" data-an-label="'+heater.display+'">'+heater.display+'</label>';
 				htmlHeater += '<div id="label-he-slide-'+deviceId+'-'+heater.name+'"></div><div class="heater" data-an-device="'+deviceId+'" data-an-heater="'+heater.name+'" id="he-slide-'+deviceId+'-'+heater.name+'" ></div>\n';
 				htmlHeater += '</p>\n';
@@ -408,7 +412,7 @@ function overviewDevice(deviceId) {
 			}
 			for (var i=0; i<dimmers_list.length; i++) {
 				var dimmer = dimmers_list[i];
-				var htmlDimmer = '<p id="p-dimmer-'+deviceId+'-'+dimmer.name+'" class="'+(!dimmer.enabled?'p-hidden':'')+'"><input type="button" class="admin-button admin-modify" value="+" name="admin-dimmer-'+deviceId+'-'+dimmer.name+'" id="admin-dimmer-'+deviceId+'-'+dimmer.name+'" data-an-device="'+deviceId+'" data-an-dimmer="'+dimmer.name+'"/>\n'
+				var htmlDimmer = '<p id="p-dimmer-'+deviceId+'-'+dimmer.name+'" class="'+(!dimmer.enabled?'p-hidden':'')+'"><input type="button" class="admin-button admin-modify-graph" value="+" name="admin-dimmer-'+deviceId+'-'+dimmer.name+'" id="admin-dimmer-'+deviceId+'-'+dimmer.name+'" data-an-device="'+deviceId+'" data-an-dimmer="'+dimmer.name+'" data-an-unit="&#37;"/>\n'
 			  htmlDimmer += '<label id="label-dimmer-'+deviceId+'-'+dimmer.name+'" for="di-'+deviceId+'-'+dimmer.name+'" data-an-label="'+dimmer.display+'">'+dimmer.display+'</label>\n';
 				htmlDimmer += '<div class="dimmer-row">\n';
 				htmlDimmer += '<div class="dimmer-0"><input type="button" name="di-set-0-'+deviceId+'-'+dimmer.name+'" id="di-set-0-'+deviceId+'-'+dimmer.name+'" value="0%" data-an-dimmer-value="0" class="styled-button" data-an-dimmer="di-slide-'+deviceId+'-'+dimmer.name+'" data-an-dimmer-id="'+dimmer.name+'"></div>\n';
@@ -969,12 +973,26 @@ function monitorElement($button) {
 	var device = $button.attr('data-an-device');
 	var sensor = $button.attr('data-an-sensor');
 	var switcher = $button.attr('data-an-switch');
+	var dimmer = $button.attr('data-an-dimmer');
+	var heater = $button.attr('data-an-heater');
 	var unit = encodeURIComponent($button.attr('data-an-unit'));
 	var startDate = '';
 	var title = '';
 
 	if (sensor === undefined) {
-		sensor = '0';
+		sensor = '';
+	} else {
+		sensors = globalOverview[device].sensors;
+		for (var i=0; i<sensors.length; i++) {
+			if (sensor == sensors[i].name) {
+				title = sensors[i].display;
+			}
+		}
+  }
+  
+	if (switcher === undefined) {
+		switcher = '';
+	} else {
 		switches = globalOverview[device].switches;
 		for (var i=0; i<switches.length; i++) {
 			if (switcher == switches[i].name) {
@@ -982,12 +1000,25 @@ function monitorElement($button) {
 			}
 		}
 	}
-	if (switcher === undefined) {
-		switcher = '0';
-		sensors = globalOverview[device].sensors;
-		for (var i=0; i<sensors.length; i++) {
-			if (sensor == sensors[i].name) {
-				title = sensors[i].display;
+  
+	if (dimmer === undefined) {
+		dimmer = '';
+	} else {
+		dimmers = globalOverview[device].dimmers;
+		for (var i=0; i<dimmers.length; i++) {
+			if (dimmer == dimmers[i].name) {
+				title = dimmers[i].display;
+			}
+		}
+	}
+  
+	if (heater === undefined) {
+		heater = '';
+	} else {
+		heaters = globalOverview[device].heaters;
+		for (var i=0; i<heaters.length; i++) {
+			if (heater == heaters[i].name) {
+				title = heaters[i].display;
 			}
 		}
 	}
@@ -996,7 +1027,7 @@ function monitorElement($button) {
 	var $dialog = $('#dialog-monitor');
 	$dialog.find('#dialog-monitor-since').find('option[value="4"]').prop('selected', true);
 	
-	var iframe = '<iframe border="0" src="graph.html?device='+device+'&switcher='+switcher+'&sensor='+sensor+'&startDate='+startDate+'&unit='+unit+'" width="430px" height="350px"></iframe>';
+	var iframe = '<iframe border="0" src="graph.html?device='+device+'&switcher='+switcher+'&sensor='+sensor+'&dimmer='+dimmer+'&heater='+heater+'&startDate='+startDate+'&unit='+unit+'" width="430px" height="350px"></iframe>';
 	$dialog.find('#dialog-chart').html(iframe);
 	
 	$dialog.dialog({
@@ -1052,7 +1083,7 @@ function monitorElement($button) {
 							break;
 					}
 					
-					var iframe = '<iframe border="0" src="graph.html?device='+device+'&switcher='+switcher+'&sensor='+sensor+'&startDate='+startDate+'&unit='+unit+'" width="430px" height="350px"></iframe>';
+					var iframe = '<iframe border="0" src="graph.html?device='+device+'&switcher='+switcher+'&sensor='+sensor+'&dimmer='+dimmer+'&heater='+heater+'&startDate='+startDate+'&unit='+unit+'" width="430px" height="350px"></iframe>';
 					$('#dialog-chart').html(iframe);
 					
 				});
@@ -1178,10 +1209,22 @@ function editHeater($heaterAdminButton) {
 			$dialog.find('#dialog-heater-display').val(curHeater.display);
 			$dialog.find('#dialog-heater-unit').val(curHeater.unit);
 			$dialog.find('#dialog-heater-enabled').prop('checked', curHeater.enabled);
+			$dialog.find('#dialog-heater-monitored').prop('checked', curHeater.monitored);
+			$dialog.find('#dialog-heater-monitored-every').find('option[value="'+(curHeater.monitored_every==0?1:curHeater.monitored_every)+'"]').prop('selected', true);
       $dialog.find('#dialog-heater-tags').tagsinput('removeAll');
       for (var key in curHeater.tags) {
         $dialog.find('#dialog-heater-tags').tagsinput('add', curHeater.tags[key]);
       }
+			
+			if (!curHeater.monitored) {
+				$dialog.find('#p-dialog-heater-monitored-every').hide();
+			} else {
+				$dialog.find('#p-dialog-heater-monitored-every').show();
+			}
+			
+			$dialog.find('#dialog-heater-monitored').unbind('change').change(function() {
+				$dialog.find('#p-dialog-heater-monitored-every').slideToggle();
+			});
 			
 			$dialog.on('keypress', function(e) {
 				var code = (e.keyCode ? e.keyCode : e.which);
@@ -1190,9 +1233,11 @@ function editHeater($heaterAdminButton) {
 					var curDisplay=$(this).find('#dialog-heater-display').val();
 					var curUnit=$(this).find('#dialog-heater-unit').val();
 					var curEnabled=$(this).find('#dialog-heater-enabled').prop('checked')?'true':'false';
+					var curMonitored=$(this).find('#dialog-heater-monitored').prop('checked')?'true':'false';
+					var curMonitoredEvery=$(this).find('#dialog-heater-monitored-every').val();
           var curTags=$(this).find('#dialog-heater-tags').tagsinput('items').join();
 					
-					okDialogHeater($heaterAdminButton.attr('data-an-device'), curName, curDisplay, curUnit, curEnabled, curTags);
+					okDialogHeater($heaterAdminButton.attr('data-an-device'), curName, curDisplay, curUnit, curEnabled, curMonitored, curMonitoredEvery, curTags);
 					
 					$( this ).dialog( 'close' );
 				}
@@ -1210,9 +1255,11 @@ function editHeater($heaterAdminButton) {
 						var curDisplay=$(this).find('#dialog-heater-display').val();
 						var curUnit=$(this).find('#dialog-heater-unit').val();
 						var curEnabled=$(this).find('#dialog-heater-enabled').prop('checked')?'true':'false';
+            var curMonitored=$(this).find('#dialog-heater-monitored').prop('checked')?'true':'false';
+            var curMonitoredEvery=$(this).find('#dialog-heater-monitored-every').val();
             var curTags=$(this).find('#dialog-heater-tags').tagsinput('items').join();
             
-						okDialogHeater($heaterAdminButton.attr('data-an-device'), curName, curDisplay, curUnit, curEnabled, curTags);
+						okDialogHeater($heaterAdminButton.attr('data-an-device'), curName, curDisplay, curUnit, curEnabled, curMonitored, curMonitoredEvery, curTags);
 						$( this ).dialog( 'close' );
 					}
 				}]
@@ -1223,10 +1270,10 @@ function editHeater($heaterAdminButton) {
 	}
 }
 
-function okDialogHeater(curDevice, curName, curDisplay, curUnit, curEnabled, curTags) {
+function okDialogHeater(curDevice, curName, curDisplay, curUnit, curEnabled, curMonitored, curMonitoredEvery, curTags) {
 	var url = prefix+'/SETHEATERDATA/';
 	var $posting = $.post(url,
-		{name: curName, device: curDevice, display: curDisplay, unit: curUnit, enabled: curEnabled, tags: curTags}
+		{name: curName, device: curDevice, display: curDisplay, unit: curUnit, enabled: curEnabled, monitored: curMonitored, monitored_every: curMonitoredEvery, tags: curTags}
 	);
 	
 	$posting.done(function(data) {
@@ -1250,6 +1297,8 @@ function okDialogHeater(curDevice, curName, curDisplay, curUnit, curEnabled, cur
 				globalOverview[curDevice].heaters[i].display = curDisplay;
 				globalOverview[curDevice].heaters[i].unit = curUnit;
 				globalOverview[curDevice].heaters[i].enabled = curEnabled;
+				globalOverview[curDevice].heaters[i].monitored = curMonitored;
+				globalOverview[curDevice].heaters[i].monitored_every = curMonitoredEvery;
 				globalOverview[curDevice].heaters[i].tags = curTags.split(',');
 			}
 		}
@@ -1264,10 +1313,22 @@ function editDimmer($dimmerAdminButton) {
 			$dialog.find('#dialog-dimmer-name').text(curDimmer.name);
 			$dialog.find('#dialog-dimmer-display').val(curDimmer.display);
 			$dialog.find('#dialog-dimmer-enabled').prop('checked', curDimmer.enabled);
+			$dialog.find('#dialog-dimmer-monitored').prop('checked', curDimmer.monitored);
+			$dialog.find('#dialog-dimmer-monitored-every').find('option[value="'+(curDimmer.monitored_every==0?1:curDimmer.monitored_every)+'"]').prop('selected', true);
       $dialog.find('#dialog-dimmer-tags').tagsinput('removeAll');
       for (var key in curDimmer.tags) {
         $dialog.find('#dialog-dimmer-tags').tagsinput('add', curDimmer.tags[key]);
       }
+			
+			if (!curDimmer.monitored) {
+				$dialog.find('#p-dialog-dimmer-monitored-every').hide();
+			} else {
+				$dialog.find('#p-dialog-dimmer-monitored-every').show();
+			}
+			
+			$dialog.find('#dialog-dimmer-monitored').unbind('change').change(function() {
+				$dialog.find('#p-dialog-dimmer-monitored-every').slideToggle();
+			});
 			
 			$dialog.on('keypress', function(e) {
 				var code = (e.keyCode ? e.keyCode : e.which);
@@ -1275,9 +1336,11 @@ function editDimmer($dimmerAdminButton) {
 					var curName=curDimmer.name;
 					var curDisplay=$(this).find('#dialog-dimmer-display').val();
 					var curEnabled=$(this).find('#dialog-dimmer-enabled').prop('checked')?'true':'false';
+					var curMonitored=$(this).find('#dialog-dimmer-monitored').prop('checked')?'true':'false';
+					var curMonitoredEvery=$(this).find('#dialog-dimmer-monitored-every').val();
           var curTags=$(this).find('#dialog-dimmer-tags').tagsinput('items').join();
 					
-					okDialogDimmer($dimmerAdminButton.attr('data-an-device'), curName, curDisplay, curEnabled, curTags);
+					okDialogDimmer($dimmerAdminButton.attr('data-an-device'), curName, curDisplay, curEnabled, curMonitored, curMonitoredEvery, curTags);
 					
 					$( this ).dialog( 'close' );
 				}
@@ -1294,9 +1357,11 @@ function editDimmer($dimmerAdminButton) {
 						var curName=curDimmer.name;
 						var curDisplay=$(this).find('#dialog-dimmer-display').val();
 						var curEnabled=$(this).find('#dialog-dimmer-enabled').prop('checked')?'true':'false';
+            var curMonitored=$(this).find('#dialog-dimmer-monitored').prop('checked')?'true':'false';
+            var curMonitoredEvery=$(this).find('#dialog-dimmer-monitored-every').val();
             var curTags=$(this).find('#dialog-dimmer-tags').tagsinput('items').join();
 						
-						okDialogDimmer($dimmerAdminButton.attr('data-an-device'), curName, curDisplay, curEnabled, curTags);
+						okDialogDimmer($dimmerAdminButton.attr('data-an-device'), curName, curDisplay, curEnabled, curMonitored, curMonitoredEvery, curTags);
 						
 						$( this ).dialog( 'close' );
 					}
@@ -1308,10 +1373,10 @@ function editDimmer($dimmerAdminButton) {
 	}
 }
 
-function okDialogDimmer(curDevice, curName, curDisplay, curEnabled, curTags) {
+function okDialogDimmer(curDevice, curName, curDisplay, curEnabled, curMonitored, curMonitoredEvery, curTags) {
 	var url = prefix+'/SETDIMMERDATA/';
 	var $posting = $.post(url,
-		{name: curName, device: curDevice, display: curDisplay, enabled: curEnabled, tags: curTags}
+		{name: curName, device: curDevice, display: curDisplay, enabled: curEnabled, monitored: curMonitored, monitored_every: curMonitoredEvery, tags: curTags}
 	);
 	
 	$posting.done(function(data) {
@@ -1331,6 +1396,8 @@ function okDialogDimmer(curDevice, curName, curDisplay, curEnabled, curTags) {
 			if (globalOverview[curDevice].dimmers[i].name == curName) {
 				globalOverview[curDevice].dimmers[i].display = curDisplay;
 				globalOverview[curDevice].dimmers[i].enabled = curEnabled;
+				globalOverview[curDevice].dimmers[i].monitored = curMonitored;
+				globalOverview[curDevice].dimmers[i].monitored_every = curMonitoredEvery;
 				globalOverview[curDevice].dimmers[i].tags = curTags.split(',');
 			}
 		}

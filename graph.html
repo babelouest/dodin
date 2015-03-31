@@ -62,8 +62,10 @@ function getUrlParameter(sParam) {
 $(document).ready(function(){
     
     var device = getUrlParameter('device');
-    var pin = getUrlParameter('pin')?getUrlParameter('pin'):'0';
-    var sensor = getUrlParameter('sensor')?getUrlParameter('sensor'):'0';
+    var switcher = getUrlParameter('switcher');
+    var sensor = getUrlParameter('sensor');
+    var dimmer = getUrlParameter('dimmer');
+    var heater = getUrlParameter('heater');
     var startDate = getUrlParameter('startDate')?getUrlParameter('startDate'):'';
     var unit = getUrlParameter('unit')==undefined?'':decodeURIComponent(getUrlParameter('unit'));
     var url;
@@ -72,7 +74,7 @@ $(document).ready(function(){
     
     initConfig();
     
-    url = prefix + '/MONITOR/'+device+'/'+pin+'/'+sensor+'/'+startDate;
+    url = prefix + '/MONITOR/'+device+'/'+switcher+'/'+sensor+'/'+dimmer+'/'+heater+'/'+startDate;
     
     var jqxhr = $.get( url, function(data) {
         try {

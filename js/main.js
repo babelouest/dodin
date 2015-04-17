@@ -24,6 +24,7 @@ var globalRadioDataToggle = false;
 var globalRadioSources = [];
 var globalCurrentRadioStream = '';
 var globalCameras = [];
+var globalRestart = false;
 
 function initConfig() {
     $.ajax({
@@ -51,11 +52,12 @@ function htmlI18n() {
 	$('#admin-action-global-add').attr('value', $.t('Add'));
 	$('#dialog-script-action-add').attr('value', $.t('Add'));
 	$('#refresh').attr('value', $.t('Refresh'));
-	$('#archive').attr('value', $.t('Run archive'));
 	$('#dialog-script-action-up').attr('value', $.t('Up'));
 	$('#dialog-script-action-down').attr('value', $.t('Down'));
 	$('#dialog-script-action-remove').attr('value', $.t('Remove'));
-  $('#global-archive-last-title').text($.t('Last archive completed')+':');
+	$('#restart-confirm').attr('value', $.t('Restart Angharad Server'));
+	$('#restart-yes').attr('value', $.t('Yes, I know what I\'m doing'));
+	$('#restart-no').attr('value', $.t('No, I will think again'));
 	$('.template').i18n();
 }
 
@@ -188,12 +190,6 @@ function initDevices() {
 				$(currentTab).show();
 				return false;
 			});
-			$('#a-admin-cameras').click(function() {
-				adminGlobal = !adminGlobal;
-				$('#tab-cameras .admin-button').slideToggle();
-				$('#tab-cameras .p-hidden').slideToggle();
-				return false;
-			});
 			
 			$('#tabs ul').append('<li><a href="#tab-global" id="href-global">'+$.t('Global')+'</a></li>');
 			var template = $('#template-global').html();
@@ -216,10 +212,6 @@ function initDevices() {
 			$('#refresh').click(function () {
 				refresh(true);
 			});
-
-			$('#archive').click(function() {
-				archive();
-			});
 			
 			$('#global-lang-select option[value="'+$.i18n.options.lng+'"]').prop('selected', true);
 			
@@ -237,10 +229,10 @@ function initDevices() {
 			
 			initSchedules();
 
-      updateArchiveDisplay();
-
 			toggleRadio(globalRadioToggle);
 			toggleRadioData(globalRadioDataToggle);
+      
+      toggleRestart();
 
 			$('#radio-toggle').click(function() {
 				toggleRadio(!globalRadioToggle);
@@ -253,6 +245,18 @@ function initDevices() {
 			$('#radio-list').change(function() {
 				changeRadioSource($(this).val());
 			});
+      
+      $('#restart-confirm').click(function() {
+        toggleRestart();
+      });
+      
+      $('#restart-no').click(function() {
+        toggleRestart();
+      });
+      
+      $('#restart-yes').click(function() {
+        restartServer();
+      });
 
 			$('#message').text('');
 			
@@ -279,37 +283,37 @@ function overviewDevice(deviceId) {
 		var json = $.parseJSON(data);
 		if (!json.syntax_error) {
 			globalOverview[deviceId] = json.device;
-      var switches_list = json.device.switches;
+		var switches_list = json.device.switches;
 			var $switches = $('#switch-'+deviceId+' .inside');
-      if (switches_list.length == 0) {
-        $('#switch-'+deviceId).hide();
-      }
-			for (var i=0; i<switches_list.length; i++) {
-				var switcher = switches_list[i];
-				var isChecked = switcher.status==1?'checked="checked"':'';
-				var switcherClass = '';
-				if (switcher.type == 0) {
-					// Normally on
-					switcherClass = 'sw-type-no';
-				} else if (switcher.type == 1) {
-					// Normally on
-					switcherClass = 'sw-type-nc';
-				} else if (switcher.type == 2) {
-					// Three-way
-					switcherClass = 'sw-type-tw';
-				}
-				var htmlSwitcher = '<p id="p-switch-'+deviceId+'-'+switcher.name+'" class="'+(!switcher.enabled?'p-hidden':'')+' '+switcherClass+'"><input type="button" class="admin-button admin-modify-graph" value="+" name="admin-switch-'+deviceId+'-'+switcher.name+'" id="admin-switch-'+deviceId+'-'+switcher.name+'" data-an-device="'+deviceId+'" data-an-switch="'+switcher.name+'" data-an-unit=""/><input type="checkbox" value="sw-'+deviceId+'-'+switcher.name+'" data-an-device="'+deviceId+'" data-an-switcher="'+switcher.name+'" name="sw-'+deviceId+'-'+switcher.name+'" id="sw-'+deviceId+'-'+switcher.name+'" '+isChecked+' data-an-display="'+switcher.enabled+'"/>';
-				htmlSwitcher += '<label for="sw-'+deviceId+'-'+switcher.name+'" id="label-sw-'+deviceId+'-'+switcher.name+'" >'+switcher.display+'</label>';
-				htmlSwitcher += '<label id="message-'+deviceId+'-'+switcher.name+'"></label></p>\n';
-				$switches.append(htmlSwitcher);
-				var $checkbox = $('#sw-'+deviceId+'-'+switcher.name);
-				$checkbox.change(function() {
-					var value = $(this).prop('checked')?'1':'0';
-					setSwitchValue($(this).attr('data-an-device'), $(this).attr('data-an-switcher'), value);
-				});
+		if (switches_list.length == 0) {
+			$('#switch-'+deviceId).hide();
+		}
+		for (var i=0; i<switches_list.length; i++) {
+			var switcher = switches_list[i];
+			var isChecked = switcher.status==1?'checked="checked"':'';
+			var switcherClass = '';
+			if (switcher.type == 0) {
+				// Normally on
+				switcherClass = 'sw-type-no';
+			} else if (switcher.type == 1) {
+				// Normally on
+				switcherClass = 'sw-type-nc';
+			} else if (switcher.type == 2) {
+				// Three-way
+				switcherClass = 'sw-type-tw';
 			}
-			
-			var $sensor = $('#sensor-'+deviceId+' .inside');
+			var htmlSwitcher = '<p id="p-switch-'+deviceId+'-'+switcher.name+'" class="'+(!switcher.enabled?'p-hidden':'')+' '+switcherClass+'"><input type="button" class="admin-button admin-modify-graph" value="+" name="admin-switch-'+deviceId+'-'+switcher.name+'" id="admin-switch-'+deviceId+'-'+switcher.name+'" data-an-device="'+deviceId+'" data-an-switch="'+switcher.name+'" data-an-unit=""/><input type="checkbox" value="sw-'+deviceId+'-'+switcher.name+'" data-an-device="'+deviceId+'" data-an-switcher="'+switcher.name+'" name="sw-'+deviceId+'-'+switcher.name+'" id="sw-'+deviceId+'-'+switcher.name+'" '+isChecked+' data-an-display="'+switcher.enabled+'"/>';
+			htmlSwitcher += '<label for="sw-'+deviceId+'-'+switcher.name+'" id="label-sw-'+deviceId+'-'+switcher.name+'" >'+switcher.display+'</label>';
+			htmlSwitcher += '<label id="message-'+deviceId+'-'+switcher.name+'"></label></p>\n';
+			$switches.append(htmlSwitcher);
+			var $checkbox = $('#sw-'+deviceId+'-'+switcher.name);
+			$checkbox.change(function() {
+				var value = $(this).prop('checked')?'1':'0';
+				setSwitchValue($(this).attr('data-an-device'), $(this).attr('data-an-switcher'), value);
+			});
+		}
+		
+		var $sensor = $('#sensor-'+deviceId+' .inside');
       var sensors_list = json.device.sensors;
       if (sensors_list.length == 0) {
         $('#sensor-'+deviceId).hide();
@@ -815,84 +819,12 @@ function refresh(force) {
 		getCameraFiles(camera, true);
 	}
 	
-  // Refresh last archive date
-  updateArchiveDisplay();
-  
 	var date = new Date();
 	if (footerMessage != "") {
 		$('#footer-message').text($.t('Last sync')+': '+date.toLocaleString()+'<br/>'+footerMessage);
 	} else {
 		$('#footer-message').text($.t('Last sync')+': '+date.toLocaleString());
 	}
-}
-
-function archive() {
-	var url = prefix+'/ARCHIVE/';
-	var $message = $('#header-message-global');
-	var archiveUpTo = $('#global-archive-up-to').val();
-	var curDate = new Date();
-	curDate.setHours(0);
-	curDate.setMinutes(0);
-	curDate.setSeconds(0);
-	switch (archiveUpTo) {
-		case "1-week":
-			curDate.setDate(curDate.getDate() - 7);
-			break;
-		case "2-weeks":
-			curDate.setDate(curDate.getDate() - 14);
-			break;
-		case "1-month":
-			curDate.setMonth(curDate.getMonth() - 1);
-			break;
-		case "3-months":
-			curDate.setMonth(curDate.getMonth() - 3);
-			break;
-		case "1-year":
-			curDate.setFullYear(curDate.getFullYear() - 1);
-			break;
-	}
-	url += parseInt(curDate.getTime() / 1000);
-	var jqxhr = $.get( url, function(data) {
-		var json = $.parseJSON(data);
-		if (json.result != 'error') {
-			$message.text($.t('Archive launched'));
-		} else {
-			$message.text($.t('Error running archive'));
-		}
-		setTimeout(function() {
-			$message.text('');
-		}, 10000);
-	})
-	.fail(function() {
-		$message.text($.t('Error running archive')+', '+$.t('network error'));
-		setTimeout(function() {
-			$message.text('');
-		}, 10000);
-	});
-}
-
-function updateArchiveDisplay() {
-	var url = prefix + '/LASTARCHIVE';
-	
-  var jqxhr = $.get( url, function(data) {
-    var json = $.parseJSON(data);
-    if (json.result == 'ok') {
-      if (json.last_archive > 0) {
-        var lastArchive = new Date(json.last_archive * 1000);
-        $('#global-archive-last').text(lastArchive.toLocaleString());
-      } else {
-        $('#global-archive-last').text($.t('Never'));
-      }
-      $('#global-archive-ongoing').text(json.archive_running?$.t('Currently archiving...'):'');
-    } else {
-      $('#global-archive-last').text($.t('Error getting last archive date'));
-      $('#global-archive-ongoing').text('');
-    }
-  })
-  .fail(function() {
-    $('#global-archive-last').text($.t('Error getting last archive date'));
-    $('#global-archive-ongoing').text('');
-  });
 }
 
 function updateMpds() {
@@ -2804,4 +2736,41 @@ function changeRadioSource(sourceId) {
 		$('#radio-stream').load()
 		$('#radio-list-song').empty();
 	}
+}
+
+function toggleRestart() {
+  if (globalRestart) {
+    globalRestart = false;
+    $('#p-restart-confirm').slideDown();
+    $('#p-restart-launch').slideUp();
+  } else {
+    globalRestart = true;
+    $('#p-restart-confirm').slideUp();
+    $('#p-restart-launch').slideDown();
+  }
+}
+
+function restartServer() {
+  toggleRestart();
+  
+  $message = $('#header-message-restart');
+  var url = prefix+'/RESTARTSERVER/';
+  var jqxhr = $.get(url, function(data) {
+    restart = $.parseJSON(data);
+    
+    if (restart.result == 'error') {
+      $message.text($.t('Error restarting server'));
+    } else {
+      $message.text($.t('Server restart in progress, this might take a while'));
+    }
+    setTimeout(function() {
+      $message.text('');
+    }, 10000);
+  })
+  .fail(function() {
+    $message.text($.t('Server restart in progress, this might take a while'));
+    setTimeout(function() {
+      $message.text('');
+    }, 10000);
+  });
 }

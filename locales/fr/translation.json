@@ -155,15 +155,6 @@
     "Last 3 months": "Derniers 3 mois",
     "Last year": "Dernière année",
     "Close": "Fermer",
-    "Archive": "Archivage",
-    "Archive up to": "Archiver jusqu'à",
-    "Run archive": "Lancer l'archivage",
-    "Archive launched": "Archivage lancé",
-    "Error running archive": "Erreur lors du lancement de l'archivage",
-    "Last archive completed": "Date du dernier archivage",
-    "Never": "Jamais",
-    "Currently archiving...": "Archivage en cours...",
-    "Error getting last archive date": "Erreur lors de la récupération de la date du dernier archivage",
     "Last snapshot": "Dernière image",
     "Pictures list": "Liste des images",
     "Pictures type": "Types d'images",
@@ -189,5 +180,11 @@
     "You must enter a script name": "Vous devez saisir un nom pour la tâche",
     "You must enter at least one action": "Vous devez ajouter au moins une action",
     "Graph": "Graphique",
-    "Dimmers": "Gradateurs"
+    "Dimmers": "Gradateurs",
+    "Restart server": "Redémarrer le serveur",
+    "Restart Angharad Server": "Redémarrer le Serveur Angharad",
+    "Yes, I know what I'm doing": "Oui, je sais ce que je suis en train de faire",
+    "No, I will think again": "Non, je vais encore y réfléchir",
+    "Error restarting server": "Erreur lors du redémarrage du serveur",
+    "Server restart in progress, this might take a while": "Redémarrage du serveur en cours, cela peut prendre quelques temps"
 }

@@ -125,26 +125,18 @@ Licenced under AGPL
           <label id="header-message-global"></label>
         </p>
       </div>
-      <div id="archive-global" class="archive">
-        <div class="inside">
-          <h3 data-i18n>Archive</h3>
+      <div id="restart-global" class="restart block">
+        <div id="inner-restart" class="inside">
+          <h3 data-i18n>Restart server</h3>
           <p>
-            <label id="global-archive-last-title" for="global-archive-last" data-i18n>Last archive completed:</label>
-            <label id="global-archive-last" data-i18n></label>
-            <label id="global-archive-ongoing"></label>
+            <label id="header-message-restart"></label>
           </p>
-          <p>
-            <label for="global-archive-up-to" data-i18n>Archive up to</label>
-            <select id="global-archive-up-to" name="global-archive-up-to">
-              <option value="1-week" data-i18n>Last week</option>
-              <option value="2-weeks" data-i18n>Last 2 weeks</option>
-              <option value="1-month" data-i18n>Last month</option>
-              <option value="3-months" data-i18n>Last 3 months</option>
-              <option value="1-year" data-i18n>Last year</option>
-            </select>
+          <p id="p-restart-launch" class="restart">
+            <input type="button" id="restart-confirm" name="restart-confirm" value="Restart Angharad Server" class="styled-button" data-i18n />
           </p>
-          <p>
-            <input type="button" name="archive" id="archive" value="Run archive" class="styled-button" data-i18n />
+          <p id="p-restart-confirm" class="restart">
+            <input type="button" id="restart-yes" name="restart-yes" value="Yes, I know what I'm doing" class="styled-button" data-i18n />&nbsp;
+            <input type="button" id="restart-no" name="restart-no" value="No, I will think again" class="styled-button" data-i18n />
           </p>
         </div>
       </div>

@@ -63,87 +63,87 @@ function htmlI18n() {
 
 $(document).ready(function() {
 
-    $.i18n.init({fallbackLng:'en'}).done(function() {
-        htmlI18n();
-    	$.contextMenu({
-    		selector: '.admin-modify-delete',
-    		trigger: 'left',
-    		callback: function (key, options) {
-    			if (key == 'edit') {
-    				if ($(this).attr('name').indexOf('admin-global-action') == 0) {
-    					editAction($(this));
-    				} else if ($(this).attr('name').indexOf('admin-global-script') == 0 || $(this).attr('name').indexOf('admin-script') == 0) {
-    					editScript($(this));
-    				} else if ($(this).attr('name').indexOf('admin-global-schedule') == 0 || $(this).attr('name').indexOf('admin-schedule') == 0) {
-    					editSchedule($(this));
-    				}
-    			} else {
-    				if ($(this).attr('name').indexOf('admin-global-action') == 0) {
-    					deleteAction($(this));
-    				} else if ($(this).attr('name').indexOf('admin-global-script') == 0 || $(this).attr('name').indexOf('admin-script') == 0) {
-    					deleteScript($(this));
-    				} else if ($(this).attr('name').indexOf('admin-global-schedule') == 0 || $(this).attr('name').indexOf('admin-schedule') == 0) {
-    					deleteSchedule($(this));
-    				}
-    			}
-    		},
-    		items: {
-    			'edit': {name: $.t('Edit'), icon: 'edit'},
-    			'delete': {name: $.t('Delete'), icon: 'delete'},
-    		}
-    	});
-    		
-    	$.contextMenu({
-    		selector: '.admin-modify-graph',
-    		trigger: 'left',
-    		callback: function (key, options) {
-    			if (key == 'graph') {
-    				if ($(this).attr('name').indexOf('admin-sensor-') == 0) {
-    					monitorElement($(this));
-    				} else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
-    					monitorElement($(this));
-    				} else if ($(this).attr('name').indexOf('admin-dimmer-') == 0) {
-    					monitorElement($(this));
-    				} else if ($(this).attr('name').indexOf('admin-heater-') == 0) {
-    					monitorElement($(this));
-    				}
-    			} else {
-    				if ($(this).attr('name').indexOf('admin-sensor-') == 0) {
-    					editSensor($(this));
-    				} else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
-    					editSwitch($(this));
-    				} else if ($(this).attr('name').indexOf('admin-dimmer-') == 0) {
-    					editDimmer($(this));
-    				} else if ($(this).attr('name').indexOf('admin-heater-') == 0) {
-    					editHeater($(this));
-    				}
-    			}
-    		},
-    		items: {
-    			'edit': {name: $.t('Edit'), icon: 'edit'},
-    			'graph': {name: $.t('Graph'), icon: 'graph'},
-    		}
-    	});
-    
-    	$.contextMenu({
-    		selector: '.admin-modify',
-    		trigger: 'left',
-    		callback: function (key, options) {
-    			if ($(this).attr('name').indexOf('admin-sensor-') == 0) {
-    				editSensor($(this));
-    			} else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
-    				editSwitch($(this));
-    			} else if ($(this).attr('name').indexOf('admin-dimmer-') == 0) {
-    				editDimmer($(this));
-    			} else if ($(this).attr('name').indexOf('admin-heater-') == 0) {
-    				editHeater($(this));
-    			}
-    		},
-    		items: {
-    			'edit': {name: $.t('Edit'), icon: 'edit'},
-    		}
-    	});
+  $.i18n.init({fallbackLng:'en'}).done(function() {
+    htmlI18n();
+    $.contextMenu({
+      selector: '.admin-modify-delete',
+      trigger: 'left',
+      callback: function (key, options) {
+        if (key == 'edit') {
+          if ($(this).attr('name').indexOf('admin-global-action') == 0) {
+            editAction($(this));
+          } else if ($(this).attr('name').indexOf('admin-global-script') == 0 || $(this).attr('name').indexOf('admin-script') == 0) {
+            editScript($(this));
+          } else if ($(this).attr('name').indexOf('admin-global-schedule') == 0 || $(this).attr('name').indexOf('admin-schedule') == 0) {
+            editSchedule($(this));
+          }
+        } else {
+          if ($(this).attr('name').indexOf('admin-global-action') == 0) {
+            deleteAction($(this));
+          } else if ($(this).attr('name').indexOf('admin-global-script') == 0 || $(this).attr('name').indexOf('admin-script') == 0) {
+            deleteScript($(this));
+          } else if ($(this).attr('name').indexOf('admin-global-schedule') == 0 || $(this).attr('name').indexOf('admin-schedule') == 0) {
+            deleteSchedule($(this));
+          }
+        }
+      },
+      items: {
+        'edit': {name: $.t('Edit'), icon: 'edit'},
+        'delete': {name: $.t('Delete'), icon: 'delete'},
+      }
     });
+      
+    $.contextMenu({
+      selector: '.admin-modify-graph',
+      trigger: 'left',
+      callback: function (key, options) {
+        if (key == 'graph') {
+          if ($(this).attr('name').indexOf('admin-sensor-') == 0) {
+            monitorElement($(this));
+          } else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
+            monitorElement($(this));
+          } else if ($(this).attr('name').indexOf('admin-dimmer-') == 0) {
+            monitorElement($(this));
+          } else if ($(this).attr('name').indexOf('admin-heater-') == 0) {
+            monitorElement($(this));
+          }
+        } else {
+          if ($(this).attr('name').indexOf('admin-sensor-') == 0) {
+            editSensor($(this));
+          } else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
+            editSwitch($(this));
+          } else if ($(this).attr('name').indexOf('admin-dimmer-') == 0) {
+            editDimmer($(this));
+          } else if ($(this).attr('name').indexOf('admin-heater-') == 0) {
+            editHeater($(this));
+          }
+        }
+      },
+      items: {
+        'edit': {name: $.t('Edit'), icon: 'edit'},
+        'graph': {name: $.t('Graph'), icon: 'graph'},
+      }
+    });
+  
+    $.contextMenu({
+      selector: '.admin-modify',
+      trigger: 'left',
+      callback: function (key, options) {
+        if ($(this).attr('name').indexOf('admin-sensor-') == 0) {
+          editSensor($(this));
+        } else if ($(this).attr('name').indexOf('admin-switch-') == 0) {
+          editSwitch($(this));
+        } else if ($(this).attr('name').indexOf('admin-dimmer-') == 0) {
+          editDimmer($(this));
+        } else if ($(this).attr('name').indexOf('admin-heater-') == 0) {
+          editHeater($(this));
+        }
+      },
+      items: {
+        'edit': {name: $.t('Edit'), icon: 'edit'},
+      }
+    });
+  });
 
 	initConfig();
 	
@@ -171,7 +171,7 @@ function initDevices() {
 				$('#tab-'+device.name).hide();
 				$('#href-'+device.name).click(function(){
 					$('#tabs ul li').removeClass('active');
-					$(this).parent().addClass('active'); 
+					$(this).parent().addClass('active');
 					var currentTab = $(this).attr('href'); 
 					$('#tabs .tab').hide();
 					$(currentTab).show();
@@ -1966,73 +1966,75 @@ function okScript($dialog) {
 	
 	$posting.done(function(data) {
 		var json = $.parseJSON(data);
-		var script = json.script;
-		script.actions = [];
-		var i=0;
-		$dialog.find('#dialog-script-actions option').each(function () {
-			script.actions[i] = {id:$(this).val(), name:$(this).text(), enabled:$(this).attr('data-an-enabled')=='true', rank:i+1};
-			i++;
-		});
-		globalScripts[script.id] = script;
-		scriptId = script.id;
-		scriptName = script.name;
-		if (isAdd) {
-			var enabled = script.enabled?'enabled="true"':'enabled="false"';
-			var htmlScript = '<p><input type="button" id="admin-global-script-'+script.id+'" name="admin-global-script-'+script.id+'" data-an-script-id="'+script.id+'" class="admin-button admin-modify-delete" value="+"><input type="button" data-an-script-id="'+script.id+'" data-an-device="" name="script-'+script.id+'" id="script-'+script.id+'" value="'+script.name+'" '+enabled+' class="styled-button"><label id="message-script-'+script.id+'"></label></p>\n';
-			$('#script-global .inside').append(htmlScript);
-			if (adminGlobal) {
-				$('#admin-global-script-'+script.id).slideDown();
-			} else {
-				$('#admin-global-script-'+script.id).slideUp();
-			}
-			$('#script-'+script.id).click(function() {
-				runScript(this);
-			});
-			
-			if (script.device != "") {
-				htmlScript = '<p><input type="button" id="admin-script-'+script.id+'" name="admin-script-'+script.id+'" data-an-script-id="'+script.id+'" class="admin-button admin-modify-delete" value="+"><input type="button" data-an-script-id="'+script.id+'" data-an-device="'+script.device+'" name="script-'+script.device+'-'+script.id+'" id="script-'+script.device+'-'+script.id+'" value="'+script.name+'" '+enabled+' class="styled-button"/><label id="message-script-'+script.device+'-'+script.id+'"></label></p>\n';
-				$('#script-'+script.device+' .inside').append(htmlScript);
-				if (devicesTab[script.device].admin) {
-					$('#admin-script-'+script.id).slideDown();
-				} else {
-					$('#admin-script-'+script.id).slideUp();
-				}
-
-				$('#script-'+script.device+'-'+script.id).click(function() {
-					runScript(this);
-				});
-			}
-      var urlAction = prefix + '/ADDACTION/';
-      var params = {};
-      params.name = 'script - '+scriptName;
-      params.type = 77;
-      params.device = '';
-      params.dimmers = '';
-      params.switcher = '';
-      params.heater = '';
-      params.params = scriptId;
-      
-      var $postingAction = $.post(urlAction, params);
-      $postingAction.done(function(dataAction) {
-        var jsonAction = $.parseJSON(dataAction)
-        var newAction = jsonAction.action;
-        globalActions[newAction.id] = newAction;
-        var htmlAction = '<p id="p-admin-global-action-'+newAction.id+'"><input type="button" id="admin-global-action-'+newAction.id+'" name="admin-global-action-'+newAction.id+'" data-an-action-id="'+newAction.id+'" class="admin-button admin-modify-delete" value="+"><label id="global-action-name-'+newAction.id+'">'+newAction.name+'</label></p>\n';
-        $('#action-global .inside').append(htmlAction);
-        if (adminGlobal) {
-          $('#admin-global-action-'+newAction.id).slideDown();
-        } else {
-          $('#admin-global-action-'+newAction.id).slideUp();
-        }
+    if (json.result != 'error') {
+      var script = json.script;
+      script.actions = [];
+      var i=0;
+      $dialog.find('#dialog-script-actions option').each(function () {
+        script.actions[i] = {id:$(this).val(), name:$(this).text(), enabled:$(this).attr('data-an-enabled')=='true', rank:i+1};
+        i++;
       });
-    } else {
-			$('#script-'+script.id).val(script.name);
-			for (var key in devicesTab) {
-				if ($('#script-'+devicesTab[key].name+'-'+script.id).length > 0) {
-					$('#script-'+devicesTab[key].name+'-'+script.id).val(script.name);
-				}
-			}
-		}
+      globalScripts[script.id] = script;
+      scriptId = script.id;
+      scriptName = script.name;
+      if (isAdd) {
+        var enabled = script.enabled?'enabled="true"':'enabled="false"';
+        var htmlScript = '<p><input type="button" id="admin-global-script-'+script.id+'" name="admin-global-script-'+script.id+'" data-an-script-id="'+script.id+'" class="admin-button admin-modify-delete" value="+"><input type="button" data-an-script-id="'+script.id+'" data-an-device="" name="script-'+script.id+'" id="script-'+script.id+'" value="'+script.name+'" '+enabled+' class="styled-button"><label id="message-script-'+script.id+'"></label></p>\n';
+        $('#script-global .inside').append(htmlScript);
+        if (adminGlobal) {
+          $('#admin-global-script-'+script.id).slideDown();
+        } else {
+          $('#admin-global-script-'+script.id).slideUp();
+        }
+        $('#script-'+script.id).click(function() {
+          runScript(this);
+        });
+        
+        if (script.device != "") {
+          htmlScript = '<p><input type="button" id="admin-script-'+script.id+'" name="admin-script-'+script.id+'" data-an-script-id="'+script.id+'" class="admin-button admin-modify-delete" value="+"><input type="button" data-an-script-id="'+script.id+'" data-an-device="'+script.device+'" name="script-'+script.device+'-'+script.id+'" id="script-'+script.device+'-'+script.id+'" value="'+script.name+'" '+enabled+' class="styled-button"/><label id="message-script-'+script.device+'-'+script.id+'"></label></p>\n';
+          $('#script-'+script.device+' .inside').append(htmlScript);
+          if (devicesTab[script.device].admin) {
+            $('#admin-script-'+script.id).slideDown();
+          } else {
+            $('#admin-script-'+script.id).slideUp();
+          }
+
+          $('#script-'+script.device+'-'+script.id).click(function() {
+            runScript(this);
+          });
+        }
+        var urlAction = prefix + '/ADDACTION/';
+        var params = {};
+        params.name = 'script - '+scriptName;
+        params.type = 77;
+        params.device = '';
+        params.dimmers = '';
+        params.switcher = '';
+        params.heater = '';
+        params.params = scriptId;
+        
+        var $postingAction = $.post(urlAction, params);
+        $postingAction.done(function(dataAction) {
+          var jsonAction = $.parseJSON(dataAction)
+          var newAction = jsonAction.action;
+          globalActions[newAction.id] = newAction;
+          var htmlAction = '<p id="p-admin-global-action-'+newAction.id+'"><input type="button" id="admin-global-action-'+newAction.id+'" name="admin-global-action-'+newAction.id+'" data-an-action-id="'+newAction.id+'" class="admin-button admin-modify-delete" value="+"><label id="global-action-name-'+newAction.id+'">'+newAction.name+'</label></p>\n';
+          $('#action-global .inside').append(htmlAction);
+          if (adminGlobal) {
+            $('#admin-global-action-'+newAction.id).slideDown();
+          } else {
+            $('#admin-global-action-'+newAction.id).slideUp();
+          }
+        });
+      } else {
+        $('#script-'+script.id).val(script.name);
+        for (var key in devicesTab) {
+          if ($('#script-'+devicesTab[key].name+'-'+script.id).length > 0) {
+            $('#script-'+devicesTab[key].name+'-'+script.id).val(script.name);
+          }
+        }
+      }
+    }
 	});
 	$dialog.dialog( 'close' ); 
 }

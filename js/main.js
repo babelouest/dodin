@@ -27,18 +27,17 @@ var globalCameras = [];
 var globalRestart = false;
 
 function initConfig() {
-    $.ajax({
-        async: false,
-        type: 'GET',
-        url: 'config/config.json',
-        success: function(data) {
-            prefix = data.prefix;
-        },
-        fail: function() {
-            $('#message-'+deviceId).text($.t('Error getting config'));
-        }
-    });
-    
+  $.ajax({
+      async: false,
+      type: 'GET',
+      url: 'config/config.json',
+      success: function(data) {
+          prefix = data.prefix;
+      },
+      fail: function() {
+          $('#message-'+deviceId).text($.t('Error getting config'));
+      }
+  });
 }
 
 function htmlI18n() {
@@ -1037,6 +1036,7 @@ function editSensor($sensorAdminButton) {
 			$dialog.find('#dialog-sensor-name').text(curSensor.name);
 			$dialog.find('#dialog-sensor-display').val(curSensor.display);
 			$dialog.find('#dialog-sensor-unit').val(curSensor.unit);
+      $dialog.find('#dialog-sensor-value-type').find('option[value="'+(curSensor.value_type)+'"]').prop('selected', true);
 			$dialog.find('#dialog-sensor-enabled').prop('checked', curSensor.enabled);
 			$dialog.find('#dialog-sensor-monitored').prop('checked', curSensor.monitored);
 			$dialog.find('#dialog-sensor-monitored-every').find('option[value="'+(curSensor.monitored_every==0?1:curSensor.monitored_every)+'"]').prop('selected', true);
@@ -1061,12 +1061,13 @@ function editSensor($sensorAdminButton) {
 					var curName=curSensor.name;
 					var curDisplay=$(this).find('#dialog-sensor-display').val();
 					var curUnit=$(this).find('#dialog-sensor-unit').val();
+          var curValueType=$(this).find('#dialog-sensor-value-type').val()
 					var curEnabled=$(this).find('#dialog-sensor-enabled').prop('checked')?'true':'false';
 					var curMonitored=$(this).find('#dialog-sensor-monitored').prop('checked')?'true':'false';
 					var curMonitoredEvery=$(this).find('#dialog-sensor-monitored-every').val();
           var curTags=$(this).find('#dialog-sensor-tags').tagsinput('items').join();
 					
-					okDialogSensor($sensorAdminButton.attr('data-an-device'), curName, curDisplay, curUnit, curEnabled, curMonitored, curMonitoredEvery, curTags);
+					okDialogSensor($sensorAdminButton.attr('data-an-device'), curName, curDisplay, curUnit, curValueType, curEnabled, curMonitored, curMonitoredEvery, curTags);
 					
 					$( this ).dialog( 'close' );
 				}
@@ -1083,12 +1084,13 @@ function editSensor($sensorAdminButton) {
 						var curName=curSensor.name;
 						var curDisplay=$(this).find('#dialog-sensor-display').val();
 						var curUnit=$(this).find('#dialog-sensor-unit').val();
+            var curValueType=$(this).find('#dialog-sensor-value-type').val()
 						var curEnabled=$(this).find('#dialog-sensor-enabled').prop('checked')?'true':'false';
 						var curMonitored=$(this).find('#dialog-sensor-monitored').prop('checked')?'true':'false';
 						var curMonitoredEvery=$(this).find('#dialog-sensor-monitored-every').val();
             var curTags=$(this).find('#dialog-sensor-tags').tagsinput('items').join();
 						
-						okDialogSensor($sensorAdminButton.attr('data-an-device'), curName, curDisplay, curUnit, curEnabled, curMonitored, curMonitoredEvery, curTags);
+						okDialogSensor($sensorAdminButton.attr('data-an-device'), curName, curDisplay, curUnit, curValueType, curEnabled, curMonitored, curMonitoredEvery, curTags);
 						
 						$( this ).dialog( 'close' );
 					}
@@ -1100,10 +1102,10 @@ function editSensor($sensorAdminButton) {
 	}
 }
 
-function okDialogSensor(curDevice, curName, curDisplay, curUnit, curEnabled, curMonitored, curMonitoredEvery, curTags) {
+function okDialogSensor(curDevice, curName, curDisplay, curUnit, curValueType, curEnabled, curMonitored, curMonitoredEvery, curTags) {
 	var url = prefix+'/SETSENSORDATA/';
 	var $posting = $.post(url,
-		{name: curName, device: curDevice, display: curDisplay, unit: curUnit, enabled: curEnabled, monitored: curMonitored, monitored_every: curMonitoredEvery, tags: curTags}
+		{name: curName, device: curDevice, display: curDisplay, unit: curUnit, value_type:curValueType, enabled: curEnabled, monitored: curMonitored, monitored_every: curMonitoredEvery, tags: curTags}
 	);
 	
 	$posting.done(function(data) {
@@ -1123,6 +1125,7 @@ function okDialogSensor(curDevice, curName, curDisplay, curUnit, curEnabled, cur
 			if (globalOverview[curDevice].sensors[i].name == curName) {
 				globalOverview[curDevice].sensors[i].display = curDisplay;
 				globalOverview[curDevice].sensors[i].unit = curUnit;
+				globalOverview[curDevice].sensors[i].value_type = curValueType;
 				globalOverview[curDevice].sensors[i].enabled = curEnabled;
 				globalOverview[curDevice].sensors[i].monitored = curMonitored;
 				globalOverview[curDevice].sensors[i].monitoredEvery = curMonitoredEvery;
@@ -1140,6 +1143,7 @@ function editHeater($heaterAdminButton) {
 			$dialog.find('#dialog-heater-name').text(curHeater.name);
 			$dialog.find('#dialog-heater-display').val(curHeater.display);
 			$dialog.find('#dialog-heater-unit').val(curHeater.unit);
+      $dialog.find('#dialog-heater-value-type').find('option[value="'+(curHeater.value_type)+'"]').prop('selected', true);
 			$dialog.find('#dialog-heater-enabled').prop('checked', curHeater.enabled);
 			$dialog.find('#dialog-heater-monitored').prop('checked', curHeater.monitored);
 			$dialog.find('#dialog-heater-monitored-every').find('option[value="'+(curHeater.monitored_every==0?1:curHeater.monitored_every)+'"]').prop('selected', true);
@@ -1164,12 +1168,13 @@ function editHeater($heaterAdminButton) {
 					var curName=curHeater.name;
 					var curDisplay=$(this).find('#dialog-heater-display').val();
 					var curUnit=$(this).find('#dialog-heater-unit').val();
+          var curValueType=$(this).find('#dialog-heater-value-type').val();
 					var curEnabled=$(this).find('#dialog-heater-enabled').prop('checked')?'true':'false';
 					var curMonitored=$(this).find('#dialog-heater-monitored').prop('checked')?'true':'false';
 					var curMonitoredEvery=$(this).find('#dialog-heater-monitored-every').val();
           var curTags=$(this).find('#dialog-heater-tags').tagsinput('items').join();
 					
-					okDialogHeater($heaterAdminButton.attr('data-an-device'), curName, curDisplay, curUnit, curEnabled, curMonitored, curMonitoredEvery, curTags);
+					okDialogHeater($heaterAdminButton.attr('data-an-device'), curName, curDisplay, curUnit, curValueType, curEnabled, curMonitored, curMonitoredEvery, curTags);
 					
 					$( this ).dialog( 'close' );
 				}
@@ -1186,12 +1191,13 @@ function editHeater($heaterAdminButton) {
 						var curName=curHeater.name;
 						var curDisplay=$(this).find('#dialog-heater-display').val();
 						var curUnit=$(this).find('#dialog-heater-unit').val();
+            var curValueType=$(this).find('#dialog-heater-value-type').val();
 						var curEnabled=$(this).find('#dialog-heater-enabled').prop('checked')?'true':'false';
             var curMonitored=$(this).find('#dialog-heater-monitored').prop('checked')?'true':'false';
             var curMonitoredEvery=$(this).find('#dialog-heater-monitored-every').val();
             var curTags=$(this).find('#dialog-heater-tags').tagsinput('items').join();
             
-						okDialogHeater($heaterAdminButton.attr('data-an-device'), curName, curDisplay, curUnit, curEnabled, curMonitored, curMonitoredEvery, curTags);
+						okDialogHeater($heaterAdminButton.attr('data-an-device'), curName, curDisplay, curUnit, curValueType, curEnabled, curMonitored, curMonitoredEvery, curTags);
 						$( this ).dialog( 'close' );
 					}
 				}]
@@ -1202,10 +1208,10 @@ function editHeater($heaterAdminButton) {
 	}
 }
 
-function okDialogHeater(curDevice, curName, curDisplay, curUnit, curEnabled, curMonitored, curMonitoredEvery, curTags) {
+function okDialogHeater(curDevice, curName, curDisplay, curUnit, curValueType, curEnabled, curMonitored, curMonitoredEvery, curTags) {
 	var url = prefix+'/SETHEATERDATA/';
 	var $posting = $.post(url,
-		{name: curName, device: curDevice, display: curDisplay, unit: curUnit, enabled: curEnabled, monitored: curMonitored, monitored_every: curMonitoredEvery, tags: curTags}
+		{name: curName, device: curDevice, display: curDisplay, unit: curUnit, value_type:curValueType, enabled: curEnabled, monitored: curMonitored, monitored_every: curMonitoredEvery, tags: curTags}
 	);
 	
 	$posting.done(function(data) {
@@ -1228,6 +1234,7 @@ function okDialogHeater(curDevice, curName, curDisplay, curUnit, curEnabled, cur
 			if (globalOverview[curDevice].heaters[i].name == curName) {
 				globalOverview[curDevice].heaters[i].display = curDisplay;
 				globalOverview[curDevice].heaters[i].unit = curUnit;
+				globalOverview[curDevice].heaters[i].value_type = curValueType;
 				globalOverview[curDevice].heaters[i].enabled = curEnabled;
 				globalOverview[curDevice].heaters[i].monitored = curMonitored;
 				globalOverview[curDevice].heaters[i].monitored_every = curMonitoredEvery;
